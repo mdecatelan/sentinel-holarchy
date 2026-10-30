@@ -1,3 +1,3 @@
-from .clamart_hub import ClamartTerritoryModel
+from .clamart_hub import ClamartTerritoryModel, UrbanWasteStream
 
-__all__ = ["ClamartTerritoryModel"]
+__all__ = ["ClamartTerritoryModel", "UrbanWasteStream"]
