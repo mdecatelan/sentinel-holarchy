@@ -1,0 +1,35 @@
+[
+  {
+    "batch_id": "CLAMART-2026-B01",
+    "intrant_type": "organique",
+    "t_total": 72.0,
+    "adaptation_factor": 1.0,
+    "final_GradeA": 32.2,
+    "final_GradeB": 1.95,
+    "final_GradeC": 185.9,
+    "raman_purity_pct": 85.0,
+    "ecocert_status": "APPROVED_UAB"
+  },
+  {
+    "batch_id": "CLAMART-2026-B02",
+    "intrant_type": "organique",
+    "t_total": 72.0,
+    "adaptation_factor": 1.24,
+    "final_GradeA": 39.93,
+    "final_GradeB": 1.95,
+    "final_GradeC": 185.9,
+    "raman_purity_pct": 87.4,
+    "ecocert_status": "APPROVED_UAB"
+  },
+  {
+    "batch_id": "CLAMART-2026-B03",
+    "intrant_type": "organique",
+    "t_total": 72.0,
+    "adaptation_factor": 1.38,
+    "final_GradeA": 44.44,
+    "final_GradeB": 1.95,
+    "final_GradeC": 185.9,
+    "raman_purity_pct": 94.2,
+    "ecocert_status": "APPROVED_UAB"
+  }
+]

@@ -1,0 +1,51 @@
+Ecocert, intrans, et Clotaire c'est quoi ?
+
+Ces trois termes sont directement liés à la certification en agriculture biologique (notamment via le référentiel français et européen) :
+
+Ecocert : organisme certificateur historique et indépendant de référence pour l'agriculture biologique, les cosmétiques écologiques et le commerce équitable. Il contrôle et délivre la certification attestant de la conformité aux règlements bio.
+
+Intrants (ou intrants agricoles) : ensemble des produits apportés aux terres ou aux cultures qui ne proviennent pas de l'exploitation elle-même (fertilisants, amendements, biostimulants, produits de protection des cultures, supports de culture). En bio, seuls certains intrants conformes au cahier des charges (dits « Utilisables en Agriculture Biologique » ou UAB) sont autorisés.
+
+Clotaire : la base de données interne et le système de gestion d'Ecocert (notamment pour l'évaluation, le référencement et la validation de la conformité des intrants utilisables en agriculture biologique). Lorsqu'un fabricant formule un amendement ou un fertilisant et demande une attestation d'utilisabilité en bio, son dossier est instruit et référencé dans cet outil.
+
+quels sont les criteres pour etre validé ?
+
+Pour qu’un intrant (fertilisant, amendement, biostimulant, matière de traitement) soit validé par Ecocert comme Utilisable en Agriculture Biologique (UAB), le produit doit respecter les critères stricts du Règlement (UE) 2018/848 (et ses règlements d'exécution, notamment le 2021/1165).
+
+L'évaluation porte à 100 % sur la formule et le procédé de fabrication :
+
+1. Origine et nature des matières premières
+Exclusion stricte des molécules de synthèse chimique : aucun pesticide de synthèse, aucun engrais azoté minéral de synthèse (ammonitrate, urée, etc.).
+
+Matières autorisées : substances d’origine végétale, animale (sous-produits réglementés), microbienne ou minérale naturelle (roches broyées, phosphates naturels faibles en cadmium, etc.).
+
+Exclusion totale des OGM : aucune matière première issue d'organismes génétiquement modifiés (y compris les substrats de fermentation ou souches microbiennes).
+
+Déchets ménagers triés à la source : pour les composts ou digestats, obligation d'utiliser des biodéchets collectés séparément (les boues de stations d’épuration urbaines et les composts d’ordures ménagères brutes sont formellement interdits).
+
+2. Procédés de transformation autorisés
+Procédés physiques et mécaniques : broyage, centrifugation, décantation, filtration, séchage, traitement thermique.
+
+Procédés biologiques : fermentation aérobie (compostage), fermentation anaérobie (méthanisation), action enzymatique.
+
+Extraction chimique limitée : solvants de synthèse interdits (usage exclusif de l'eau, de la vapeur ou de solvants naturels d'origine végétale comme l'éthanol bio).
+
+3. Seuils d'innocuité et contaminants
+Le produit fini doit respecter les normes d'innocuité (norme française NF ou marquage CE selon le Règlement Fertilisants UE 2019/1009) :
+
+Éléments traces métalliques (ETM) : seuils maximaux stricts sur le plomb, le cadmium, le mercure, l'arsenic, le nickel, le chrome et le cuivre.
+
+Microbiologie et pathogènes : absence de Salmonella, seuils limites sur Escherichia coli et les entérocoques.
+
+Polluants organiques et résidus : limites sur les HAP, PCB, PFAS et résidus de pesticides.
+
+4. Statut réglementaire de mise sur le marché
+Avant même l'évaluation UAB par Ecocert, l'intrant doit avoir une existence légale sur le marché français/européen :
+
+Soit être conforme à une norme homologuée (ex. NF U 42-001, NF U 44-051).
+
+Soit disposer d'une Autorisation de Mise sur le Marché (AMM) délivrée par l'Anses.
+
+Soit porter le marquage CE au titre du Règlement fertilisants de l'UE.
+
+Une fois ces éléments validés sur pièces (fiches techniques, FDS, analyses de laboratoire accrédité, schéma de fabrication) et après audit éventuel du site de production, Ecocert délivre une attestation de conformité permettant de revendiquer la mention « Utilisable en Agriculture Biologique ».

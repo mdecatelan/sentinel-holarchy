@@ -1,0 +1,52 @@
+[
+  {
+    "intrant_type": "algues",
+    "t_total": 72.0,
+    "adaptation_factor": 2.5,
+    "final_GradeA": 23.871,
+    "final_GradeB": 992.973,
+    "final_GradeC": -15.588,
+    "final_capital": 5432.88,
+    "final_pollution": 8.01
+  },
+  {
+    "intrant_type": "algues",
+    "t_total": 72.0,
+    "adaptation_factor": 0.5,
+    "final_GradeA": 23.891,
+    "final_GradeB": 912.012,
+    "final_GradeC": -15.575,
+    "final_capital": 5194.26,
+    "final_pollution": 8.04
+  },
+  {
+    "intrant_type": "algues",
+    "t_total": 72.0,
+    "adaptation_factor": 2.5,
+    "final_GradeA": 23.859,
+    "final_GradeB": 1025.943,
+    "final_GradeC": -15.6,
+    "final_capital": 5527.76,
+    "final_pollution": 8.0
+  },
+  {
+    "intrant_type": "algues",
+    "t_total": 72.0,
+    "adaptation_factor": 1.0,
+    "final_GradeA": 14.073,
+    "final_GradeB": 169.091,
+    "final_GradeC": 60.727,
+    "final_capital": 1268.04,
+    "final_pollution": 2.5
+  },
+  {
+    "intrant_type": "e_waste",
+    "t_total": 72.0,
+    "adaptation_factor": 1.0,
+    "final_GradeA": 0.913,
+    "final_GradeB": 0.97,
+    "final_GradeC": 6.761,
+    "final_capital": 452.82,
+    "final_pollution": 1.87
+  }
+]

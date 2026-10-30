@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sentinel-holarchy"
+version = "1.0.0"
+description = "Universal Bio-Foundry & Decentralized Holarchic Biorefinery (Bio-Drum 60L, OpenRAMAN, Mixed Microbial Cultures)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Marc & Sentinel-Algae Team" }
+]
+keywords = [
+    "biorefinery", "holarchy", "bioplastics", "pha", "openraman", 
+    "circular-economy", "esp32", "digital-twin", "ecocert"
+]
+dependencies = [
+    "numpy>=1.24.0",
+    "pydantic>=2.0.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pandas>=2.0.0",
+    "matplotlib>=3.7.0"
+]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --import-mode=importlib"
+testpaths = ["tests"]
+pythonpath = ["src"]
