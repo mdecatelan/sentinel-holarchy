@@ -1,6 +1,6 @@
 # 🌿 Sentinel-Holarchy: Universal Bio-Foundry & Decentralized Biorefinery
 
-[![Sentinel-Holarchy CI](https://github.com/your-username/sentinel-holarchy/actions/workflows/ci.yml/badge.svg)](https://github.com/your-username/sentinel-holarchy/actions)
+[![Sentinel-Holarchy CI](https://github.com/mdecatelan/sentinel-holarchy/actions/workflows/ci.yml/badge.svg)](https://github.com/mdecatelan/sentinel-holarchy/actions)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Hardware: Open-Source](https://img.shields.io/badge/Hardware-Open%20Source-green.svg)](docs/CLAMART_PROTOTYPE_GUIDE.md)
@@ -87,7 +87,7 @@ Polyhydroxyalkanoates        Organic Biostimulant          Calcium-Buffered
 ### 1. Installation
 Clone the repository and install dependencies:
 ```bash
-git clone https://github.com/your-username/sentinel-holarchy.git
+git clone https://github.com/mdecatelan/sentinel-holarchy.git
 cd sentinel-holarchy
 pip install -r requirements.txt
 pip install -e .
