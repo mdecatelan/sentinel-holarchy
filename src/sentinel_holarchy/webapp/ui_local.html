@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sentinel Holarchy — Serveur Local Jumeau Numérique (Zéro-Pesée)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --background: #090d16;
+      --card: #111827;
+      --secondary: #1e293b;
+      --foreground: #f8fafc;
+      --muted-foreground: #94a3b8;
+      --border: #334155;
+    }
+    body {
+      background-color: var(--background);
+      color: var(--foreground);
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+    }
+    input[type="range"] {
+      accent-color: #10b981;
+    }
+  </style>
+</head>
+<body class="p-4 md:p-6 antialiased">
+  <div class="max-w-7xl mx-auto space-y-5">
+
+    <!-- EN-TÊTE SERVEUR PYTHON LOCAL + MODE "ZÉRO PESÉE" -->
+    <div class="bg-[var(--card)] border border-emerald-500/40 rounded-2xl p-5 shadow-lg">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border-b border-[var(--border)] pb-4">
+        <div>
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+              🟢 SERVEUR PYTHON LOCAL ACTIF (127.0.0.1:8080)
+            </span>
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40">
+              🪣 PROTOCOLE "DUMP & GO" (ZÉRO PESÉE MANUELLE)
+            </span>
+            <span id="badge-fsm" class="px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/40">
+              2_ACIDOGENESE_ANAEROBIE
+            </span>
+          </div>
+          <h1 class="text-xl md:text-2xl font-bold mt-2">
+            Tu jettes ton seau en vrac : comment les capteurs devinent tout sans balance ?
+          </h1>
+          <p class="text-xs md:text-sm text-[var(--muted-foreground)] mt-0.5">
+            L'opérateur ne pèse <strong>jamais rien</strong>. Clique sur un seau ci-dessous : le serveur Python (<code class="text-emerald-400">auto_dosing.py</code> + <code class="text-emerald-400">kinetics.py</code>) calcule tout en direct.
+          </p>
+        </div>
+
+        <!-- BOUTONS "JETER UN SEAU EN VRAC" -->
+        <div class="flex flex-wrap gap-2">
+          <button onclick="throwBucket('kitchen')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition shadow">
+            🪣 1. Jeter un Seau Cuisine Vrac (~1.15 kg)
+          </button>
+          <button onclick="throwBucket('canteen_pasta')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-500 text-white transition shadow">
+            🍝 2. Jeter un Seau Cantine (Lourd en Pâtes/Pain)
+          </button>
+          <button onclick="throwBucket('algae_mix')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-cyan-600 hover:bg-cyan-500 text-white transition shadow">
+            🌿 3. Jeter un Seau Algues + Épluchures
+          </button>
+          <button onclick="throwBucket('empty_cartridge')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-rose-600/80 hover:bg-rose-500 text-white transition shadow">
+            ⚠️ 4. Panier Coquilles Vide (Crash pH)
+          </button>
+        </div>
+      </div>
+
+      <!-- CURSEUR TEMPOREL 0h -> 73h -->
+      <div class="mt-4 space-y-2">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="btn-play" onclick="togglePlay()" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950 hover:bg-emerald-400 transition">
+              ▶ Lecture Auto (0h → 73h)
+            </button>
+            <button onclick="setHour(0.5)" class="px-2.5 py-1 rounded text-xs bg-[var(--secondary)] hover:bg-slate-700">0.5h (Auto-Diagnostic)</button>
+            <button onclick="setHour(18)" class="px-2.5 py-1 rounded text-xs bg-[var(--secondary)] hover:bg-slate-700">18h (Cœur Acide)</button>
+            <button onclick="setHour(36)" class="px-2.5 py-1 rounded text-xs bg-[var(--secondary)] hover:bg-slate-700">36h (Essorage 650 RPM)</button>
+            <button onclick="setHour(52)" class="px-2.5 py-1 rounded text-xs bg-[var(--secondary)] hover:bg-slate-700">52h (Gavage PHA)</button>
+            <button onclick="setHour(72.5)" class="px-2.5 py-1 rounded text-xs bg-[var(--secondary)] hover:bg-slate-700">72.5h (Récolte 70°C)</button>
+          </div>
+          <div>
+            <span class="text-xs text-[var(--muted-foreground)]">Heure du cycle :</span>
+            <span id="lbl-hour" class="text-lg font-mono font-bold text-emerald-400 ml-1">t = 18.0 h</span>
+          </div>
+        </div>
+        <input id="slider-time" type="range" min="0" max="73" step="0.5" value="18" oninput="onTimeChange(this.value)" class="w-full h-2.5 cursor-pointer" />
+      </div>
+    </div>
+
+    <!-- LIGNE 1 : LES 3 ASTUCES MATÉRIELLES "ZÉRO PESÉE" (POURQUOI L'OPÉRATEUR NE PÈSE RIEN) -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+      <!-- ASTUCE 1 : JAUGE DE POIDS SOUS LES PIEDS (HX711) + VANNE D'EAU AUTO -->
+      <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4">
+        <div class="flex items-center justify-between border-b border-[var(--border)] pb-2 mb-3">
+          <span class="text-xs font-bold uppercase text-emerald-400">⚖️ BOÎTE A — Tare Auto & Eau Auto (HX711)</span>
+          <span class="text-xs font-mono px-2 py-0.5 rounded bg-[var(--secondary)]">Coût : 2,50 €</span>
+        </div>
+        <p class="text-xs text-[var(--muted-foreground)] mb-3">
+          4 jauges de contrainte sous les pieds du tambour pèsent ce que tu jettes en vrac et ouvrent l'électrovanne d'eau toutes seules :
+        </p>
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <div class="p-2.5 rounded-xl bg-[var(--secondary)]">
+            <div class="text-[var(--muted-foreground)]">Déchets jetés (HX711)</div>
+            <div id="zd-waste" class="font-mono font-bold text-base text-white mt-0.5">1.15 kg</div>
+          </div>
+          <div class="p-2.5 rounded-xl bg-[var(--secondary)]">
+            <div class="text-[var(--muted-foreground)]">Eau injectée toute seule</div>
+            <div id="zd-water" class="font-mono font-bold text-base text-cyan-400 mt-0.5">+1.73 L</div>
+          </div>
+        </div>
+        <div class="mt-3 text-xs flex items-center justify-between text-[var(--muted-foreground)]">
+          <span>Ajuster le poids du seau jeté :</span>
+          <input id="in-waste" type="range" min="0.4" max="2.5" step="0.05" value="1.15" onchange="fetchSimulation()" class="w-36" />
+        </div>
+      </div>
+
+      <!-- ASTUCE 2 : CARTOUCHE MINÉRALE PASSIVE (COQUILLES D'ŒUFS / HUÎTRES EN EXCÈS) -->
+      <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4">
+        <div class="flex items-center justify-between border-b border-[var(--border)] pb-2 mb-3">
+          <span class="text-xs font-bold uppercase text-amber-400">🥚 BOÎTE B — Panier Passif CaCO₃ (Sans Dosage)</span>
+          <span class="text-xs font-mono px-2 py-0.5 rounded bg-[var(--secondary)]">Recharge 1× / mois</span>
+        </div>
+        <p class="text-xs text-[var(--muted-foreground)] mb-3">
+          Un panier inox contient <strong>250 g</strong> de coquilles broyées. Comme le $\text{CaCO}_3$ est <strong>insoluble à pH neutre</strong>, il ne se dissout que si l'acide l'attaque !
+        </p>
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <div class="p-2.5 rounded-xl bg-[var(--secondary)]">
+            <div class="text-[var(--muted-foreground)]">Dissous sur ce batch</div>
+            <div id="zd-caco3-used" class="font-mono font-bold text-base text-amber-400 mt-0.5">38.4 g</div>
+          </div>
+          <div class="p-2.5 rounded-xl bg-[var(--secondary)]">
+            <div class="text-[var(--muted-foreground)]">Reste dans le panier</div>
+            <div id="zd-caco3-left" class="font-mono font-bold text-base text-emerald-400 mt-0.5">181.6 g (5 tournées)</div>
+          </div>
+        </div>
+        <div class="mt-2.5 w-full h-2 rounded-full bg-[var(--secondary)] overflow-hidden">
+          <div id="bar-cartridge" class="h-full bg-emerald-500 transition-all" style="width: 72%"></div>
+        </div>
+      </div>
+
+      <!-- ASTUCE 3 : INFÉRENCE AVEUGLE EN MACÉRATION (0h -> 2h) -->
+      <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4">
+        <div class="flex items-center justify-between border-b border-[var(--border)] pb-2 mb-3">
+          <span class="text-xs font-bold uppercase text-purple-400">🔍 BOÎTE C — Devinette par le Courant & Rédox</span>
+          <span class="text-xs font-mono px-2 py-0.5 rounded bg-[var(--secondary)]">0h – 2h (45 RPM)</span>
+        </div>
+        <p class="text-xs text-[var(--muted-foreground)] mb-3">
+          Pendant que ça tourne à 45 RPM, l'ESP32 lit la force du moteur (<span id="zd-ma" class="font-mono text-white">580 mA</span>) et la conductivité (<span id="zd-ec" class="font-mono text-white">4.2 mS/cm</span>) pour deviner la recette :
+        </p>
+        <div class="grid grid-cols-3 gap-2 text-xs text-center">
+          <div class="p-2 rounded-xl bg-[var(--secondary)]">
+            <div class="text-[var(--muted-foreground)]">Sucres devinés</div>
+            <div id="zd-carbs" class="font-mono font-bold text-sm text-amber-300 mt-0.5">64.2 g/L</div>
+          </div>
+          <div class="p-2 rounded-xl bg-[var(--secondary)]">
+            <div class="text-[var(--muted-foreground)]">Ratio C/N deviné</div>
+            <div id="zd-cn" class="font-mono font-bold text-sm text-cyan-300 mt-0.5">33.9</div>
+          </div>
+          <div class="p-2 rounded-xl bg-[var(--secondary)]">
+            <div class="text-[var(--muted-foreground)]">Précurseurs 3HV</div>
+            <div id="zd-odd" class="font-mono font-bold text-sm text-purple-300 mt-0.5">21.6 %</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- LIGNE 2 : LES 6 BOÎTES DE CAPTEURS PHYSIQUES EN DIRECT -->
+    <div class="bg-[var(--card)] border-2 border-emerald-500/30 rounded-2xl p-5">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 border-b border-[var(--border)] pb-3 mb-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">
+            📡 TABLEAU DES 6 CAPTEURS PHYSIQUES DU TAMBOUR (HOLON 1)
+          </span>
+          <h2 class="text-base md:text-lg font-bold">
+            Ce que délivrent les sondes à <span id="sens-hour" class="font-mono text-emerald-400">t = 18.0 h</span>
+          </h2>
+        </div>
+        <div id="json-box" class="text-xs font-mono bg-[var(--secondary)] px-3 py-1.5 rounded-lg border border-[var(--border)] text-emerald-300">
+          {"t":18.0,"ph":6.58,"orp_mv":-265,"do_mg_l":0.1,"rpm":8,"motor_ma":322,"ec_ms":7.4}
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <!-- 1. pH -->
+        <div class="p-3 rounded-xl bg-[var(--secondary)] border border-[var(--border)]">
+          <div class="text-xs text-[var(--muted-foreground)]">🧪 1. Sonde pH</div>
+          <div id="s-ph" class="text-2xl font-mono font-bold text-emerald-400 mt-1">6.58</div>
+          <div id="s-ph-tag" class="text-xs font-semibold text-emerald-400 mt-1">✅ Tampon CaCO₃ actif</div>
+          <p class="text-xs text-[var(--muted-foreground)] mt-2 pt-2 border-t border-[var(--border)]">
+            Reste entre 5.8 et 6.8 tant qu'il reste des coquilles dans le panier.
+          </p>
+        </div>
+
+        <!-- 2. ORP -->
+        <div class="p-3 rounded-xl bg-[var(--secondary)] border border-[var(--border)]">
+          <div class="text-xs text-[var(--muted-foreground)]">⚡ 2. Rédox (ORP)</div>
+          <div id="s-orp" class="text-2xl font-mono font-bold text-amber-400 mt-1">-265 mV</div>
+          <div id="s-orp-tag" class="text-xs font-semibold text-amber-400 mt-1">🔒 Fermentation acide</div>
+          <p class="text-xs text-[var(--muted-foreground)] mt-2 pt-2 border-t border-[var(--border)]">
+            Négatif (-250 mV) de 2h à 36h, puis positif (+160 mV) sous bullage.
+          </p>
+        </div>
+
+        <!-- 3. O2 dissous -->
+        <div class="p-3 rounded-xl bg-[var(--secondary)] border border-[var(--border)]">
+          <div class="text-xs text-[var(--muted-foreground)]">🫧 3. O₂ Dissous</div>
+          <div id="s-do" class="text-2xl font-mono font-bold text-cyan-400 mt-1">0.10 mg/L</div>
+          <div id="s-do-tag" class="text-xs font-semibold text-slate-400 mt-1">💤 Anoxie Phase 1</div>
+          <p class="text-xs text-[var(--muted-foreground)] mt-2 pt-2 border-t border-[var(--border)]">
+            0.1 mg/L sans air (0–36h) → 8.2 mg/L dès que le compresseur bulle.
+          </p>
+        </div>
+
+        <!-- 4. Courant Moteur & RPM -->
+        <div class="p-3 rounded-xl bg-[var(--secondary)] border border-[var(--border)]">
+          <div class="text-xs text-[var(--muted-foreground)]">🌀 4. Rotation & Couple</div>
+          <div id="s-rpm" class="text-2xl font-mono font-bold text-purple-400 mt-1">8 RPM</div>
+          <div id="s-ma-tag" class="text-xs font-semibold text-purple-300 mt-1">⚡ Moteur : 322 mA</div>
+          <p id="s-shear-tag" class="text-xs text-[var(--muted-foreground)] mt-2 pt-2 border-t border-[var(--border)]">
+            Cisaillement Kolmogorov λK = 537 µm (Flocs intacts).
+          </p>
+        </div>
+
+        <!-- 5. Conductivité EC -->
+        <div class="p-3 rounded-xl bg-[var(--secondary)] border border-[var(--border)]">
+          <div class="text-xs text-[var(--muted-foreground)]">🧂 5. Conductivité EC</div>
+          <div id="s-ec" class="text-2xl font-mono font-bold text-yellow-300 mt-1">7.4 mS/cm</div>
+          <div class="text-xs font-semibold text-yellow-400 mt-1">📈 Ions & Acides dissous</div>
+          <p class="text-xs text-[var(--muted-foreground)] mt-2 pt-2 border-t border-[var(--border)]">
+            Monte quand les coquilles ($\text{Ca}^{2+}$) et les acides gras se dissolvent.
+          </p>
+        </div>
+
+        <!-- 6. Température -->
+        <div class="p-3 rounded-xl bg-[var(--secondary)] border border-[var(--border)]">
+          <div class="text-xs text-[var(--muted-foreground)]">🌡️ 6. Température</div>
+          <div id="s-temp" class="text-2xl font-mono font-bold text-orange-400 mt-1">30.0 °C</div>
+          <div id="s-temp-tag" class="text-xs font-semibold text-orange-300 mt-1">🔥 Régulation PID</div>
+          <p class="text-xs text-[var(--muted-foreground)] mt-2 pt-2 border-t border-[var(--border)]">
+            30°C (Acide) → 26°C (Gavage PHA) → 70°C (Lyse récolte finale).
+          </p>
+        </div>
+      </div>
+
+      <!-- GRAPHIQUE TEMPOREL + BOÎTE BIOLOGIQUE & BOÎTE PLASTIQUE -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mt-5 pt-4 border-t border-[var(--border)]">
+        <div class="lg:col-span-8">
+          <div class="flex flex-wrap items-center justify-between text-xs mb-2">
+            <span class="font-bold">📈 Courbes en direct du moteur Python (0h → 73h) :</span>
+            <div class="flex flex-wrap gap-3">
+              <span class="text-emerald-400 font-semibold">● pH (×10)</span>
+              <span class="text-amber-400 font-semibold">● AGV réels (g/L)</span>
+              <span class="text-cyan-400 font-semibold">● % Plastique PHA dans cellules</span>
+              <span class="text-purple-400 font-semibold">● Rédox ORP</span>
+            </div>
+          </div>
+          <div class="bg-[var(--secondary)] p-2 rounded-xl border border-[var(--border)]">
+            <canvas id="sim-canvas" width="820" height="220" class="w-full h-52 block"></canvas>
+          </div>
+        </div>
+
+        <!-- ÉTAT INTERNE & PLASTIQUE FINAL -->
+        <div class="lg:col-span-4 flex flex-col justify-between bg-[var(--secondary)] p-4 rounded-xl border border-[var(--border)] text-xs space-y-3">
+          <div>
+            <div class="font-bold text-emerald-400 uppercase mb-2">🦠 État Biologique Interne & EKF</div>
+            <div class="space-y-1.5">
+              <div class="flex justify-between">
+                <span class="text-[var(--muted-foreground)]">Sucres restants :</span>
+                <span id="b-carb" class="font-mono font-bold">8.2 g/L</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-[var(--muted-foreground)]">AGV réels vs EKF :</span>
+                <span id="b-vfa" class="font-mono font-bold text-amber-400">41.2 g/L (EKF: 40.5 g/L)</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-[var(--muted-foreground)]">Acides toxiques [HVFA] :</span>
+                <span id="b-hvfa" class="font-mono font-bold text-rose-400">0.58 g/L (Max 1.8)</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-[var(--muted-foreground)]">PHA intracellulaire :</span>
+                <span id="b-pha" class="font-mono font-bold text-cyan-400">0.02 g/L (3.8%)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-[var(--border)]">
+            <div class="font-bold text-cyan-400 uppercase mb-1.5">🏆 Bioplastique PHBV récolté à 73h</div>
+            <div class="grid grid-cols-2 gap-2">
+              <div class="p-2 rounded bg-[var(--card)]">
+                <div class="text-[var(--muted-foreground)]">Poudre PHBV sèche</div>
+                <div id="p-mass" class="font-mono font-bold text-sm text-emerald-400">8.9 g</div>
+              </div>
+              <div class="p-2 rounded bg-[var(--card)]">
+                <div class="text-[var(--muted-foreground)]">Taux 3HV / Fusion</div>
+                <div id="p-tm" class="font-mono font-bold text-sm text-cyan-300">13.0% / 156°C</div>
+              </div>
+            </div>
+            <div id="p-app" class="mt-2 text-[var(--muted-foreground)] italic">
+              Application : Films souples & Piézoélectricité (d33 = 14.6 pC/N)
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    let simData = null;
+    let currentHour = 18.0;
+    let playTimer = null;
+    let currentPayload = {
+      gross_waste_kg: 1.15,
+      motor_current_ma: 580.0,
+      conductivity_ec_ms_cm: 4.2,
+      initial_orp_drop_mv_h: -115.0,
+      cartridge_mass_g: 220.0
+    };
+
+    function throwBucket(preset) {
+      if (preset === 'kitchen') {
+        currentPayload = {
+          gross_waste_kg: 1.15,
+          motor_current_ma: 580.0,
+          conductivity_ec_ms_cm: 4.2,
+          initial_orp_drop_mv_h: -115.0,
+          cartridge_mass_g: 220.0
+        };
+      } else if (preset === 'canteen_pasta') {
+        currentPayload = {
+          gross_waste_kg: 1.45,
+          motor_current_ma: 760.0, // Pâtes/pain plus épais -> courant moteur plus fort !
+          conductivity_ec_ms_cm: 3.6,
+          initial_orp_drop_mv_h: -135.0,
+          cartridge_mass_g: 220.0
+        };
+      } else if (preset === 'algae_mix') {
+        currentPayload = {
+          gross_waste_kg: 1.30,
+          motor_current_ma: 620.0,
+          conductivity_ec_ms_cm: 7.8, // Algues riches en sels et acides aminés -> haute EC -> fort 3HV !
+          initial_orp_drop_mv_h: -110.0,
+          cartridge_mass_g: 220.0
+        };
+      } else if (preset === 'empty_cartridge') {
+        currentPayload = {
+          gross_waste_kg: 1.25,
+          motor_current_ma: 640.0,
+          conductivity_ec_ms_cm: 4.0,
+          initial_orp_drop_mv_h: -125.0,
+          cartridge_mass_g: 0.0 // Panier de coquilles vide !
+        };
+      }
+      document.getElementById('in-waste').value = currentPayload.gross_waste_kg;
+      fetchSimulation(true);
+    }
+
+    async function fetchSimulation(keepPreset = false) {
+      if (!keepPreset) {
+        currentPayload.gross_waste_kg = parseFloat(document.getElementById('in-waste').value);
+      }
+      const res = await fetch('/api/simulate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(currentPayload)
+      });
+      simData = await res.json();
+
+      // Mise à jour des 3 boîtes "Zéro-Pesée"
+      const inf = simData.inferred_feedstock;
+      const cart = simData.cartridge_status;
+      const cop = simData.copolymer;
+
+      document.getElementById('zd-waste').textContent = inf.detected_waste_kg.toFixed(2) + ' kg';
+      document.getElementById('zd-water').textContent = '+' + inf.auto_water_injected_l.toFixed(2) + ' L';
+
+      document.getElementById('zd-caco3-used').textContent = cart.dissolved_this_batch_g.toFixed(1) + ' g';
+      if (cart.remaining_cartridge_g <= 0.1) {
+        document.getElementById('zd-caco3-left').textContent = '0 g (VIDE 🚨)';
+        document.getElementById('zd-caco3-left').className = 'font-mono font-bold text-base text-rose-400 mt-0.5';
+      } else {
+        document.getElementById('zd-caco3-left').textContent = `${cart.remaining_cartridge_g.toFixed(0)} g (${cart.estimated_batches_remaining} tournées)`;
+        document.getElementById('zd-caco3-left').className = 'font-mono font-bold text-base text-emerald-400 mt-0.5';
+      }
+      document.getElementById('bar-cartridge').style.width = cart.cartridge_level_pct + '%';
+
+      document.getElementById('zd-ma').textContent = Math.round(currentPayload.motor_current_ma) + ' mA';
+      document.getElementById('zd-ec').textContent = currentPayload.conductivity_ec_ms_cm.toFixed(1) + ' mS/cm';
+      document.getElementById('zd-carbs').textContent = inf.inferred_carbohydrates_g_l.toFixed(1) + ' g/L';
+      document.getElementById('zd-cn').textContent = inf.inferred_cn_ratio.toFixed(1);
+      document.getElementById('zd-odd').textContent = (inf.inferred_odd_vfa_ratio * 100).toFixed(1) + ' %';
+
+      document.getElementById('p-mass').textContent = cop.final_pha_g.toFixed(1) + ' g secs';
+      document.getElementById('p-tm').textContent = `${cop.hv_mol_pct}% 3HV / ${cop.tm_c}°C`;
+      document.getElementById('p-app').textContent = `${cop.application} (d33 = ${cop.d33_pc_n} pC/N)`;
+
+      renderHour(currentHour);
+    }
+
+    function setHour(h) {
+      currentHour = parseFloat(h);
+      document.getElementById('slider-time').value = currentHour;
+      renderHour(currentHour);
+    }
+
+    function onTimeChange(val) {
+      currentHour = parseFloat(val);
+      renderHour(currentHour);
+    }
+
+    function togglePlay() {
+      const btn = document.getElementById('btn-play');
+      if (playTimer) {
+        clearInterval(playTimer);
+        playTimer = null;
+        btn.textContent = '▶ Lecture Auto (0h → 73h)';
+      } else {
+        if (currentHour >= 72.5) currentHour = 0;
+        btn.textContent = '⏸ Pause';
+        playTimer = setInterval(() => {
+          currentHour += 0.5;
+          if (currentHour > 73.0) {
+            clearInterval(playTimer);
+            playTimer = null;
+            btn.textContent = '▶ Lecture Auto (0h → 73h)';
+            return;
+          }
+          document.getElementById('slider-time').value = currentHour;
+          renderHour(currentHour);
+        }, 110);
+      }
+    }
+
+    function renderHour(h) {
+      if (!simData || !simData.trajectory) return;
+      const idx = Math.min(simData.trajectory.length - 1, Math.max(0, Math.round(h * 2)));
+      const pt = simData.trajectory[idx];
+
+      document.getElementById('lbl-hour').textContent = `t = ${pt.t.toFixed(1)} h`;
+      document.getElementById('sens-hour').textContent = `t = ${pt.t.toFixed(1)} h`;
+      document.getElementById('badge-fsm').textContent = pt.fsm_state;
+
+      document.getElementById('s-ph').textContent = pt.ph.toFixed(2);
+      const phTag = document.getElementById('s-ph-tag');
+      if (pt.ph < 4.5) {
+        phTag.textContent = '🚨 ALARME CHOC ACIDE !';
+        phTag.className = 'text-xs font-semibold text-rose-400 mt-1';
+      } else {
+        phTag.textContent = '✅ Tampon CaCO₃ passif OK';
+        phTag.className = 'text-xs font-semibold text-emerald-400 mt-1';
+      }
+
+      document.getElementById('s-orp').textContent = (pt.orp_mv >= 0 ? '+' : '') + pt.orp_mv + ' mV';
+      document.getElementById('s-orp-tag').textContent = pt.orp_mv < -120 ? '🔒 Anaérobie (Acidogenèse)' : '🌬️ Aérobie (Stockage PHA)';
+
+      document.getElementById('s-do').textContent = pt.do_mg_l.toFixed(2) + ' mg/L';
+      document.getElementById('s-do-tag').textContent = pt.aerated ? '🫧 Compresseur Air ON' : '💤 Sans bullage';
+
+      document.getElementById('s-rpm').textContent = pt.rpm + ' RPM';
+      document.getElementById('s-ma-tag').textContent = `⚡ Courant Moteur : ${pt.motor_ma} mA`;
+      document.getElementById('s-shear-tag').textContent = pt.rpm >= 600
+        ? `🌪️ Essorage Centrifuge : ${pt.rcf_g} G`
+        : `🛡️ Cisaillement λK = ${pt.lambda_k_um} µm (Flocs OK)`;
+
+      document.getElementById('s-ec').textContent = pt.ec_ms.toFixed(2) + ' mS/cm';
+      document.getElementById('s-temp').textContent = pt.temp_c.toFixed(1) + ' °C';
+
+      document.getElementById('b-carb').textContent = pt.carb.toFixed(1) + ' g/L';
+      document.getElementById('b-vfa').textContent = `${pt.vfa.toFixed(1)} g/L (EKF: ${pt.ekf_vfa.toFixed(1)} g/L)`;
+      document.getElementById('b-hvfa').textContent = `${pt.hvfa.toFixed(2)} g/L (Seuil 1.8)`;
+      document.getElementById('b-pha').textContent = `${pt.pha_g_l.toFixed(2)} g/L (${pt.pha_pct.toFixed(1)}%)`;
+
+      document.getElementById('json-box').textContent = JSON.stringify({
+        t_h: pt.t,
+        ph: pt.ph,
+        orp_mv: pt.orp_mv,
+        do_mg_l: pt.do_mg_l,
+        rpm: pt.rpm,
+        motor_ma: pt.motor_ma,
+        ec_ms: pt.ec_ms
+      });
+
+      drawChart(pt.t);
+    }
+
+    function drawChart(cursorHour) {
+      const canvas = document.getElementById('sim-canvas');
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width, h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      const padL = 36, padR = 16, padT = 14, padB = 24;
+      const pw = w - padL - padR, ph = h - padT - padB;
+
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.16)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 4; i++) {
+        const y = padT + (ph * i) / 4;
+        ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(w - padR, y); ctx.stroke();
+      }
+
+      const x36 = padL + (36.0 / 73.0) * pw;
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.45)';
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath(); ctx.moveTo(x36, padT); ctx.lineTo(x36, h - padB); ctx.stroke();
+      ctx.setLineDash([]);
+
+      function plot(fn, maxV, color) {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.3;
+        ctx.beginPath();
+        simData.trajectory.forEach((p, idx) => {
+          const x = padL + (p.t / 73.0) * pw;
+          const y = padT + ph * (1 - Math.max(0, Math.min(1, fn(p) / maxV)));
+          if (idx === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+      }
+
+      plot(p => p.ph * 10, 80, '#34d399');
+      plot(p => p.vfa, 65, '#fbbf24');
+      plot(p => p.pha_pct, 80, '#22d3ee');
+      plot(p => ((p.orp_mv + 350) / 600) * 80, 80, '#c084fc');
+
+      const xCur = padL + (cursorHour / 73.0) * pw;
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(xCur, padT); ctx.lineTo(xCur, h - padB); ctx.stroke();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => fetchSimulation(true));
+  </script>
+</body>
+</html>

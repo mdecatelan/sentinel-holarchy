@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sentinel Holarchy — Simulateur Capteurs & Boîtes du Tambour (0h–73h)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --background: #0b0f19;
+      --card: #111827;
+      --secondary: #1f2937;
+      --foreground: #f8fafc;
+      --muted-foreground: #94a3b8;
+      --border: #334155;
+    }
+    body {
+      background-color: var(--background);
+      color: var(--foreground);
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+    }
+    input[type="range"] {
+      accent-color: #10b981;
+    }
+  </style>
+</head>
+<body class="bg-[var(--background)] text-[var(--foreground)] antialiased p-4 md:p-6">
+
+  <!-- HEADER & BARRE DE CONTRÔLE TEMPORELLE (0h -> 73h) -->
+  <div class="max-w-7xl mx-auto space-y-5">
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border-b border-[var(--border)] pb-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+              JUMEAU NUMÉRIQUE TEMPS RÉEL (HOLON 0 ↔ HOLON 1)
+            </span>
+            <span id="badge-phase" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/15 text-blue-400 border border-blue-500/30">
+              PHASE 1 : MACÉRATION
+            </span>
+          </div>
+          <h1 class="text-xl md:text-2xl font-bold mt-1">
+            Que disent les capteurs quand tu mets tes déchets dans le tambour ?
+          </h1>
+          <p class="text-xs md:text-sm text-[var(--muted-foreground)]">
+            Modifie la recette dans la <strong>Boîte 1</strong> ou déplace le curseur temporel de <strong>0h à 73h</strong> pour voir réagir chaque capteur et chaque boîte.
+          </p>
+        </div>
+
+        <!-- Scénarios rapides -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="applyPreset('clamart')" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 hover:bg-emerald-500/30 transition">
+            ✅ Recette Nominale Clamart
+          </button>
+          <button onclick="applyPreset('acid_crash')" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-rose-500/20 text-rose-400 border border-rose-500/40 hover:bg-rose-500/30 transition">
+            ⚠️ Test Oubli Coquilles d'Œufs (Crash pH)
+          </button>
+          <button onclick="applyPreset('algae_boost')" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 hover:bg-cyan-500/30 transition">
+            🌿 Mix Épluchures + Algues (Haut 3HV)
+          </button>
+        </div>
+      </div>
+
+      <!-- Timeline interactive -->
+      <div class="mt-4 space-y-2">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <button id="btn-play" onclick="togglePlay()" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-500 transition flex items-center gap-1.5">
+              ▶ Lecture Auto (0h → 73h)
+            </button>
+            <button onclick="setHour(0)" class="px-2.5 py-1 rounded text-xs border border-[var(--border)] hover:bg-[var(--secondary)]">0h (Départ)</button>
+            <button onclick="setHour(18)" class="px-2.5 py-1 rounded text-xs border border-[var(--border)] hover:bg-[var(--secondary)]">18h (Cœur Acide)</button>
+            <button onclick="setHour(36)" class="px-2.5 py-1 rounded text-xs border border-[var(--border)] hover:bg-[var(--secondary)]">36h (Centrifugeuse)</button>
+            <button onclick="setHour(50)" class="px-2.5 py-1 rounded text-xs border border-[var(--border)] hover:bg-[var(--secondary)]">50h (Gavage PHA)</button>
+            <button onclick="setHour(72.5)" class="px-2.5 py-1 rounded text-xs border border-[var(--border)] hover:bg-[var(--secondary)]">72.5h (Récolte 70°C)</button>
+          </div>
+          <div class="text-right">
+            <span class="text-xs text-[var(--muted-foreground)]">Temps écoulé :</span>
+            <span id="label-hour" class="text-lg font-mono font-bold text-emerald-400 ml-1">t = 18.0 h</span>
+            <span id="label-day" class="text-xs text-[var(--muted-foreground)] ml-1">(Jour 1, +18h)</span>
+          </div>
+        </div>
+
+        <input id="slider-time" type="range" min="0" max="73" step="0.5" value="18" oninput="onTimeSlider(this.value)" class="w-full h-2.5 rounded-lg cursor-pointer" />
+
+        <!-- Barre des 5 étapes du protocole -->
+        <div class="grid grid-cols-5 gap-1 text-xs pt-1">
+          <div onclick="setHour(1)" class="cursor-pointer p-1.5 rounded border border-[var(--border)] text-center hover:border-emerald-500/50" id="step-bar-1">
+            <div class="font-semibold">1. Macération</div>
+            <div class="text-[var(--muted-foreground)]">0h – 2h (45 RPM)</div>
+          </div>
+          <div onclick="setHour(18)" class="cursor-pointer p-1.5 rounded border border-[var(--border)] text-center hover:border-emerald-500/50" id="step-bar-2">
+            <div class="font-semibold">2. Acidogenèse</div>
+            <div class="text-[var(--muted-foreground)]">2h – 36h (Anaérobie)</div>
+          </div>
+          <div onclick="setHour(36)" class="cursor-pointer p-1.5 rounded border border-[var(--border)] text-center hover:border-emerald-500/50" id="step-bar-3">
+            <div class="font-semibold">3. Essorage Grade C</div>
+            <div class="text-[var(--muted-foreground)]">36h – 36.5h (650 RPM)</div>
+          </div>
+          <div onclick="setHour(54)" class="cursor-pointer p-1.5 rounded border border-[var(--border)] text-center hover:border-emerald-500/50" id="step-bar-4">
+            <div class="font-semibold">4. Aération PHA</div>
+            <div class="text-[var(--muted-foreground)]">36.5h – 72h (Bullage)</div>
+          </div>
+          <div onclick="setHour(72.5)" class="cursor-pointer p-1.5 rounded border border-[var(--border)] text-center hover:border-emerald-500/50" id="step-bar-5">
+            <div class="font-semibold">5. Lyse & Récolte</div>
+            <div class="text-[var(--muted-foreground)]">72h – 73h (800 RPM)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ARCHITECTURE EN BOÎTES : LIGNE 1 (INTRANTS -> TAMBOUR BIOLOGIQUE -> ACTIONNEURS & AUTOMATE) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+
+      <!-- BOÎTE 1 : CE QUE TU METS DANS LE TAMBOUR -->
+      <div class="lg:col-span-4 bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4 flex flex-col justify-between shadow-sm">
+        <div>
+          <div class="flex items-center justify-between border-b border-[var(--border)] pb-2.5 mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-amber-400">📦 BOÎTE 1 — Intrants (Ce que tu verses)</span>
+            <span class="text-xs font-mono px-2 py-0.5 rounded bg-[var(--secondary)]">Holon 0 : biomass.py</span>
+          </div>
+
+          <div class="space-y-3 text-xs">
+            <div>
+              <div class="flex justify-between mb-1">
+                <span>🥕 Épluchures légumes/fruits (85% eau)</span>
+                <span id="val-peels" class="font-mono font-bold">800 g</span>
+              </div>
+              <input id="in-peels" type="range" min="0" max="2000" step="50" value="800" oninput="recomputeSimulation()" class="w-full" />
+            </div>
+
+            <div>
+              <div class="flex justify-between mb-1">
+                <span>🍝 Restes pâtes / riz / pain (amidon)</span>
+                <span id="val-starch" class="font-mono font-bold">200 g</span>
+              </div>
+              <input id="in-starch" type="range" min="0" max="800" step="25" value="200" oninput="recomputeSimulation()" class="w-full" />
+            </div>
+
+            <div>
+              <div class="flex justify-between mb-1">
+                <span>🥚 Coquilles d'œufs broyées (Tampon CaCO₃)</span>
+                <span id="val-eggs" class="font-mono font-bold text-emerald-400">40 g</span>
+              </div>
+              <input id="in-eggs" type="range" min="0" max="80" step="2" value="40" oninput="recomputeSimulation()" class="w-full" />
+            </div>
+
+            <div>
+              <div class="flex justify-between mb-1">
+                <span>🌿 Algues brunes/vertes (protéines & C3/C5)</span>
+                <span id="val-algae" class="font-mono font-bold text-cyan-400">0 g</span>
+              </div>
+              <input id="in-algae" type="range" min="0" max="800" step="50" value="0" oninput="recomputeSimulation()" class="w-full" />
+            </div>
+
+            <div>
+              <div class="flex justify-between mb-1">
+                <span>💧 Eau tiède ajoutée</span>
+                <span id="val-water" class="font-mono font-bold">1.5 L</span>
+              </div>
+              <input id="in-water" type="range" min="0.5" max="4.0" step="0.1" value="1.5" oninput="recomputeSimulation()" class="w-full" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Résumé stœchiométrique initial -->
+        <div class="mt-4 pt-3 border-t border-[var(--border)] grid grid-cols-2 gap-2 text-xs">
+          <div class="p-2 rounded-lg bg-[var(--secondary)]">
+            <div class="text-[var(--muted-foreground)]">Volume liquide total</div>
+            <div id="mix-vol" class="font-mono font-bold text-sm">2.30 L</div>
+          </div>
+          <div class="p-2 rounded-lg bg-[var(--secondary)]">
+            <div class="text-[var(--muted-foreground)]">Sucres initiaux</div>
+            <div id="mix-carb" class="font-mono font-bold text-sm">63.5 g/L</div>
+          </div>
+          <div class="p-2 rounded-lg bg-[var(--secondary)]">
+            <div class="text-[var(--muted-foreground)]">Tampon CaCO₃</div>
+            <div id="mix-caco3" class="font-mono font-bold text-sm text-emerald-400">16.0 g/L</div>
+          </div>
+          <div class="p-2 rounded-lg bg-[var(--secondary)]">
+            <div class="text-[var(--muted-foreground)]">Ratio Carbone/Azote</div>
+            <div id="mix-cn" class="font-mono font-bold text-sm">31.7</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOÎTE 2 : L'INTÉRIEUR DU TAMBOUR (ÉTAT CHIMIQUE & BIOLOGIQUE INVISIBLE) -->
+      <div class="lg:col-span-4 bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4 flex flex-col justify-between shadow-sm">
+        <div>
+          <div class="flex items-center justify-between border-b border-[var(--border)] pb-2.5 mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">🦠 BOÎTE 2 — Tambour Inox (Réalité Biologique)</span>
+            <span class="text-xs font-mono px-2 py-0.5 rounded bg-[var(--secondary)]">Holon 0 : kinetics.py</span>
+          </div>
+
+          <p class="text-xs text-[var(--muted-foreground)] mb-3">
+            Ce qui se transforme réellement dans la soupe à <strong id="bio-hour-label">t = 18.0 h</strong> (calculé par équations différentielles RK4) :
+          </p>
+
+          <div class="space-y-3 text-xs">
+            <!-- Glucides -->
+            <div>
+              <div class="flex justify-between mb-1">
+                <span>🍯 Glucides / Sucres dissous</span>
+                <span id="bio-carb" class="font-mono font-bold">7.9 g/L</span>
+              </div>
+              <div class="w-full h-2 rounded-full bg-[var(--secondary)] overflow-hidden">
+                <div id="bar-carb" class="h-full bg-amber-400 transition-all duration-150" style="width: 15%"></div>
+              </div>
+            </div>
+
+            <!-- AGV Totaux -->
+            <div>
+              <div class="flex justify-between mb-1">
+                <span>🍋 Acides Gras Volatils (AGV C2-C5)</span>
+                <span id="bio-vfa" class="font-mono font-bold text-yellow-400">41.0 g/L</span>
+              </div>
+              <div class="w-full h-2 rounded-full bg-[var(--secondary)] overflow-hidden">
+                <div id="bar-vfa" class="h-full bg-yellow-400 transition-all duration-150" style="width: 75%"></div>
+              </div>
+            </div>
+
+            <!-- Acides protonés toxiques HVFA -->
+            <div>
+              <div class="flex justify-between mb-1">
+                <span>☠️ Acides non-dissociés toxiques [HVFA]</span>
+                <span id="bio-hvfa" class="font-mono font-bold">0.54 g/L (Seuil : 1.8 g/L)</span>
+              </div>
+              <div class="w-full h-2 rounded-full bg-[var(--secondary)] overflow-hidden">
+                <div id="bar-hvfa" class="h-full bg-rose-500 transition-all duration-150" style="width: 25%"></div>
+              </div>
+            </div>
+
+            <!-- Tampon CaCO3 restant -->
+            <div>
+              <div class="flex justify-between mb-1">
+                <span>🥚 Coquilles d'œufs CaCO₃ non dissoutes</span>
+                <span id="bio-caco3" class="font-mono font-bold">15.2 g/L</span>
+              </div>
+              <div class="w-full h-2 rounded-full bg-[var(--secondary)] overflow-hidden">
+                <div id="bar-caco3" class="h-full bg-slate-400 transition-all duration-150" style="width: 85%"></div>
+              </div>
+            </div>
+
+            <!-- Bioplastique PHA intracellulaire -->
+            <div>
+              <div class="flex justify-between mb-1">
+                <span>💎 Bioplastique PHA stocké dans les bactéries</span>
+                <span id="bio-pha" class="font-mono font-bold text-emerald-400">0.02 g/L (3.8%)</span>
+              </div>
+              <div class="w-full h-2.5 rounded-full bg-[var(--secondary)] overflow-hidden">
+                <div id="bar-pha" class="h-full bg-emerald-500 transition-all duration-150" style="width: 4%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Explication dynamique de ce qui se passe à l'heure t -->
+        <div id="bio-narrative" class="mt-4 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs leading-relaxed">
+          Les bactéries acidogènes digèrent les sucres des épluchures en absence d'oxygène et relâchent des acides gras volatils (AGV). La poudre de coquille d'œuf neutralise l'acidité au fur et à mesure.
+        </div>
+      </div>
+
+      <!-- BOÎTE 4 : AUTOMATE ESP32, ACTIONNEURS & FILTRE DE KALMAN (HOLON 1) -->
+      <div class="lg:col-span-4 bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4 flex flex-col justify-between shadow-sm">
+        <div>
+          <div class="flex items-center justify-between border-b border-[var(--border)] pb-2.5 mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-purple-400">🧠 BOÎTE 4 — Cerveau ESP32 & Actionneurs</span>
+            <span class="text-xs font-mono px-2 py-0.5 rounded bg-[var(--secondary)]">Holon 1 : EKF + PID</span>
+          </div>
+
+          <!-- Soft-Sensor EKF -->
+          <div class="p-3 rounded-xl bg-[var(--secondary)] mb-3">
+            <div class="text-xs font-semibold text-purple-400 mb-1">
+              🔍 Capteur Logiciel (Filtre de Kalman EKF)
+            </div>
+            <p class="text-xs text-[var(--muted-foreground)] mb-2">
+              Tu n'as pas de capteur d'AGV coûteux dans la cuve : l'ESP32 <strong>déduit</strong> les AGV en fusionnant le pH et le Rédox (ORP) :
+            </p>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="p-2 rounded bg-[var(--card)] border border-[var(--border)]">
+                <div class="text-[var(--muted-foreground)]">AGV estimés par EKF</div>
+                <div id="ekf-vfa" class="font-mono font-bold text-sm text-yellow-400">40.2 ± 1.4 g/L</div>
+              </div>
+              <div class="p-2 rounded bg-[var(--card)] border border-[var(--border)]">
+                <div class="text-[var(--muted-foreground)]">O₂ estimé par EKF</div>
+                <div id="ekf-do" class="font-mono font-bold text-sm text-cyan-400">0.12 ± 0.08 mg/L</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- État des Actionneurs commandés par l'ESP32 -->
+          <div class="space-y-2 text-xs">
+            <div class="font-semibold text-[var(--muted-foreground)]">Ordres envoyés aux relais matériels :</div>
+            <div class="grid grid-cols-2 gap-2">
+              <div class="p-2 rounded-lg border border-[var(--border)] flex items-center justify-between">
+                <span>🫧 Pompe à Air</span>
+                <span id="act-air" class="font-mono font-bold px-2 py-0.5 rounded bg-slate-500/20 text-slate-400">OFF (0%)</span>
+              </div>
+              <div class="p-2 rounded-lg border border-[var(--border)] flex items-center justify-between">
+                <span>🔥 Chauffage PID</span>
+                <span id="act-heat" class="font-mono font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-400">ON (30°C)</span>
+              </div>
+              <div class="p-2 rounded-lg border border-[var(--border)] flex items-center justify-between">
+                <span>🚰 Vanne Jus AGV</span>
+                <span id="act-valve-vfa" class="font-mono font-bold px-2 py-0.5 rounded bg-slate-500/20 text-slate-400">FERMÉE</span>
+              </div>
+              <div class="p-2 rounded-lg border border-[var(--border)] flex items-center justify-between">
+                <span>🪣 Vanne Vidange</span>
+                <span id="act-valve-drain" class="font-mono font-bold px-2 py-0.5 rounded bg-slate-500/20 text-slate-400">FERMÉE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bilan final à 73h (Boîte 5 miniature) -->
+        <div class="mt-4 pt-3 border-t border-[var(--border)]">
+          <div class="flex items-center justify-between text-xs mb-1.5">
+            <span class="font-bold text-cyan-400">🏆 SORTIE PRÉDITE À 73h (Holons 2 & 3)</span>
+            <span id="out-hv" class="font-mono text-xs px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-400">13.1 mol% 3HV</span>
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-xs text-center">
+            <div class="p-1.5 rounded bg-[var(--secondary)]">
+              <div class="text-[var(--muted-foreground)]">Grade A (PHBV)</div>
+              <div id="out-pha" class="font-mono font-bold text-emerald-400">7.5 g secs</div>
+            </div>
+            <div class="p-1.5 rounded bg-[var(--secondary)]">
+              <div class="text-[var(--muted-foreground)]">Fusion Tm</div>
+              <div id="out-tm" class="font-mono font-bold">156.3 °C</div>
+            </div>
+            <div class="p-1.5 rounded bg-[var(--secondary)]">
+              <div class="text-[var(--muted-foreground)]">Piézo d₃₃</div>
+              <div id="out-d33" class="font-mono font-bold text-purple-400">14.6 pC/N</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BOÎTE 3 CENTRALE : LES 5 CAPTEURS PHYSIQUES EN TEMPS RÉEL -->
+    <div class="bg-[var(--card)] border-2 border-emerald-500/40 rounded-2xl p-5 shadow-sm">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 border-b border-[var(--border)] pb-3 mb-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">
+            📡 BOÎTE 3 — Les 5 Capteurs Physiques branchés sur le Tambour (Trame JSON ESP32)
+          </span>
+          <h2 class="text-base md:text-lg font-bold">
+            Valeurs délivrées par les sondes à <span id="sensor-time-title" class="text-emerald-400 font-mono">t = 18.0 h</span>
+          </h2>
+        </div>
+        <div class="text-xs font-mono bg-[var(--secondary)] px-3 py-1.5 rounded-lg border border-[var(--border)] overflow-x-auto">
+          <span id="json-packet">{"device":"ESP32-CLAMART-01","t_h":18.0,"temp_c":30.0,"ph":6.63,"orp_mv":-268,"rpm":8,"do_mg_l":0.10}</span>
+        </div>
+      </div>
+
+      <!-- Grille des 5 boîtes capteurs -->
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
+
+        <!-- CAPTEUR 1 : pH -->
+        <div class="p-3.5 rounded-xl bg-[var(--secondary)] border border-[var(--border)] flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs text-[var(--muted-foreground)]">
+              <span>🧪 SONDE 1 : pH</span>
+              <span class="font-mono">BNC Verre</span>
+            </div>
+            <div id="sens-ph" class="text-2xl font-mono font-bold mt-1 text-emerald-400">6.63</div>
+            <div id="sens-ph-status" class="text-xs font-medium mt-1 text-emerald-400">
+              ✅ Tamponné par CaCO₃
+            </div>
+          </div>
+          <p id="sens-ph-desc" class="text-xs text-[var(--muted-foreground)] mt-3 pt-2 border-t border-[var(--border)]">
+            Sans coquilles d'œufs, le pH chuterait sous 4.5. Ici, la dissolution du CaCO₃ le stabilise vers 6.6.
+          </p>
+        </div>
+
+        <!-- CAPTEUR 2 : ORP / Rédox -->
+        <div class="p-3.5 rounded-xl bg-[var(--secondary)] border border-[var(--border)] flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs text-[var(--muted-foreground)]">
+              <span>⚡ SONDE 2 : Rédox ORP</span>
+              <span class="font-mono">Platine mV</span>
+            </div>
+            <div id="sens-orp" class="text-2xl font-mono font-bold mt-1 text-amber-400">-268 mV</div>
+            <div id="sens-orp-status" class="text-xs font-medium mt-1 text-amber-400">
+              🔒 Anaérobie stricte (&lt; -150 mV)
+            </div>
+          </div>
+          <p id="sens-orp-desc" class="text-xs text-[var(--muted-foreground)] mt-3 pt-2 border-t border-[var(--border)]">
+            Plonge dans le négatif (-250 mV) quand les bactéries fermentent sans air. Bondit à +160 mV dès qu'on bulle !
+          </p>
+        </div>
+
+        <!-- CAPTEUR 3 : Oxygène Dissous -->
+        <div class="p-3.5 rounded-xl bg-[var(--secondary)] border border-[var(--border)] flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs text-[var(--muted-foreground)]">
+              <span>🫧 SONDE 3 : O₂ Dissous</span>
+              <span class="font-mono">Galvanique</span>
+            </div>
+            <div id="sens-do" class="text-2xl font-mono font-bold mt-1 text-cyan-400">0.10 mg/L</div>
+            <div id="sens-do-status" class="text-xs font-medium mt-1 text-slate-400">
+              💤 Anoxie (Phase 1)
+            </div>
+          </div>
+          <p id="sens-do-desc" class="text-xs text-[var(--muted-foreground)] mt-3 pt-2 border-t border-[var(--border)]">
+            Consommé en 2h au départ (0.1 mg/L). Remonte à 8.2 mg/L à 36.5h quand le compresseur d'air démarre.
+          </p>
+        </div>
+
+        <!-- CAPTEUR 4 : Température -->
+        <div class="p-3.5 rounded-xl bg-[var(--secondary)] border border-[var(--border)] flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs text-[var(--muted-foreground)]">
+              <span>🌡️ SONDE 4 : Température</span>
+              <span class="font-mono">DS18B20</span>
+            </div>
+            <div id="sens-temp" class="text-2xl font-mono font-bold mt-1 text-orange-400">30.0 °C</div>
+            <div id="sens-temp-status" class="text-xs font-medium mt-1 text-orange-400">
+              🔥 Optimum Acidogenèse
+            </div>
+          </div>
+          <p id="sens-temp-desc" class="text-xs text-[var(--muted-foreground)] mt-3 pt-2 border-t border-[var(--border)]">
+            Maintenue à 30°C en Phase 1, abaissée à 26°C en Phase 2 (meilleur transfert O₂), puis montée à 70°C à 72h.
+          </p>
+        </div>
+
+        <!-- CAPTEUR 5 : Tachymètre RPM & Cisaillement -->
+        <div class="p-3.5 rounded-xl bg-[var(--secondary)] border border-[var(--border)] flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs text-[var(--muted-foreground)]">
+              <span>🌀 SONDE 5 : Rotation</span>
+              <span class="font-mono">Effet Hall</span>
+            </div>
+            <div id="sens-rpm" class="text-2xl font-mono font-bold mt-1 text-purple-400">8 RPM</div>
+            <div id="sens-rpm-status" class="text-xs font-medium mt-1 text-emerald-400">
+              🛡️ Flocs intacts (λK = 537 µm)
+            </div>
+          </div>
+          <p id="sens-rpm-desc" class="text-xs text-[var(--muted-foreground)] mt-3 pt-2 border-t border-[var(--border)]">
+            Lent pendant la culture (8–15 RPM) pour éviter de cisailler les bactéries. Accélère à 650–800 RPM (172 G) pour essorer !
+          </p>
+        </div>
+
+      </div>
+
+      <!-- COURBES MULTI-TRACES DES CAPTEURS DE 0h À 73h -->
+      <div class="mt-5 pt-4 border-t border-[var(--border)]">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+          <div class="text-xs font-semibold">
+            📈 Évolution complète des capteurs et de la biologie de 0h à 73h (la ligne verticale indique l'heure choisie) :
+          </div>
+          <div class="flex flex-wrap items-center gap-3 text-xs">
+            <span class="flex items-center gap-1"><span class="w-3 h-1 bg-emerald-400 inline-block"></span> pH (×10)</span>
+            <span class="flex items-center gap-1"><span class="w-3 h-1 bg-amber-400 inline-block"></span> AGV (g/L)</span>
+            <span class="flex items-center gap-1"><span class="w-3 h-1 bg-cyan-400 inline-block"></span> % PHA dans cellules</span>
+            <span class="flex items-center gap-1"><span class="w-3 h-1 bg-purple-400 inline-block"></span> Rédox ORP (mV normalisé)</span>
+          </div>
+        </div>
+        <div class="w-full bg-[var(--secondary)] rounded-xl p-2 border border-[var(--border)]">
+          <canvas id="chart-canvas" width="1100" height="240" class="w-full h-56 block"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let trajectory = [];
+    let currentHour = 18.0;
+    let playTimer = null;
+    let mixProps = {};
+
+    function applyPreset(name) {
+      if (name === 'clamart') {
+        document.getElementById('in-peels').value = 800;
+        document.getElementById('in-starch').value = 200;
+        document.getElementById('in-eggs').value = 40;
+        document.getElementById('in-algae').value = 0;
+        document.getElementById('in-water').value = 1.5;
+      } else if (name === 'acid_crash') {
+        document.getElementById('in-peels').value = 1000;
+        document.getElementById('in-starch').value = 350;
+        document.getElementById('in-eggs').value = 0;
+        document.getElementById('in-algae').value = 0;
+        document.getElementById('in-water').value = 1.5;
+      } else if (name === 'algae_boost') {
+        document.getElementById('in-peels').value = 600;
+        document.getElementById('in-starch').value = 150;
+        document.getElementById('in-eggs').value = 44;
+        document.getElementById('in-algae').value = 500;
+        document.getElementById('in-water').value = 1.6;
+      }
+      recomputeSimulation();
+    }
+
+    function recomputeSimulation() {
+      const peelsKg = parseFloat(document.getElementById('in-peels').value) / 1000.0;
+      const starchKg = parseFloat(document.getElementById('in-starch').value) / 1000.0;
+      const eggsKg = parseFloat(document.getElementById('in-eggs').value) / 1000.0;
+      const algaeKg = parseFloat(document.getElementById('in-algae').value) / 1000.0;
+      const waterL = parseFloat(document.getElementById('in-water').value);
+
+      document.getElementById('val-peels').textContent = Math.round(peelsKg * 1000) + ' g';
+      document.getElementById('val-starch').textContent = Math.round(starchKg * 1000) + ' g';
+      document.getElementById('val-eggs').textContent = Math.round(eggsKg * 1000) + ' g';
+      document.getElementById('val-algae').textContent = Math.round(algaeKg * 1000) + ' g';
+      document.getElementById('val-water').textContent = waterL.toFixed(1) + ' L';
+
+      const dryPeels = peelsKg * 0.15;
+      const dryStarch = starchKg * 0.40;
+      const dryEggs = eggsKg * 0.98;
+      const dryAlgae = algaeKg * 0.18;
+
+      const totalWaterL = Math.max(0.5, waterL + (peelsKg - dryPeels) + (starchKg - dryStarch) + (eggsKg - dryEggs) + (algaeKg - dryAlgae));
+      const carbsG = (dryPeels * 0.65 + dryStarch * 0.85 + dryAlgae * 0.52) * 1000.0;
+      const nG = (dryPeels * 0.02 + dryStarch * 0.025 + dryEggs * 0.005 + dryAlgae * 0.045) * 1000.0;
+      const caco3G = (dryEggs * 0.94 + dryAlgae * 0.04) * 1000.0;
+
+      const carbsGL = carbsG / totalWaterL;
+      const nGL = Math.max(0.1, nG / totalWaterL);
+      const caco3GL = caco3G / totalWaterL;
+      const cnRatio = carbsGL / nGL;
+      const oddRatio = Math.min(0.42, 0.22 + (algaeKg / (peelsKg + starchKg + algaeKg + 0.01)) * 0.18);
+
+      mixProps = {
+        volL: totalWaterL,
+        carbsGL: carbsGL,
+        nGL: nGL,
+        caco3GL: caco3GL,
+        cnRatio: cnRatio,
+        oddRatio: oddRatio
+      };
+
+      document.getElementById('mix-vol').textContent = totalWaterL.toFixed(2) + ' L';
+      document.getElementById('mix-carb').textContent = carbsGL.toFixed(1) + ' g/L';
+      document.getElementById('mix-caco3').textContent = caco3GL.toFixed(1) + ' g/L';
+      document.getElementById('mix-cn').textContent = cnRatio.toFixed(1);
+
+      trajectory = [];
+      let s = {
+        carb: carbsGL,
+        vfa: 1.0,
+        n: nGL,
+        caco3: caco3GL,
+        xAcid: 1.2,
+        xPha: 0.5,
+        pha: 0.02,
+        doMgL: 7.0,
+        ph: 6.5,
+        fault: false
+      };
+
+      const dt = 0.5;
+      for (let t = 0; t <= 73.001; t += dt) {
+        let stateName = 'ACIDOGENESIS_REST';
+        let rpm = 8;
+        let tempC = 30.0;
+        let aerated = false;
+        let valveVfa = false;
+        let valveDrain = false;
+
+        if (t < 2.0) {
+          stateName = 'FEEDING_AND_MACERATION';
+          rpm = 45;
+          tempC = 28.0;
+        } else if (t < 36.0) {
+          stateName = 'ACIDOGENESIS_REST';
+          rpm = 8;
+          tempC = 30.0;
+        } else if (t < 36.5) {
+          stateName = 'CENTRIFUGE_SEPARATION';
+          rpm = 650;
+          tempC = 25.0;
+          valveVfa = true;
+        } else if (t < 72.0) {
+          stateName = 'AERATION_PHA_FEAST';
+          rpm = 15;
+          tempC = 26.0;
+          aerated = true;
+        } else {
+          stateName = 'HARVEST_EXTRACTION';
+          rpm = 800;
+          tempC = 70.0;
+          valveDrain = true;
+        }
+
+        if (Math.abs(t - 36.5) < 0.01) {
+          s.n = Math.max(0.05, s.n * 0.15);
+          s.xPha = Math.max(s.xPha, 1.2);
+        }
+
+        const baseVfaLog = Math.log10(Math.max(s.vfa, 0.05) / 60.0);
+        const bufferShift = Math.min(s.caco3 * 0.12, 1.8);
+        let rawPh = 4.76 - baseVfaLog * 0.45 + bufferShift;
+        if (s.caco3 < 0.5 && s.vfa > 15.0) {
+          rawPh -= (s.vfa - 15.0) * 0.045;
+        }
+        s.ph = Math.max(3.8, Math.min(7.6, rawPh));
+
+        if (s.ph < 4.25) {
+          s.fault = true;
+          stateName = 'FAULT (CHOC ACIDE pH < 4.2)';
+          rpm = 0;
+          aerated = false;
+        }
+
+        const hPlus = Math.pow(10, -s.ph);
+        const ka = Math.pow(10, -4.76);
+        const hvfa = s.vfa * (hPlus / (hPlus + ka));
+
+        let orpMv = 120.0 + 65.0 * Math.log10(Math.max(0.02, s.doMgL)) - 59.16 * (s.ph - 7.0) - 6.2 * s.vfa;
+        if (!aerated && t >= 2.0 && t < 36.5) {
+          orpMv = Math.min(-160.0, orpMv - 80.0);
+        } else if (aerated) {
+          orpMv = 145.0 + (7.0 - s.ph) * 25.0 + (s.doMgL - 6.0) * 12.0;
+        }
+        orpMv = Math.max(-340, Math.min(240, orpMv));
+
+        const nRps = Math.max(0.01, rpm / 60.0);
+        const d = 0.48;
+        const nu = 1.15e-6;
+        const powerW = 0.85 * 1015.0 * Math.pow(nRps, 3) * Math.pow(d, 5);
+        const eps = Math.max(1e-8, powerW / (1015.0 * 0.045));
+        const lambdaKum = Math.pow(Math.pow(nu, 3) / eps, 0.25) * 1e6;
+        const rcfG = 1.118e-5 * 24.0 * rpm * rpm;
+
+        const totalPhaBio = s.xPha + s.pha;
+        const phaPct = totalPhaBio > 0 ? (s.pha / totalPhaBio) * 100.0 : 0.0;
+
+        trajectory.push({
+          t: Number(t.toFixed(1)),
+          stateName,
+          carb: s.carb,
+          vfa: s.vfa,
+          hvfa: hvfa,
+          caco3: s.caco3,
+          pha: s.pha,
+          phaPct: phaPct,
+          ph: s.ph,
+          doMgL: s.doMgL,
+          orpMv: orpMv,
+          tempC: tempC,
+          rpm: rpm,
+          lambdaKum: lambdaKum,
+          rcfG: rcfG,
+          aerated: aerated,
+          valveVfa: valveVfa,
+          valveDrain: valveDrain,
+          fault: s.fault
+        });
+
+        if (!s.fault) {
+          const inhibHvfa = 1.8 / (1.8 + hvfa);
+          const denomCarb = 2.5 + s.carb + (s.carb * s.carb) / 120.0;
+          let muAcid = 0.35 * (s.carb / Math.max(1e-6, denomCarb)) * inhibHvfa;
+          if (s.ph < 5.0) {
+            muAcid *= Math.max(0.0, (s.ph - 4.2) / 0.8);
+          }
+          const rCarb = muAcid * s.xAcid;
+          const rVfaProd = rCarb * 0.72;
+          const rXAcid = (muAcid - 0.015) * s.xAcid;
+
+          let rCaco3 = 0.0;
+          if (s.ph < 6.7 && s.caco3 > 0) {
+            rCaco3 = 0.14 * Math.max(0.1, (6.8 - s.ph));
+          }
+
+          let rVfaCons = 0.0;
+          let rPha = 0.0;
+          let rXPha = 0.0;
+          let rDo = 0.0;
+
+          if (aerated) {
+            const monodO2 = s.doMgL / (0.25 + s.doMgL);
+            const spaceFactor = Math.max(0.0, 1.0 - (phaPct / 100.0) / 0.78);
+            const qPha = 0.40 * (s.vfa / (0.5 + s.vfa)) * monodO2 * spaceFactor;
+            if (s.n < 0.5) {
+              rPha = qPha * s.xPha;
+              rVfaCons = rPha / 0.65;
+            } else {
+              const muG = 0.18 * (s.vfa / (0.5 + s.vfa)) * monodO2;
+              rXPha = muG * s.xPha;
+              rPha = 0.25 * qPha * s.xPha;
+              rVfaCons = rXPha / 0.45 + rPha / 0.65;
+            }
+            rDo = 45.0 * (8.2 - s.doMgL) - rVfaCons * 1.15;
+          } else {
+            rDo = -1.8 * (s.doMgL / (0.2 + s.doMgL));
+          }
+
+          s.carb = Math.max(0.0, s.carb - rCarb * dt);
+          s.vfa = Math.max(0.0, s.vfa + (rVfaProd - rVfaCons) * dt);
+          s.caco3 = Math.max(0.0, s.caco3 - rCaco3 * dt);
+          s.xAcid = Math.max(0.1, s.xAcid + rXAcid * dt);
+          s.xPha = Math.max(0.1, s.xPha + rXPha * dt);
+          s.pha = Math.max(0.0, s.pha + rPha * dt);
+          s.doMgL = Math.max(0.08, Math.min(8.2, s.doMgL + rDo * dt));
+        }
+      }
+
+      const last = trajectory[trajectory.length - 1];
+      const xHv = Math.min(0.35, mixProps.oddRatio * 0.60);
+      const invTm = (1.0 / 450.15) - (8.314 / 10900.0) * Math.log(1.0 - xHv);
+      const tmC = (1.0 / invTm) - 273.15;
+      const d33 = 3.2 + 14.5 * Math.exp(-Math.pow((xHv - 0.18) / 0.10, 2));
+
+      document.getElementById('out-pha').textContent = (last.pha * mixProps.volL).toFixed(1) + ' g secs';
+      document.getElementById('out-hv').textContent = (xHv * 100).toFixed(1) + ' mol% 3HV';
+      document.getElementById('out-tm').textContent = tmC.toFixed(1) + ' °C';
+      document.getElementById('out-d33').textContent = d33.toFixed(1) + ' pC/N';
+
+      updateUIAtHour(currentHour);
+    }
+
+    function setHour(h) {
+      currentHour = parseFloat(h);
+      document.getElementById('slider-time').value = currentHour;
+      updateUIAtHour(currentHour);
+    }
+
+    function onTimeSlider(val) {
+      currentHour = parseFloat(val);
+      updateUIAtHour(currentHour);
+    }
+
+    function togglePlay() {
+      const btn = document.getElementById('btn-play');
+      if (playTimer) {
+        clearInterval(playTimer);
+        playTimer = null;
+        btn.textContent = '▶ Lecture Auto (0h → 73h)';
+      } else {
+        if (currentHour >= 72.5) currentHour = 0;
+        btn.textContent = '⏸ Pause';
+        playTimer = setInterval(() => {
+          currentHour += 0.5;
+          if (currentHour > 73.0) {
+            clearInterval(playTimer);
+            playTimer = null;
+            btn.textContent = '▶ Lecture Auto (0h → 73h)';
+            return;
+          }
+          document.getElementById('slider-time').value = currentHour;
+          updateUIAtHour(currentHour);
+        }, 120);
+      }
+    }
+
+    function updateUIAtHour(h) {
+      const idx = Math.min(trajectory.length - 1, Math.max(0, Math.round(h * 2)));
+      const pt = trajectory[idx];
+      if (!pt) return;
+
+      const dayNum = Math.floor(pt.t / 24) + 1;
+      const remH = (pt.t % 24).toFixed(1);
+      document.getElementById('label-hour').textContent = `t = ${pt.t.toFixed(1)} h`;
+      document.getElementById('label-day').textContent = `(Jour ${dayNum}, +${remH}h)`;
+      document.getElementById('bio-hour-label').textContent = `t = ${pt.t.toFixed(1)} h`;
+      document.getElementById('sensor-time-title').textContent = `t = ${pt.t.toFixed(1)} h`;
+
+      const badge = document.getElementById('badge-phase');
+      badge.textContent = `AUTOMATE : ${pt.stateName}`;
+
+      for (let i = 1; i <= 5; i++) {
+        document.getElementById('step-bar-' + i).className = 'cursor-pointer p-1.5 rounded border border-[var(--border)] text-center';
+      }
+      let activeStep = 2;
+      if (pt.t < 2.0) activeStep = 1;
+      else if (pt.t < 36.0) activeStep = 2;
+      else if (pt.t < 36.5) activeStep = 3;
+      else if (pt.t < 72.0) activeStep = 4;
+      else activeStep = 5;
+      document.getElementById('step-bar-' + activeStep).className = 'cursor-pointer p-1.5 rounded border-2 border-emerald-500 bg-emerald-500/10 text-center';
+
+      document.getElementById('bio-carb').textContent = pt.carb.toFixed(1) + ' g/L';
+      document.getElementById('bar-carb').style.width = Math.min(100, (pt.carb / Math.max(1, mixProps.carbsGL)) * 100) + '%';
+
+      document.getElementById('bio-vfa').textContent = pt.vfa.toFixed(1) + ' g/L';
+      document.getElementById('bar-vfa').style.width = Math.min(100, (pt.vfa / 55.0) * 100) + '%';
+
+      document.getElementById('bio-hvfa').textContent = `${pt.hvfa.toFixed(2)} g/L (Seuil : 1.8 g/L)`;
+      document.getElementById('bar-hvfa').style.width = Math.min(100, (pt.hvfa / 2.5) * 100) + '%';
+
+      document.getElementById('bio-caco3').textContent = pt.caco3.toFixed(1) + ' g/L';
+      document.getElementById('bar-caco3').style.width = Math.min(100, (pt.caco3 / 20.0) * 100) + '%';
+
+      document.getElementById('bio-pha').textContent = `${pt.pha.toFixed(2)} g/L (${pt.phaPct.toFixed(1)}%)`;
+      document.getElementById('bar-pha').style.width = Math.min(100, (pt.phaPct / 78.0) * 100) + '%';
+
+      const narr = document.getElementById('bio-narrative');
+      if (pt.fault) {
+        narr.className = 'mt-4 p-3 rounded-xl bg-rose-500/15 border border-rose-500/40 text-xs text-rose-300 leading-relaxed';
+        narr.innerHTML = '🚨 <strong>ARRÊT D\'URGENCE (CHOC ACIDE) :</strong> Sans coquilles d\'œufs (CaCO₃), le pH s\'est effondré sous 4.2 ! Les acides non-dissociés [HVFA] ont traversé la membrane des bactéries et tué la fermentation.';
+      } else if (pt.t < 2.0) {
+        narr.className = 'mt-4 p-3 rounded-xl bg-blue-500/10 border border-blue-500/30 text-xs leading-relaxed';
+        narr.innerHTML = '🔄 <strong>Phase 1 (Macération 0–2h) :</strong> Le tambour brasse à 45 RPM à 28°C pour déchiqueter les épluchures. Les bactéries consomment les dernières traces d\'oxygène de l\'eau : le Rédox (ORP) commence à chuter.';
+      } else if (pt.t < 36.0) {
+        narr.className = 'mt-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs leading-relaxed';
+        narr.innerHTML = '🍋 <strong>Phase 2 (Acidogenèse anaérobie 2–36h) :</strong> Plus une trace d\'oxygène (ORP = ' + Math.round(pt.orpMv) + ' mV). Les sucres sont convertis en Acides Gras Volatils (AGV). Les coquilles d\'œufs se dissolvent doucement pour bloquer le pH autour de ' + pt.ph.toFixed(2) + '.';
+      } else if (pt.t < 36.5) {
+        narr.className = 'mt-4 p-3 rounded-xl bg-purple-500/10 border border-purple-500/30 text-xs leading-relaxed';
+        narr.innerHTML = '🌪️ <strong>Phase 3 (Essorage Centrifuge 36h) :</strong> Le tambour accélère à 650 RPM (113 G) ! Les fibres solides restent plaquées contre la grille inox (Compost Grade C) tandis que le jus clair riche en AGV (' + pt.vfa.toFixed(1) + ' g/L) passe en phase aérobie.';
+      } else if (pt.t < 72.0) {
+        narr.className = 'mt-4 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs leading-relaxed';
+        narr.innerHTML = '🫧 <strong>Phase 4 (Gavage Aérobie PHA 36.5–72h) :</strong> La pompe à air injecte de l\'oxygène (DO = 8.2 mg/L, ORP bondit à +' + Math.round(pt.orpMv) + ' mV). Privées d\'azote mais gavées d\'AGV, les bactéries stockent ' + pt.phaPct.toFixed(1) + '% de leur poids en plastique PHBV !';
+      } else {
+        narr.className = 'mt-4 p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-xs leading-relaxed';
+        narr.innerHTML = '🏆 <strong>Phase 5 (Lyse Thermique & Récolte 72–73h) :</strong> Chauffage à 70°C + carbonate de sodium et essorage à 800 RPM (172 G) pour récupérer la poudre blanche de bioplastique PHBV (Grade A) et le biostimulant liquide (Grade B).';
+      }
+
+      document.getElementById('ekf-vfa').textContent = `${(pt.vfa * 0.98).toFixed(1)} ± 1.2 g/L`;
+      document.getElementById('ekf-do').textContent = `${pt.doMgL.toFixed(2)} ± 0.08 mg/L`;
+
+      const actAir = document.getElementById('act-air');
+      actAir.textContent = pt.aerated ? 'ON (100%)' : 'OFF (0%)';
+      actAir.className = pt.aerated
+        ? 'font-mono font-bold px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-400'
+        : 'font-mono font-bold px-2 py-0.5 rounded bg-slate-500/20 text-slate-400';
+
+      const actHeat = document.getElementById('act-heat');
+      actHeat.textContent = pt.fault ? 'COUPÉ' : `ON (${pt.tempC.toFixed(0)}°C)`;
+
+      const actVfa = document.getElementById('act-valve-vfa');
+      actVfa.textContent = pt.valveVfa ? 'OUVERTE' : 'FERMÉE';
+      actVfa.className = pt.valveVfa
+        ? 'font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400'
+        : 'font-mono font-bold px-2 py-0.5 rounded bg-slate-500/20 text-slate-400';
+
+      const actDrain = document.getElementById('act-valve-drain');
+      actDrain.textContent = pt.valveDrain ? 'OUVERTE' : 'FERMÉE';
+      actDrain.className = pt.valveDrain
+        ? 'font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400'
+        : 'font-mono font-bold px-2 py-0.5 rounded bg-slate-500/20 text-slate-400';
+
+      document.getElementById('sens-ph').textContent = pt.ph.toFixed(2);
+      const phStat = document.getElementById('sens-ph-status');
+      if (pt.ph < 4.5) {
+        phStat.textContent = '🚨 ALARME CHOC ACIDE (< 4.5)';
+        phStat.className = 'text-xs font-medium mt-1 text-rose-400';
+      } else if (pt.ph < 5.5) {
+        phStat.textContent = '⚠️ Acidité forte (Tampon faible)';
+        phStat.className = 'text-xs font-medium mt-1 text-amber-400';
+      } else {
+        phStat.textContent = '✅ Zone optimale (Tampon CaCO₃ actif)';
+        phStat.className = 'text-xs font-medium mt-1 text-emerald-400';
+      }
+
+      document.getElementById('sens-orp').textContent = (pt.orpMv >= 0 ? '+' : '') + Math.round(pt.orpMv) + ' mV';
+      const orpStat = document.getElementById('sens-orp-status');
+      if (pt.orpMv < -150) {
+        orpStat.textContent = '🔒 Anaérobie stricte (Fermentation AGV)';
+        orpStat.className = 'text-xs font-medium mt-1 text-amber-400';
+      } else if (pt.orpMv > 80) {
+        orpStat.textContent = '🌬️ Milieu oxydant (Stockage PHA actif)';
+        orpStat.className = 'text-xs font-medium mt-1 text-cyan-400';
+      } else {
+        orpStat.textContent = '⏳ Transition Rédox';
+        orpStat.className = 'text-xs font-medium mt-1 text-slate-400';
+      }
+
+      document.getElementById('sens-do').textContent = pt.doMgL.toFixed(2) + ' mg/L';
+      const doStat = document.getElementById('sens-do-status');
+      doStat.textContent = pt.aerated ? '🫧 Saturation O₂ (Bullage ON)' : '💤 Anoxie (Pompe à air OFF)';
+      doStat.className = pt.aerated ? 'text-xs font-medium mt-1 text-cyan-400' : 'text-xs font-medium mt-1 text-slate-400';
+
+      document.getElementById('sens-temp').textContent = pt.tempC.toFixed(1) + ' °C';
+      const tempStat = document.getElementById('sens-temp-status');
+      tempStat.textContent = pt.tempC > 60 ? '♨️ Lyse thermique 70°C' : `🔥 Régulation PID (${pt.tempC.toFixed(0)}°C)`;
+
+      document.getElementById('sens-rpm').textContent = pt.rpm + ' RPM';
+      const rpmStat = document.getElementById('sens-rpm-status');
+      if (pt.rpm >= 600) {
+        rpmStat.textContent = `🌪️ Essorage Centrifuge (${pt.rcfG.toFixed(0)} G)`;
+        rpmStat.className = 'text-xs font-medium mt-1 text-purple-400';
+      } else {
+        rpmStat.textContent = `🛡️ Flocs intacts (λK = ${pt.lambdaKum.toFixed(0)} µm > 65 µm)`;
+        rpmStat.className = 'text-xs font-medium mt-1 text-emerald-400';
+      }
+
+      document.getElementById('json-packet').textContent = JSON.stringify({
+        device_id: "ESP32-CLAMART-01",
+        time_h: pt.t,
+        temp_c: pt.tempC,
+        ph: Number(pt.ph.toFixed(2)),
+        orp_mv: Math.round(pt.orpMv),
+        drum_rpm: pt.rpm,
+        dissolved_o2_mg_l: Number(pt.doMgL.toFixed(2)),
+        aeration_status: pt.aerated
+      });
+
+      drawChart(pt.t);
+    }
+
+    function drawChart(cursorHour) {
+      const canvas = document.getElementById('chart-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      const padL = 42, padR = 20, padT = 16, padB = 26;
+      const pw = w - padL - padR;
+      const ph = h - padT - padB;
+
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.18)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 4; i++) {
+        const y = padT + (ph * i) / 4;
+        ctx.beginPath();
+        ctx.moveTo(padL, y);
+        ctx.lineTo(w - padR, y);
+        ctx.stroke();
+      }
+
+      const x36 = padL + (36.0 / 73.0) * pw;
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.45)';
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(x36, padT);
+      ctx.lineTo(x36, h - padB);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = 'rgba(148, 163, 184, 0.8)';
+      ctx.font = '12px monospace';
+      ctx.fillText('0h', padL, h - 6);
+      ctx.fillText('36h (Filtration + Bullage ON)', x36 - 70, h - 6);
+      ctx.fillText('73h', w - padR - 24, h - 6);
+
+      function plotLine(extractor, maxVal, color) {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.4;
+        ctx.beginPath();
+        trajectory.forEach((pt, i) => {
+          const x = padL + (pt.t / 73.0) * pw;
+          const norm = Math.max(0, Math.min(1, extractor(pt) / maxVal));
+          const y = padT + ph * (1 - norm);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+      }
+
+      plotLine(p => p.ph * 10, 80, '#34d399');
+      plotLine(p => p.vfa, 60, '#fbbf24');
+      plotLine(p => p.phaPct, 80, '#22d3ee');
+      plotLine(p => ((p.orpMv + 350) / 600) * 80, 80, '#c084fc');
+
+      const xCur = padL + (cursorHour / 73.0) * pw;
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(xCur, padT);
+      ctx.lineTo(xCur, h - padB);
+      ctx.stroke();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      recomputeSimulation();
+    });
+  </script>
+</body>
+</html>

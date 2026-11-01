@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Manuel d'Étude Complet — Bioraffinerie Holarchique Sentinel (De l'Intrant au Produit Certifié)</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 14mm 15mm 14mm 15mm;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+      color: #1e293b;
+      line-height: 1.42;
+      font-size: 9.2pt;
+      margin: 0;
+      padding: 0;
+      background: #ffffff;
+    }
+    h1 {
+      font-size: 19pt;
+      color: #0f172a;
+      margin: 0 0 6px 0;
+      letter-spacing: -0.3px;
+    }
+    h2 {
+      font-size: 12.5pt;
+      color: #065f46;
+      border-bottom: 2px solid #10b981;
+      padding-bottom: 3px;
+      margin-top: 14px;
+      margin-bottom: 8px;
+      page-break-after: avoid;
+    }
+    h3 {
+      font-size: 10.5pt;
+      color: #0f172a;
+      margin-top: 10px;
+      margin-bottom: 4px;
+      page-break-after: avoid;
+    }
+    p {
+      margin: 4px 0 7px 0;
+      text-align: justify;
+    }
+    ul, ol {
+      margin: 4px 0 8px 0;
+      padding-left: 18px;
+    }
+    li {
+      margin-bottom: 3.5px;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%);
+      color: #ffffff;
+      padding: 16px 20px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+    }
+    .header-banner h1 {
+      color: #ffffff;
+      font-size: 18pt;
+    }
+    .header-banner .subtitle {
+      color: #a7f3d0;
+      font-size: 10pt;
+      margin-top: 4px;
+      font-weight: 500;
+    }
+    .header-banner .meta {
+      color: #cbd5e1;
+      font-size: 8.5pt;
+      margin-top: 8px;
+      display: flex;
+      justify-content: space-between;
+      border-top: 1px solid rgba(255,255,255,0.2);
+      padding-top: 6px;
+    }
+    .callout {
+      border-left: 4px solid #10b981;
+      background: #f0fdf4;
+      padding: 9px 12px;
+      border-radius: 0 8px 8px 0;
+      margin: 8px 0;
+      page-break-inside: avoid;
+    }
+    .callout-warn {
+      border-left: 4px solid #f59e0b;
+      background: #fffbeb;
+      padding: 9px 12px;
+      border-radius: 0 8px 8px 0;
+      margin: 8px 0;
+      page-break-inside: avoid;
+    }
+    .callout-blue {
+      border-left: 4px solid #0284c7;
+      background: #f0f9ff;
+      padding: 9px 12px;
+      border-radius: 0 8px 8px 0;
+      margin: 8px 0;
+      page-break-inside: avoid;
+    }
+    .callout-title {
+      font-weight: 700;
+      color: #065f46;
+      margin-bottom: 3px;
+      font-size: 9.8pt;
+    }
+    .callout-warn .callout-title {
+      color: #b45309;
+    }
+    .callout-blue .callout-title {
+      color: #0369a1;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8px 0 10px 0;
+      font-size: 8.8pt;
+      page-break-inside: avoid;
+    }
+    th {
+      background: #0f172a;
+      color: #ffffff;
+      text-align: left;
+      padding: 6px 8px;
+      font-weight: 600;
+    }
+    td {
+      padding: 5.5px 8px;
+      border-bottom: 1px solid #cbd5e1;
+      vertical-align: top;
+    }
+    tr:nth-child(even) td {
+      background: #f8fafc;
+    }
+    .formula-box {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 7px 12px;
+      font-family: 'Cambria Math', 'Times New Roman', serif;
+      font-size: 10pt;
+      text-align: center;
+      margin: 6px 0;
+      color: #0f172a;
+      page-break-inside: avoid;
+    }
+    .grid-2 {
+      display: flex;
+      gap: 10px;
+      margin: 8px 0;
+      page-break-inside: avoid;
+    }
+    .grid-2 > .card {
+      flex: 1;
+      width: 48%;
+    }
+    .grid-3 {
+      display: flex;
+      gap: 8px;
+      margin: 8px 0;
+      page-break-inside: avoid;
+    }
+    .grid-3 > .card {
+      flex: 1;
+      width: 32%;
+    }
+    .card {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 9px 11px;
+      background: #ffffff;
+      page-break-inside: avoid;
+    }
+    .card-header {
+      font-weight: 700;
+      font-size: 9.2pt;
+      color: #0f172a;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 4px;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .badge {
+      display: inline-block;
+      padding: 1.5px 6px;
+      border-radius: 10px;
+      font-size: 7.5pt;
+      font-weight: 700;
+      background: #d1fae5;
+      color: #065f46;
+      white-space: nowrap;
+    }
+    .badge-amber {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    .badge-blue {
+      background: #e0f2fe;
+      color: #075985;
+    }
+    .badge-purple {
+      background: #f3e8ff;
+      color: #6b21a8;
+    }
+    .flow-diagram {
+      display: flex;
+      align-items: stretch;
+      justify-content: space-between;
+      gap: 6px;
+      margin: 10px 0;
+      page-break-inside: avoid;
+    }
+    .flow-step {
+      flex: 1;
+      border: 1.5px solid #059669;
+      background: #f0fdf4;
+      border-radius: 8px;
+      padding: 7px 8px;
+      font-size: 8.3pt;
+      text-align: center;
+    }
+    .flow-step strong {
+      display: block;
+      color: #065f46;
+      font-size: 8.8pt;
+      margin-bottom: 2px;
+    }
+    .flow-arrow {
+      display: flex;
+      align-items: center;
+      font-weight: bold;
+      color: #059669;
+      font-size: 13pt;
+    }
+    .page-break {
+      margin-top: 10px;
+    }
+    code {
+      font-family: Consolas, 'Courier New', monospace;
+      font-size: 8.5pt;
+      background: #f1f5f9;
+      padding: 1px 4px;
+      border-radius: 3px;
+      color: #0f172a;
+    }
+    .footer-note {
+      margin-top: 14px;
+      padding-top: 6px;
+      border-top: 1px solid #cbd5e1;
+      font-size: 8pt;
+      color: #64748b;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ======================= PAGE 1 : VISION GLOBALE & FIL CONDUCTEUR ======================= -->
+  <div class="header-banner">
+    <h1>MANUEL COMPLET DE LA BIORAFFINERIE HOLARCHIQUE</h1>
+    <div class="subtitle">
+      Fil conducteur intégral : De l'insertion des déchets « au doigt mouillé » jusqu'à la certification optique &amp; cryptographique des bioproduits
+    </div>
+    <div class="meta">
+      <span>Projet : <strong>Sentinel Holarchy (Pilote Clamart &amp; Ferme d'Algues)</strong></span>
+      <span>Architecture : <strong>Holarchie à 6 Niveaux (Holons 0 à 5)</strong></span>
+      <span>Licence : <strong>MIT / CERN-OHL-S v2</strong></span>
+    </div>
+  </div>
+
+  <p>
+    Ce document de référence est conçu pour étudier et comprendre en profondeur le fonctionnement de notre bioraffinerie distribuée. Il répond à un défi d'ingénierie fondamental : <strong>comment transformer des déchets organiques variables (épluchures ménagères, restes de repas, algues) en produits de haute technologie (bioplastique piézoélectrique PHBV, biostimulant agricole, amendement) de qualité industrielle irréprochable, tout en exigeant zéro pesée fastidieuse de la part de l'opérateur humain ?</strong>
+  </p>
+
+  <div class="callout">
+    <div class="callout-title">Le Principe Directeur : « Simple à l'Entrée, Infaillible en Sortie »</div>
+    <ul>
+      <li><strong>À l'entrée (Zéro balance de précision) :</strong> L'opérateur applique deux règles physiques ultra-simples issues du compostage : <strong>(1) la règle volumétrique « 1/3 Féculents-Brun / 2/3 Vert-Algues »</strong> pour garantir un rapport Carbone/Azote favorable, et <strong>(2) un panier passif de coquilles d'œufs/huîtres en excès</strong> qui s'autorégule chimiquement par solubilité.</li>
+      <li><strong>Pendant le cycle (Pilotage par les produits) :</strong> Au lieu de chercher à deviner au gramme près ce que l'opérateur a jeté, les capteurs mesurent en temps réel <strong>l'apparition des produits chimiques</strong> (acides gras volatils via la conductivité différentielle &Delta;EC et le CO<sub>2</sub>, puis fin de synthèse du bioplastique via le rebond d'oxygène dissous).</li>
+      <li><strong>À la sortie (Preuve absolue de qualité) :</strong> Aucun lot ne sort à l'aveugle. Le polymère est analysé par <strong>spectroscopie laser OpenRAMAN</strong> (cristallinité, taux de copolymère 3HV, pureté) et scellé dans un <strong>registre cryptographique SHA-256</strong> qui met à jour le jumeau numérique par inférence bayésienne.</li>
+    </ul>
+  </div>
+
+  <h2>1. Vue Synoptique : Le Fil Conducteur Temporel (0h &rarr; 73h) à travers les 6 Holons</h2>
+
+  <div class="flow-diagram">
+    <div class="flow-step">
+      <strong>ACTE I (t = 0h)</strong>
+      Insertion « Dump &amp; Go »<br>
+      <em>1/3 Féculents + 2/3 Vert<br>+ Panier Coquilles CaCO<sub>3</sub></em>
+    </div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">
+      <strong>ACTE II (0h &ndash; 36h)</strong>
+      Acidogenèse Anaérobie<br>
+      <em>Sucres &rarr; Acides (AGV)<br>Suivi par &Delta;EC, ORP, CO<sub>2</sub></em>
+    </div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">
+      <strong>ACTE III (36h)</strong>
+      Essorage Centrifuge<br>
+      <em>650 RPM (113 G)<br>&rarr; Sortie Compost Grade C</em>
+    </div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">
+      <strong>ACTE IV (36.5h &ndash; 72h)</strong>
+      Gavage Aérobie PHA<br>
+      <em>Bullage O<sub>2</sub> + Carence N<br>AGV &rarr; Granules PHBV</em>
+    </div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step">
+      <strong>ACTE V (72h &ndash; 73h)</strong>
+      Lyse Verte &amp; Raman<br>
+      <em>Na<sub>2</sub>CO<sub>3</sub> 70°C + 800 RPM<br>&rarr; Grade B &amp; Grade A Certifié</em>
+    </div>
+  </div>
+
+  <h2>2. Rappel de la Vision Holarchique : Comment les 6 Niveaux s'emboîtent</h2>
+  <p>
+    Dans la théorie d'Arthur Koestler, un <strong>Holon</strong> est une entité qui est à la fois un <em>tout autonome</em> à son échelle et une <em>partie intégrée</em> de l'échelle supérieure. Si Internet ou le serveur central tombe en panne, chaque niveau inférieur continue de fonctionner de manière autonome :
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 13%;">Niveau</th>
+        <th style="width: 24%;">Nom du Holon &amp; Code</th>
+        <th style="width: 35%;">Rôle dans le Fil Conducteur (0h &rarr; 73h)</th>
+        <th style="width: 28%;">Garantie d'Autonomie &amp; Qualité</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Holon 0</strong></td>
+        <td><strong>Bioréacteur Microbien</strong><br><code>holon0_microbial/</code></td>
+        <td>Consortium bactérien (MMC) qui digère les sucres en acides gras volatils (C2 à C5) puis les polymérise en granules intracellulaires de <strong>PHBV</strong>.</td>
+        <td>Autorégulation du pH par équilibre solide-liquide avec le carbonate de calcium (CaCO<sub>3</sub>).</td>
+      </tr>
+      <tr>
+        <td><strong>Holon 1</strong></td>
+        <td><strong>Tambour Matériel Edge</strong><br><code>holon1_hardware/</code></td>
+        <td>Tambour inox 60 L (&lt; 300 €) piloté par ESP32 : jauges de poids HX711, sondes pH, Rédox ORP, O<sub>2</sub>, Conductivité &Delta;EC, régulation PID et filtre de Kalman (EKF).</td>
+        <td>Fonctionne 100 % hors-ligne. Protège les flocs bactériens (Kolmogorov &lambda;<sub>K</sub> &gt; 65 &mu;m) et coupe tout en cas de choc acide.</td>
+      </tr>
+      <tr>
+        <td><strong>Holon 2</strong></td>
+        <td><strong>Atelier &amp; Extraction Verte</strong><br><code>holon2_workshop/</code></td>
+        <td>Lyse thermique douce (70 °C + Na<sub>2</sub>CO<sub>3</sub>) sans aucun solvant chloré. Sépare les Grades A (PHBV), B (Biostimulant) et C (Compost).</td>
+        <td>Validateur logiciel <strong>Ecocert</strong> bloquant tout réactif interdit ; modélisation de la masse molaire M<sub>w</sub> (&gt; 320 kDa).</td>
+      </tr>
+      <tr>
+        <td><strong>Holon 3</strong></td>
+        <td><strong>Intelligence &amp; OpenRAMAN</strong><br><code>holon3_intelligence/</code></td>
+        <td>Analyse laser à 532 nm de la poudre récoltée (déconvolution des pics 1724/1740 cm<sup>-1</sup>) et recalibrage bayésien des constantes du Holon 0.</td>
+        <td>Délivre le <strong>Certificat d'Analyse (CoA)</strong> signé par hachage SHA-256 prouvant la pureté et la cristallinité du lot.</td>
+      </tr>
+      <tr>
+        <td><strong>Holon 4</strong></td>
+        <td><strong>Maillage Territorial</strong><br><code>holon4_territory/</code></td>
+        <td>Mutualise les flux à l'échelle d'une commune (Clamart) ou d'une ferme côtière (équilibrage collectif des gisements Carbone et Azote).</td>
+        <td>Résilience logistique locale : aucune dépendance aux chaînes d'approvisionnement pétrochimiques.</td>
+      </tr>
+      <tr>
+        <td><strong>Holon 5</strong></td>
+        <td><strong>Paradigme &amp; ACV ISO-14040</strong><br><code>holon5_paradigm/</code></td>
+        <td>Comptabilise le carbone séquestré (-3,95 kg CO<sub>2</sub>e par kg de PHA produit) et la rentabilité économique distribuée (ROIC, VAN).</td>
+        <td>Architecture Open-Source (MIT / CERN-OHL) auditable scientifiquement de bout en bout.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ======================= PAGE 2 : ACTE I — INSERTION DES DÉCHETS AU DOIGT MOUILLÉ ======================= -->
+  <div class="page-break"></div>
+
+  <h2>3. ACTE I (t = 0h) : L'Insertion des Déchets « au Doigt Mouillé » mais Chimiquement Verrouillée</h2>
+  <p>
+    La première question pratique que se pose tout opérateur est : <em>« Dois-je peser mes épluchures, mes restes de pâtes et mes coquilles d'œufs sur une balance avant de lancer une tournée ? »</em> La réponse est <strong>NON</strong>. Peser chaque ingrédient manuellement tuerait l'adoption du système. À l'inverse, jeter absolument n'importe quoi (par exemple 100 % de viande ou 100 % de citrons) ferait échouer la biologie. Comment concilier <strong>zéro pesée</strong> et <strong>rigueur biochimique</strong> ? Grâce à <strong>trois verrous passifs et matériels</strong> :
+  </p>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <span>Verrou 1 : Règle du Compost</span>
+        <span class="badge">Ratio C/N &amp; 3HV</span>
+      </div>
+      <p>
+        Comme dans un composteur domestique, l'opérateur applique une <strong>règle visuelle de volume</strong> en remplissant son seau :
+      </p>
+      <ul>
+        <li><strong>~1/3 de « Carboné / Féculents » :</strong> restes de pain, pâtes, riz, pommes de terre, carton brun non encré.</li>
+        <li><strong>~2/3 de « Vert / Humide » :</strong> épluchures de légumes/fruits, salades, ou algues fraîches rincées.</li>
+        <li><strong>Interdits visuels simples :</strong> pas d'huiles de friture, pas de montagne d'agrumes (limonène antibactérien).</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span>Verrou 2 : Panier CaCO<sub>3</sub></span>
+        <span class="badge badge-amber">Tampon Passif Auto</span>
+      </div>
+      <p>
+        L'opérateur ne dose <strong>jamais</strong> les coquilles d'œufs à chaque batch ! Un panier grillagé en inox fixé dans le tambour contient en permanence <strong>250 g de coquilles d'œufs ou d'huîtres broyées</strong> (qu'on ne remplit qu'une fois par mois).
+      </p>
+      <p>
+        <strong>Pourquoi est-ce inratable ?</strong> Parce que le carbonate de calcium (CaCO<sub>3</sub>) est <strong>insoluble dans l'eau neutre</strong> (pH &gt; 6,2). Il est chimiquement impossible de faire une overdose : seul l'acide produit par les bactéries dissout la juste dose !
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span>Verrou 3 : Pesons HX711</span>
+        <span class="badge badge-blue">Eau &amp; Tare Auto</span>
+      </div>
+      <p>
+        Les 4 pieds du tambour reposent sur des jauges de contrainte <code>HX711</code> (coût : 2,50 €).
+      </p>
+      <ul>
+        <li>L'opérateur jette son seau en vrac : l'ESP32 détecte instantanément la masse totale versée (ex : <code>+1,20 kg</code>).</li>
+        <li>L'ESP32 ouvre alors tout seul l'électrovanne d'eau jusqu'à ajouter <code>1,5 &times;</code> cette masse (<code>+1,80 L</code>), puis enregistre la <strong>conductivité de base EC<sub>0</sub></strong> (pour annuler l'effet du sel de cuisine !).</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Pourquoi la règle « Féculents + Épluchures/Algues » suffit-elle à garantir la chimie ?</h3>
+  <p>
+    Les bactéries de notre consortium ont besoin de deux choses contradictoires au cours des 72 heures :
+  </p>
+  <ol>
+    <li>
+      <strong>Un ratio Carbone/Azote (C/N) compris entre 20 et 40 :</strong> Si l'on ne mettait que de l'azote (ex. 100 % de tonte de gazon, de poisson ou de microalgues pures où C/N &approx; 7), le jus serait saturé d'ammonium (NH<sub>4</sub><sup>+</sup>). En Phase 2, au lieu de stocker du bioplastique PHA pour survivre, les bactéries utiliseraient cet azote pour se diviser et faire de la boue cellulaire ! Le mélange visuel « Épluchures + Féculents/Pain » place naturellement le ratio C/N dans le tunnel optimal <strong>[22 &ndash; 36]</strong>.
+    </li>
+    <li>
+      <strong>Un équilibre entre précurseurs pairs (3HB) et impairs (3HV) :</strong>
+      <ul>
+        <li>Les <strong>glucides des féculents et sucres</strong> fermentent majoritairement en acides gras à nombre <strong>pair</strong> de carbones : <strong>Acétate (C<sub>2</sub>)</strong> et <strong>Butyrate (C<sub>4</sub>)</strong>, qui donnent le monomère rigide <em>3-hydroxybutyrate (3HB)</em>.</li>
+        <li>Les <strong>protéines végétales des épluchures vertes et des algues</strong> (acides aminés ramifiés : valine, isoleucine, thréonine) fermentent par la voie de Stickland en acides gras à nombre <strong>impair</strong> de carbones : <strong>Propionate (C<sub>3</sub>)</strong> et <strong>Valérate (C<sub>5</sub>)</strong>, qui donnent le monomère souple <em>3-hydroxyvalérate (3HV)</em>.</li>
+      </ul>
+      Ainsi, la simple règle de compostage produit automatiquement un mélange d'acides contenant <strong>18 % à 28 % d'acides impairs</strong>, ce qui synthétise directement le copolymère souple et piézoélectrique <strong>PHBV</strong> (et non du PHB pur cassant) !
+    </li>
+  </ol>
+
+  <h3>L'équation chimique d'autorégulation passive par les coquilles d'œufs (CaCO<sub>3</sub>)</h3>
+  <p>
+    Pourquoi le panier de coquilles d'œufs protège-t-il le bioréacteur sans intervention humaine ? Dans l'eau pure à pH 7, le produit de solubilité du carbonate de calcium est minuscule (K<sub>sp</sub> = [Ca<sup>2+</sup>][CO<sub>3</sub><sup>2-</sup>] = 3,3 &times; 10<sup>-9</sup>) : le panier reste solide. Mais dès que la fermentation produit des acides gras volatils (notés R-COOH, de pK<sub>a</sub> &approx; 4,76), les protons H<sup>+</sup> attaquent la surface solide des coquilles selon la réaction stœchiométrique :
+  </p>
+
+  <div class="formula-box">
+    2 R-COOH <sub>(acide produit)</sub> + CaCO<sub>3 (solide dans le panier)</sub> &longrightarrow; Ca<sup>2+</sup><sub>(aq)</sub> + 2 R-COO<sup>&minus;</sup><sub>(carboxylate dissous non toxique)</sub> + H<sub>2</sub>O + CO<sub>2</sub> &uarr;
+  </div>
+
+  <p>
+    Cette réaction unique accomplit <strong>trois miracles d'ingénierie simultanés</strong> :
+  </p>
+  <ol>
+    <li><strong>Désarmement de la toxicité membranaire :</strong> Tant que l'acide gras est sous sa forme protonée neutre (<code>HVFA = R-COOH</code>), il est lipophile, traverse la membrane des bactéries et détruit leur gradient de protons (mort cellulaire dès que <code>[HVFA] &gt; 1,8 g/L</code>). En le transformant en ion carboxylate chargé (<code>R-COO<sup>-</sup></code>), le CaCO<sub>3</sub> l'empêche de rentrer dans la bactérie : la fermentation peut monter jusqu'à <strong>45 &ndash; 50 g/L d'AGV</strong> sans s'empoisonner !</li>
+    <li><strong>Création d'un signal électrique mesurable (&Delta;EC) :</strong> Au départ, l'amidon est neutre et le CaCO<sub>3</sub> est un solide isolant. Mais chaque gramme d'acide neutralisé libère des ions <code>Ca<sup>2+</sup></code> et <code>R-COO<sup>-</sup></code> dans l'eau, ce qui fait grimper la <strong>conductivité électrique (EC)</strong> proportionnellement à la quantité de produit formée !</li>
+    <li><strong>Création d'un signal gazeux mesurable (CO<sub>2</sub>) :</strong> Chaque mole de CaCO<sub>3</sub> dissoute libère exactement 1 mole de gaz CO<sub>2</sub> à travers le barboteur.</li>
+  </ol>
+
+  <!-- ======================= PAGE 3 : ACTES II & III — PILOTAGE PAR LES PRODUITS ======================= -->
+  <div class="page-break"></div>
+
+  <h2>4. ACTE II (0h &rarr; 36h) : L'Acidogenèse et le Pilotage par l'Apparition des Produits</h2>
+
+  <div class="callout-blue">
+    <div class="callout-title">Pourquoi on pilote sur les PRODUITS et non sur une estimation fragile des intrants</div>
+    <p>
+      Vouloir deviner au bout de 2 heures combien de grammes d'amidon ou de sucres ont été jetés dans la cuve à partir du couple moteur ou de la conductivité initiale brute serait scientifiquement erroné (les fibres de bois font forcer le moteur sans donner de sucre, et une cuillère de sel de cuisine fausse la conductivité brute).<br>
+      <strong>La solution rigoureuse :</strong> L'ESP32 fait une <strong>tare ionique à t = 0,5h (EC<sub>0</sub>)</strong> qui soustrait une fois pour toutes le sel de cuisine. Ensuite, pendant toute la Phase 1, il ne cherche pas à deviner les intrants : il <strong>mesure directement l'accumulation des produits (les AGV)</strong> via la hausse de conductivité <strong>&Delta;EC(t) = EC(t) &minus; EC<sub>0</sub></strong>, le flux de <strong>CO<sub>2</sub></strong> et le potentiel <strong>Rédox (ORP)</strong>.
+    </p>
+  </div>
+
+  <h3>Le tableau de bord des capteurs pendant la Phase 1 (0h &rarr; 36h)</h3>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 18%;">Capteur Physique</th>
+        <th style="width: 16%;">Valeur 0h &rarr; 2h<br>(Macération)</th>
+        <th style="width: 18%;">Valeur 2h &rarr; 30h<br>(Cœur Acidogenèse)</th>
+        <th style="width: 18%;">Signal à 32h &ndash; 36h<br>(Fin des Sucres)</th>
+        <th style="width: 30%;">Ce que l'ESP32 en déduit physiquement</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>1. Potentiel Rédox (ORP Platine)</strong></td>
+        <td>Chute rapide de<br><code>+120 mV</code> à <code>-150 mV</code></td>
+        <td>Plancher stable entre<br><code>-240 mV</code> et <code>-290 mV</code></td>
+        <td>Remonte légèrement de <code>-270</code> vers <code>-230 mV</code></td>
+        <td>Confirme que tout l'oxygène est consommé et que le métabolisme fermentaire anaérobie est actif.</td>
+      </tr>
+      <tr>
+        <td><strong>2. Sonde pH (BNC Verre)</strong></td>
+        <td>Part de <code>7,2</code> et descend vers <code>6,4</code></td>
+        <td>Stabilisé entre<br><code>5,8</code> et <code>6,6</code></td>
+        <td>Stable à <code>6,60</code><br>(dpH/dt = 0)</td>
+        <td>Prouve que le panier passif de CaCO<sub>3</sub> neutralise les acides en temps réel (alarme si pH &lt; 4,5).</td>
+      </tr>
+      <tr>
+        <td><strong>3. Conductivité Différentielle &Delta;EC</strong></td>
+        <td>Tare <code>EC<sub>0</sub></code> prise<br>(&Delta;EC = <code>0,0 mS/cm</code>)</td>
+        <td>Monte linéairement de<br><code>0</code> à <code>+3,8 mS/cm</code></td>
+        <td><strong>PLAFONNE</strong><br>(d(&Delta;EC)/dt &approx; 0)</td>
+        <td><strong>Mesure directe des AGV produits</strong> (1 mS/cm de &Delta;EC &approx; 12 g/L d'AGV tamponnés sous forme de sels de calcium).</td>
+      </tr>
+      <tr>
+        <td><strong>4. Débit CO<sub>2</sub> (Capteur IR / Bulles)</strong></td>
+        <td>Faible démarrage</td>
+        <td>Dégagement soutenu<br>(pic vers 14h &ndash; 22h)</td>
+        <td><strong>RETOMBE À ZÉRO</strong></td>
+        <td>Quand d(&Delta;EC)/dt = 0 <strong>ET</strong> que le CO<sub>2</sub> s'arrête, <strong>100 % des sucres digestibles sont convertis en AGV !</strong></td>
+      </tr>
+      <tr>
+        <td><strong>5. Rotation (RPM) &amp; Température</strong></td>
+        <td><code>45 RPM</code> / <code>28 °C</code><br>(Délitage mécanique)</td>
+        <td><code>8 RPM</code> / <code>30 °C</code><br>(Repos thermique)</td>
+        <td>Prêt pour essorage</td>
+        <td>À 8 RPM, pas de ré-oxygénation de surface et consommation électrique minimale.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>La Cinétique Mathématique du Holon 0 (<code>kinetics.py</code>) et le Filtre de Kalman (<code>soft_sensor.py</code>)</h3>
+  <p>
+    Dans le moteur Python (classe <code>Holon0Engine</code> dans <code>kinetics.py</code>), la vitesse spécifique de fermentation des glucides S<sub>carb</sub> par la biomasse acidogène X<sub>acid</sub> obéit à une loi de <strong>Monod-Haldane couplée à l'inhibition par les acides protonés [HVFA]</strong>, intégrée par la méthode de <strong>Runge-Kutta d'ordre 4 (RK4)</strong> :
+  </p>
+
+  <div class="formula-box">
+    &mu;<sub>acid</sub>(S<sub>carb</sub>, pH) = &mu;<sub>max</sub> &middot; 
+    [ S<sub>carb</sub> / (K<sub>S</sub> + S<sub>carb</sub> + S<sub>carb</sub><sup>2</sup> / K<sub>I,carb</sub>) ] &middot;
+    [ K<sub>I,HVFA</sub> / (K<sub>I,HVFA</sub> + [HVFA]) ]
+    &nbsp;&nbsp;&nbsp;avec&nbsp;&nbsp;&nbsp;
+    [HVFA] = [AGV]<sub>tot</sub> &middot; [ 10<sup>-pH</sup> / (10<sup>-pH</sup> + 10<sup>-pK<sub>a</sub></sup>) ]
+  </div>
+
+  <p>
+    En parallèle, toutes les 15 minutes, le <strong>Filtre de Kalman Étendu (EKF)</strong> du Holon 1 (classe <code>BioprocessEKFSoftSensor</code>) fusionne les mesures bruitées des sondes électrochimiques (z<sub>k</sub> = [pH, ORP, &Delta;EC]<sup>T</sup>) avec la prédiction du modèle RK4 pour estimer l'état interne exact x&#770;<sub>k</sub> = [AGV estimés, O<sub>2</sub> estimé]<sup>T</sup> et son incertitude &plusmn;&sigma;. Dès que le critère d'arrêt d(AGV)/dt &lt; 0,05 g/(L&middot;h) est franchi (typiquement vers t = 36h), l'automate déclenche tout seul l'Acte III !
+  </p>
+
+  <h2>5. ACTE III (t = 36h &rarr; 36,5h) : L'Essorage Centrifuge (650 RPM) et la Sortie du Grade C</h2>
+  <p>
+    À la fin de l'acidogenèse, le tambour contient deux phases : (1) un <strong>jus liquide limpide très riche en Acides Gras Volatils</strong> (42 à 48 g/L d'acétate, propionate, butyrate et valérate de calcium), et (2) la <strong>pulpe fibreuse non digérée</strong> (cellulose, lignine des épluchures).
+  </p>
+  <ul>
+    <li><strong>Action mécanique :</strong> L'ESP32 ouvre la vanne de transfert et lance le moteur tambour à <strong>650 RPM pendant 30 minutes</strong>.</li>
+    <li><strong>Physique centrifuge :</strong> Avec un tambour de diamètre D = 48 cm (rayon r = 24 cm), l'accélération centrifuge relative vaut RCF = 1,118 &times; 10<sup>-5</sup> &times; 24 &times; 650<sup>2</sup> = <strong>113 G</strong>. Le jus d'AGV traverse les micro-perforations du panier inox tandis que le gâteau solide reste plaqué contre la paroi : c'est notre premier produit valorisable, le <strong>Compost / Amendement Solide (Grade C, ~186 g par batch de 2,3 L)</strong>.</li>
+  </ul>
+
+  <!-- ======================= PAGE 4 : ACTE IV — GAVAGE AÉROBIE PHA & ACTE V — EXTRACTION ======================= -->
+  <div class="page-break"></div>
+
+  <h2>6. ACTE IV (36,5h &rarr; 72h) : Le Gavage Aérobie (« Feast ») et la Synthèse du Bioplastique PHBV</h2>
+  <p>
+    Une fois les fibres solides écartées, il reste dans la cuve le jus concentré d'Acides Gras Volatils appauvri en azote assimilable (ratio C/N effectif &gt; 45). C'est ici que commence la magie métabolique de la <strong>Phase 2 (<code>AERATION_PHA_FEAST</code>)</strong> :
+  </p>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <span>1. Bascule Métabolique (Carence N + O<sub>2</sub>)</span>
+        <span class="badge">Stockage Intracellulaire</span>
+      </div>
+      <p>
+        L'ESP32 allume le compresseur d'air à <strong>100 %</strong> (k<sub>L</sub>a = 45 h<sup>-1</sup>). L'oxygène dissous monte à saturation (<strong>7,8 &ndash; 8,2 mg/L</strong>) et le potentiel Rédox bondit de <code>-260 mV</code> à <strong><code>+160 mV</code></strong>.
+      </p>
+      <p>
+        Les bactéries accumulatrices de PHA (telles que <em>Cupriavidus necator</em>, <em>Paracoccus</em>, <em>Plasticicumulans</em>) absorbent frénétiquement les AGV. Mais comme il n'y a presque plus d'azote (N &lt; 0,3 g/L), elles ne peuvent pas synthétiser d'ADN ni de protéines pour se diviser : elles détournent tout l'Acétyl-CoA et le Propionyl-CoA vers l'enzyme <strong>PHA synthase (PhaC)</strong> et se remplissent de granules de plastique jusqu'à <strong>73 % &ndash; 78 % de leur poids sec</strong> !
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span>2. Protection Hydrodynamique de Kolmogorov</span>
+        <span class="badge badge-purple">15 RPM (&lambda;<sub>K</sub> = 330 &mu;m)</span>
+      </div>
+      <p>
+        Pendant que les bactéries se gonflent de plastique, leurs parois deviennent fragiles et elles forment des flocs de <strong>80 à 150 &mu;m</strong>. Si le tambour tournait trop vite, les micro-tourbillons de turbulence déchireraient les cellules avant la fin !
+      </p>
+      <p>
+        Le module <code>HydrodynamicShearModel</code> (dans <code>pid_controller.py</code>) calcule la <strong>micro-échelle de Kolmogorov</strong> &lambda;<sub>K</sub> = (&nu;<sup>3</sup> / &varepsilon;)<sup>1/4</sup>. À <strong>15 RPM</strong>, &lambda;<sub>K</sub> = <strong>330 &mu;m</strong>, soit bien au-dessus du seuil critique de <strong>65 &mu;m</strong> : les flocs bactériens sont brassés en douceur sans aucun cisaillement destructeur.
+      </p>
+    </div>
+  </div>
+
+  <div class="formula-box">
+    q<sub>PHA</sub> = q<sub>PHA,max</sub> &middot; [ AGV / (K<sub>AGV</sub> + AGV) ] &middot; [ O<sub>2</sub> / (K<sub>O2</sub> + O<sub>2</sub>) ] &middot; [ 1 &minus; (f<sub>PHA</sub> / f<sub>PHA,max</sub>) ]
+    &nbsp;&nbsp;&nbsp;avec&nbsp;&nbsp;&nbsp;
+    f<sub>PHA,max</sub> = 0,78 (78 % du poids sec cellulaire)
+  </div>
+
+  <h3>Comment les capteurs savent-ils que les bactéries sont pleines à 100 % ? Le « DO Spike » (Rebond d'O<sub>2</sub>)</h3>
+  <p>
+    Pas besoin de prélever un échantillon au microscope toutes les 2 heures ! Tant que les bactéries fabriquent du plastique PHA, leur respiration cellulaire consomme de l'oxygène (r<sub>O2</sub> = 1,15 &middot; r<sub>AGV</sub>) : la sonde à oxygène dissous lit une valeur d'équilibre sous la saturation (autour de <strong>5,5 à 6,8 mg/L</strong>) et la conductivité &Delta;EC baisse progressivement à mesure que les ions carboxylates (R-COO<sup>-</sup>) sont mangés.
+  </p>
+  <p>
+    À l'instant précis où les cellules atteignent leur plafond géométrique de stockage (f<sub>PHA</sub> &approx; 73 &ndash; 75 %) ou que les AGV sont finis, la respiration s'arrête net : <strong>l'oxygène dissous remonte en flèche à 8,2 mg/L (« Dissolved Oxygen Spike »)</strong> et la pente d(O<sub>2</sub>)/dt s'annule. C'est le signal physique universel qui ordonne à l'ESP32 de lancer l'extraction finale !
+  </p>
+
+  <h2>7. ACTE V (72h &rarr; 73h) : L'Extraction Chimie Verte (Sans Solvant Chloré)</h2>
+  <p>
+    Dans l'industrie pétrochimique classique, on extrait le PHA des bactéries avec du <strong>chloroforme</strong> ou du <strong>dichlorométhane</strong> — des solvants toxiques, cancérigènes et strictement incompatibles avec une bioraffinerie citoyenne ou une certification biologique. Notre <strong>Holon 2 (<code>holon2_workshop/</code>)</strong> applique un protocole 100 % aqueux conforme au cahier des charges <strong>Ecocert</strong> :
+  </p>
+
+  <ol>
+    <li><strong>Validation réglementaire automatique (<code>EcocertComplianceValidator</code> dans <code>ecocert_validator.py</code>) :</strong> Le logiciel vérifie la liste des réactifs. Seuls le carbonate de sodium (Na<sub>2</sub>CO<sub>3</sub>, cristaux de soude ménagers), l'acide citrique et l'eau chaude sont autorisés.</li>
+    <li><strong>Lyse alcaline douce &amp; choc thermique (70 °C pendant 45 min) :</strong> Le chauffage PID monte la cuve à <strong>70 °C</strong> avec <strong>0,15 mol/L de Na<sub>2</sub>CO<sub>3</sub></strong> (pH &approx; 10,5). La paroi peptidoglycane des bactéries éclate par saponification douce et libère les granules blancs insolubles de PHBV (densité 1,25 g/cm<sup>3</sup>, plus lourds que l'eau !).</li>
+    <li><strong>Contrôle de la coupure des chaînes polymères (<code>GreenDownstreamExtractor</code> dans <code>downstream_extraction.py</code>) :</strong> Si l'on chauffait à 100 °C pendant 4 heures, l'hydrolyse alcaline couperait les chaînes de polymère (baisse de la masse molaire M<sub>w</sub>). Notre modèle cinétique d'Arrhenius (k<sub>scission</sub>) limite la lyse à <strong>70 °C / 45 min</strong>, ce qui préserve une masse molaire élevée de <strong>M<sub>w</sub> &approx; 345 kDa</strong> (seuil mécanique requis : &gt; 250 kDa) et un indice de polydispersité PDI &approx; 1,85.</li>
+    <li><strong>Centrifugation finale à 800 RPM (172 G) :</strong> Le surnageant liquide riche en acides aminés, peptides lysés et oligo-éléments est soutiré pour former le <strong>Biostimulant Agricole Liquide (Grade B, ~1,95 L)</strong>. Le culot blanc dense est rincé à l'eau claire et séché : c'est la <strong>poudre de bioplastique PHBV (Grade A)</strong> !</li>
+  </ol>
+
+  <!-- ======================= PAGE 5 : PREUVE RIGOUREUSE DE QUALITÉ PARFAITE ======================= -->
+  <div class="page-break"></div>
+
+  <h2>8. Comment Prouver Rigoureusement la Qualité Parfaite des Produits ? (Holons 2 &amp; 3)</h2>
+  <p>
+    C'est le point clé pour qu'une production décentralisée (à Clamart ou dans une ferme d'algues) soit prise au sérieux par des industriels de la cosmétique, de l'électronique souple ou du médical : <strong>comment prouver scientifiquement, lot après lot, que la poudre blanche sortie du tambour est un copolymère PHBV pur, avec le bon point de fusion et la bonne cristallinité, alors que les déchets d'entrée n'ont été dosés qu'au doigt mouillé ?</strong>
+  </p>
+  <p>
+    La réponse repose sur un <strong>protocole de qualification en 3 étages</strong> codé dans les Holons 0, 2 et 3 :
+  </p>
+
+  <div class="callout">
+    <div class="callout-title">Les 3 Piliers de la Preuve de Qualité (Quality Assurance Protocol)</div>
+    <ol>
+      <li><strong>Preuve Optique Directe par Spectroscopie Laser OpenRAMAN (532 nm)</strong> sur la poudre sèche récoltée.</li>
+      <li><strong>Preuve Thermomécanique &amp; Électro-active par les Lois de Flory-Huggins et de Fox</strong> (reliant la structure moléculaire mesurée aux propriétés physiques garanties).</li>
+      <li><strong>Preuve de Traçabilité par Certificat d'Analyse (CoA) signé SHA-256 &amp; Apprentissage Bayésien</strong>.</li>
+    </ol>
+  </div>
+
+  <h3>Pilier 1 : L'Empreinte Moléculaire par Spectroscopie OpenRAMAN (<code>openraman.py</code>)</h3>
+  <p>
+    Un spectromètre <strong>OpenRAMAN</strong> (laser vert à 532 nm, open-hardware) éclaire un échantillon de la poudre récoltée pendant 3 secondes. La lumière diffusée de manière inélastique par les vibrations des liaisons chimiques donne une <strong>signature spectrale absolue, impossible à falsifier</strong>. Notre algorithme <code>OpenRamanProcessor</code> applique un filtre polynomial de <strong>Savitzky-Golay</strong> (fenêtre de 5 points) puis réalise la <strong>déconvolution mathématique des pics</strong> :
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 22%;">Bande Raman (cm<sup>-1</sup>)</th>
+        <th style="width: 25%;">Liaison Chimique Vibrante</th>
+        <th style="width: 28%;">Grandeur Physique Mesurée</th>
+        <th style="width: 25%;">Critère de Validation « Grade A »</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Pic à 1724 cm<sup>-1</sup></strong></td>
+        <td>Élongation Carbonyle &nu;(C=O) dans le réseau <strong>cristallin</strong> ordonné</td>
+        <td rowspan="2"><strong>Degré de Cristallinité (X<sub>c</sub>) :</strong><br>Calculé par le rapport des aires intégrées :<br><code>X<sub>c</sub> = A<sub>1724</sub> / (A<sub>1724</sub> + &gamma;&middot;A<sub>1740</sub>)</code></td>
+        <td rowspan="2"><strong>X<sub>c</sub> compris entre 45 % et 62 %</strong><br>(Pour le lot nominal Clamart : <strong>55,6 %</strong>)</td>
+      </tr>
+      <tr>
+        <td><strong>Épaulement à 1740 cm<sup>-1</sup></strong></td>
+        <td>Élongation Carbonyle &nu;(C=O) dans la phase <strong>amorphe</strong> souple</td>
+      </tr>
+      <tr>
+        <td><strong>Bandes 840 &amp; 1453 cm<sup>-1</sup></strong></td>
+        <td>Élongation C&ndash;C hélicoïdale &amp; déformation asymétrique CH<sub>3</sub> / CH<sub>2</sub></td>
+        <td><strong>Fraction molaire de 3HV (x<sub>HV</sub>) :</strong><br>Mesure la proportion de chaînes éthyle latérales du 3-hydroxyvalérate.</td>
+        <td><strong>x<sub>HV</sub> entre 8 mol% et 25 mol%</strong><br>(Lot nominal : <strong>13,1 mol% 3HV</strong>)</td>
+      </tr>
+      <tr>
+        <td><strong>Zone 1650 &ndash; 1665 cm<sup>-1</sup></strong></td>
+        <td>Bande <strong>Amide I</strong> des protéines et débris cellulaires bactériens</td>
+        <td><strong>Pureté du Polymère (%) :</strong><br>Vérifie que la lyse au Na<sub>2</sub>CO<sub>3</sub> a éliminé 100 % des résidus cellulaires.</td>
+        <td><strong>Absence de pic Amide I</strong><br>&rarr; Pureté certifiée <strong>&gt; 98,5 %</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Pilier 2 : Prédiction Thermomécanique de Flory-Huggins (<code>metabolic_flux.py</code>)</h3>
+  <p>
+    Une fois la fraction molaire de 3-hydroxyvalérate (x<sub>HV</sub>) et la cristallinité (X<sub>c</sub>) confirmées, le modèle <code>PHBVCopolymerModel</code> calcule par l'équation thermodynamique de <strong>Flory-Huggins</strong> la température de fusion exacte T<sub>m</sub> (à partir de celle du PHB pur T<sub>m</sub><sup>0</sup> = 177,0 °C = 450,15 K et de l'enthalpie de fusion &Delta;H<sub>m</sub><sup>0</sup> = 10 900 J/mol) ainsi que le coefficient piézoélectrique d<sub>33</sub> :
+  </p>
+
+  <div class="formula-box">
+    1 / T<sub>m</sub> &minus; 1 / T<sub>m</sub><sup>0</sup> = &minus; (R / &Delta;H<sub>m</sub><sup>0</sup>) &middot; ln(1 &minus; x<sub>HV</sub>)
+    &nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;
+    Pour x<sub>HV</sub> = 13,1 mol%, &nbsp;<strong>T<sub>m</sub> = 156,3 °C</strong> &nbsp;(gain de 21 °C sous la dégradation thermique !)
+  </div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <span>Grade A1 : Bas 3HV (&lt; 5 %)</span>
+        <span class="badge">Rigide</span>
+      </div>
+      <p>
+        <strong>T<sub>m</sub> &approx; 172 &ndash; 177 °C</strong><br>
+        Module d'Young : <strong>3,2 GPa</strong><br>
+        Usage : Filament d'impression 3D rigide, boîtiers électroniques moulés.
+      </p>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span>Grade A2 : Moyen 3HV (10 &ndash; 16 %)</span>
+        <span class="badge badge-blue">Polyvalent</span>
+      </div>
+      <p>
+        <strong>T<sub>m</sub> &approx; 152 &ndash; 160 °C</strong><br>
+        Module : <strong>2,0 GPa</strong> | Allongement : <strong>60 %</strong><br>
+        Usage : Films souples, clips horticoles, micro-encapsulation cosmétique.
+      </p>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span>Grade A3 : Haut 3HV (17 &ndash; 25 %)</span>
+        <span class="badge badge-purple">Piézo &amp; Optique</span>
+      </div>
+      <p>
+        <strong>T<sub>m</sub> &approx; 140 &ndash; 150 °C</strong><br>
+        Piézoélectricité : <strong>d<sub>33</sub> = 16 à 17,7 pC/N</strong><br>
+        Usage : Capteurs biomédicaux souples, substrats photoniques biodégradables.
+      </p>
+    </div>
+  </div>
+
+  <!-- ======================= PAGE 6 : TRAÇABILITÉ SHA-256, AUTO-APPRENTISSAGE & SYNTHÈSE ======================= -->
+  <div class="page-break"></div>
+
+  <h3>Pilier 3 : Le Certificat Cryptographique (CoA SHA-256) et la Boucle d'Auto-Apprentissage Bayésienne</h3>
+  <p>
+    Comment garantir à un acheteur externe (ou à un organisme de certification comme Ecocert) qu'aucune étape n'a dévié pendant les 73 heures ? Et comment le modèle s'améliore-t-il tout seul au fil des semaines malgré l'insertion « au doigt mouillé » ?
+  </p>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <span>1. Certificat Infalsifiable (<code>knowledge_ledger.py</code>)</span>
+        <span class="badge">Chaîne SHA-256</span>
+      </div>
+      <p>
+        À t = 73h, la classe <code>DistributedKnowledgeLedger</code> assemble dans un bloc JSON :
+      </p>
+      <ul>
+        <li>Le profil complet des capteurs (courbe pH, minimum ORP, plateau &Delta;EC, rebond d'O<sub>2</sub>, température de lyse 70 °C).</li>
+        <li>La validation des réactifs <strong>Ecocert</strong> (zéro solvant chloré).</li>
+        <li>Le spectre <strong>OpenRAMAN</strong> complet et ses métriques (X<sub>c</sub>, x<sub>HV</sub>, pureté, masse récoltée).</li>
+        <li>Le hachage cryptographique <strong>SHA-256</strong> du lot précédent (formant une chaîne de blocs locale immuable).</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span>2. Mise à Jour Bayésienne Conjuguée</span>
+        <span class="badge badge-amber">Auto-Calibration</span>
+      </div>
+      <p>
+        À la fin de chaque batch, le système compare le poids de bioplastique réellement pesé après séchage (y<sub>obs</sub>) avec celui qu'avait prédit le Holon 0 à partir de la courbe &Delta;EC (y<sub>prédit</sub>).
+      </p>
+      <p>
+        La méthode <code>bayesian_parameter_update()</code> applique la <strong>loi conjuguée Gaussienne-Gaussienne</strong> pour mettre à jour la distribution a posteriori du rendement Y<sub>PHA/AGV</sub> :
+      </p>
+      <div class="formula-box" style="font-size: 9pt; padding: 4px 8px;">
+        &mu;<sub>post</sub> = ( &mu;<sub>prior</sub>/&sigma;<sub>prior</sub><sup>2</sup> + y<sub>obs</sub>/&sigma;<sub>obs</sub><sup>2</sup> ) / ( 1/&sigma;<sub>prior</sub><sup>2</sup> + 1/&sigma;<sub>obs</sub><sup>2</sup> )
+      </div>
+      <p>
+        Plus tu fais de tournées, plus l'incertitude &sigma;<sub>post</sub> rétrécit : le tambour « apprend » les habitudes alimentaires de ton foyer ou de ta ferme d'algues !
+      </p>
+    </div>
+  </div>
+
+  <h2>9. Récapitulatif Général : Le Guide Opérateur en 1 Coup d'Œil</h2>
+  <p>
+    Ce tableau résume toute la philosophie de notre bioraffinerie holarchique, en distinguant clairement <strong>ce que fait l'humain (ultra-léger)</strong>, <strong>ce que font les capteurs (automatique)</strong> et <strong>ce qui prouve la qualité finale</strong> :
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 15%;">Étape du Cycle</th>
+        <th style="width: 25%;">Action de l'Opérateur Humain<br>(« Au Doigt Mouillé »)</th>
+        <th style="width: 32%;">Action Automatique du Tambour &amp; Capteurs<br>(Pilotage par les Produits)</th>
+        <th style="width: 28%;">Verrou Scientifique &amp; Preuve de Qualité</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>1. Chargement<br>(t = 0h)</strong></td>
+        <td>Verse un seau en vrac avec la règle du compost : <strong>~1/3 féculents/pain + ~2/3 épluchures/algues</strong>.<br><em>Vérifie une fois par mois qu'il reste des coquilles dans le panier inox.</em></td>
+        <td>Les pieds pesons <code>HX711</code> pèsent le seau, ouvrent l'électrovanne d'eau (1,5 &times; le poids) et enregistrent la <strong>tare ionique EC<sub>0</sub></strong> (élimine l'effet du sel de cuisine).</td>
+        <td>Le ratio C/N tombe entre 22 et 35. Le panier de CaCO<sub>3</sub> est insoluble à pH neutre (aucun surdosage possible).</td>
+      </tr>
+      <tr>
+        <td><strong>2. Acidogenèse<br>(0h &rarr; 36h)</strong></td>
+        <td><strong>Aucune action.</strong></td>
+        <td>Brassage lent 8 RPM à 30 °C. Les acides produits dissolvent le CaCO<sub>3</sub>, ce qui fait monter <strong>&Delta;EC = EC(t) &minus; EC<sub>0</sub></strong> et dégage du <strong>CO<sub>2</sub></strong>.</td>
+        <td>Le pH est verrouillé au-dessus de 5,8 ([HVFA] &lt; 1,8 g/L). Quand &Delta;EC plafonne et que le CO<sub>2</sub> s'arrête, tous les sucres sont digérés.</td>
+      </tr>
+      <tr>
+        <td><strong>3. Essorage 1<br>(36h &rarr; 36,5h)</strong></td>
+        <td>Récupère (ou laisse dans le bac à compost) le gâteau fibreux essoré (<strong>Grade C : ~186 g</strong>).</td>
+        <td>Essorage centrifuge à <strong>650 RPM (113 G)</strong>. Le jus clair concentré en AGV (C2, C3, C4, C5) passe en phase aérobie.</td>
+        <td>Séparation mécanique propre sans filtre jetable colmatant.</td>
+      </tr>
+      <tr>
+        <td><strong>4. Gavage PHA<br>(36,5h &rarr; 72h)</strong></td>
+        <td><strong>Aucune action.</strong></td>
+        <td>Bullage d'air intense (O<sub>2</sub> &gt; 7 mg/L, ORP &gt; +150 mV) et rotation douce à <strong>15 RPM</strong>. Détecte la fin du remplissage cellulaire par le <strong>rebond d'oxygène (« DO Spike »)</strong>.</td>
+        <td>Micro-échelle de Kolmogorov &lambda;<sub>K</sub> = 330 &mu;m &gt; 65 &mu;m (flocs intacts). Remplissage intracellulaire à <strong>73 % de PHBV</strong>.</td>
+      </tr>
+      <tr>
+        <td><strong>5. Extraction &amp; Certification<br>(72h &rarr; 73h)</strong></td>
+        <td>Récupère le bidon de <strong>Biostimulant Grade B (~1,95 L)</strong> et la <strong>poudre de bioplastique PHBV Grade A (~7,5 à 10 g/batch)</strong>.</td>
+        <td>Lyse thermique à <strong>70 °C + Na<sub>2</sub>CO<sub>3</sub></strong> puis essorage à <strong>800 RPM (172 G)</strong>. Scan laser <strong>OpenRAMAN</strong> et génération du certificat <strong>SHA-256</strong>.</td>
+        <td>Zéro solvant chloré (Ecocert OK), M<sub>w</sub> &approx; 345 kDa, cristallinité X<sub>c</sub> = 55,6 %, 13,1 mol% 3HV, T<sub>m</sub> = 156,3 °C, piézo d<sub>33</sub> = 14,6 pC/N.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout-warn">
+    <div class="callout-title">En Conclusion : Pourquoi cette architecture est à la fois robuste au quotidien et crédible scientifiquement</div>
+    <p>
+      En séparant radicalement <strong>l'ergonomie d'entrée</strong> (règle visuelle de compostage + tampon minéral passif auto-limitant CaCO<sub>3</sub> + pesée automatique HX711) et <strong>la rigueur métrologique de suivi et de sortie</strong> (suivi stœchiométrique des produits par &Delta;EC/CO<sub>2</sub>/DO-Spike + contrôle qualité spectroscopique OpenRAMAN + recalage bayésien), la bioraffinerie Sentinel transforme un geste domestique banal en un procédé biophysique certifié de bout en bout.
+    </p>
+  </div>
+
+  <div class="footer-note">
+    Document généré pour le projet <strong>Sentinel Holarchy</strong> — Code source et modèles : <code>https://github.com/mdecatelan/sentinel-holarchy</code> — Simulateur interactif local : <code>http://127.0.0.1:8080</code>
+  </div>
+
+</body>
+</html>
