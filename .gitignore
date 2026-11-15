@@ -46,5 +46,10 @@ Documentation/*.pdf
 Documentation/260520_FutuRaM_D7.5_FinalReport.pdf
 *.pdf
 
-# Local runtime logs
+# Local runtime logs & SQLite databases
 *.log
+*.db
+*.sqlite
+*.sqlite3
+data/*.db
+data/*.json

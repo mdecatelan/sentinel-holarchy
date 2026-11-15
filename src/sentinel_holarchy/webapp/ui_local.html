@@ -1,539 +1,1086 @@
 <!DOCTYPE html>
-<html lang="fr" class="dark">
+<html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sentinel Holarchy — Serveur Local Jumeau Numérique (Zéro-Pesée)</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Jumeau Numérique v2.0 — Bioraffinerie Holarchique de Clamart</title>
   <style>
     :root {
-      --background: #090d16;
-      --card: #111827;
-      --secondary: #1e293b;
-      --foreground: #f8fafc;
-      --muted-foreground: #94a3b8;
+      --bg: #0b1120;
+      --panel: #111827;
+      --panel-2: #1e293b;
       --border: #334155;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --emerald: #10b981;
+      --cyan: #06b6d4;
+      --amber: #f59e0b;
+      --rose: #f43f5e;
+      --violet: #8b5cf6;
+      --blue: #3b82f6;
     }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background-color: var(--background);
-      color: var(--foreground);
-      font-family: Inter, system-ui, -apple-system, sans-serif;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      min-height: 100vh;
     }
+    header {
+      background: linear-gradient(90deg, #0f172a 0%, #111827 60%, #064e3b 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .brand h1 {
+      font-size: 1.22rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand p { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
+    .badge-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .pill {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.14);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+    .pill.amber {
+      background: rgba(245, 158, 11, 0.14);
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.35);
+    }
+    .pill.cyan {
+      background: rgba(6, 182, 212, 0.14);
+      color: #22d3ee;
+      border-color: rgba(6, 182, 212, 0.35);
+    }
+    nav.tabs {
+      display: flex;
+      gap: 6px;
+      padding: 10px 24px 0;
+      background: #0f172a;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+    .tab-btn {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid transparent;
+      border-bottom: none;
+      padding: 10px 16px;
+      font-size: 0.86rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 8px 8px 0 0;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .tab-btn:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+    .tab-btn.active {
+      background: var(--bg);
+      color: #34d399;
+      border-color: var(--border);
+    }
+    main { max-width: 1520px; margin: 0 auto; padding: 18px 24px 40px; }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    /* Program Cards */
+    .prog-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 1150px) { .prog-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 680px) { .prog-grid { grid-template-columns: 1fr; } }
+    .prog-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .prog-card:hover { border-color: #64748b; transform: translateY(-1px); }
+    .prog-card.selected {
+      border-color: var(--emerald);
+      background: linear-gradient(180deg, rgba(16,185,129,0.12) 0%, var(--panel) 100%);
+      box-shadow: 0 0 0 1px var(--emerald);
+    }
+    .prog-code {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .prog-title { font-size: 0.9rem; font-weight: 700; margin: 4px 0 6px; color: var(--text); }
+    .prog-price { font-size: 0.78rem; color: #34d399; font-weight: 600; margin-bottom: 4px; }
+    .prog-meta { font-size: 0.74rem; color: var(--muted); }
+
+    /* Main Cockpit Layout */
+    .cockpit-grid {
+      display: grid;
+      grid-template-columns: 330px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    @media (max-width: 1024px) { .cockpit-grid { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 15px;
+    }
+    .card h2 {
+      font-size: 0.92rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .ctrl-group { margin-bottom: 13px; }
+    .ctrl-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      margin-bottom: 4px;
+      color: #cbd5e1;
+    }
+    .ctrl-val { font-weight: 700; color: var(--cyan); font-family: monospace; font-size: 0.85rem; }
     input[type="range"] {
-      accent-color: #10b981;
+      width: 100%;
+      accent-color: var(--emerald);
+      cursor: pointer;
+    }
+    .ctrl-hint { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+
+    .btn {
+      background: var(--emerald);
+      color: #042f2e;
+      font-weight: 700;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-size: 0.84rem;
+      cursor: pointer;
+      transition: filter 0.15s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn:hover { filter: brightness(1.08); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn.secondary { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); }
+    .btn.cyan { background: var(--cyan); color: #083344; }
+    .btn.amber { background: var(--amber); color: #451a03; }
+    .btn.full { width: 100%; margin-top: 6px; }
+
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    @media (max-width: 760px) { .kpi-strip { grid-template-columns: 1fr; } }
+    .kpi-box {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .kpi-label { font-size: 0.74rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
+    .kpi-main { font-size: 1.28rem; font-weight: 800; margin: 4px 0 2px; color: var(--text); }
+    .kpi-sub { font-size: 0.76rem; color: #94a3b8; }
+
+    .chart-box {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.75rem; color: #cbd5e1; }
+    .leg-item { display: flex; align-items: center; gap: 5px; }
+    .swatch { width: 12px; height: 3px; border-radius: 2px; display: inline-block; }
+    canvas { width: 100%; height: 255px; display: block; background: #090e1a; border-radius: 6px; }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 960px) { .two-col { grid-template-columns: 1fr; } }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.81rem; }
+    th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #1e293b; }
+    th { color: var(--muted); font-weight: 600; font-size: 0.74rem; text-transform: uppercase; }
+    code.hash {
+      font-family: Consolas, monospace;
+      font-size: 0.75rem;
+      background: #090e1a;
+      padding: 3px 6px;
+      border-radius: 4px;
+      color: #38bdf8;
+      word-break: break-all;
+    }
+    pre.code-block {
+      background: #090e1a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 0.75rem;
+      color: #a7f3d0;
+      overflow-x: auto;
+      font-family: Consolas, monospace;
+    }
+    .info-banner {
+      background: rgba(6, 182, 212, 0.08);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      color: #cffafe;
+      margin-bottom: 14px;
     }
   </style>
 </head>
-<body class="p-4 md:p-6 antialiased">
-  <div class="max-w-7xl mx-auto space-y-5">
+<body>
 
-    <!-- EN-TÊTE SERVEUR PYTHON LOCAL + MODE "ZÉRO PESÉE" -->
-    <div class="bg-[var(--card)] border border-emerald-500/40 rounded-2xl p-5 shadow-lg">
-      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border-b border-[var(--border)] pb-4">
-        <div>
-          <div class="flex flex-wrap items-center gap-2">
-            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
-              🟢 SERVEUR PYTHON LOCAL ACTIF (127.0.0.1:8080)
-            </span>
-            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40">
-              🪣 PROTOCOLE "DUMP & GO" (ZÉRO PESÉE MANUELLE)
-            </span>
-            <span id="badge-fsm" class="px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/40">
-              2_ACIDOGENESE_ANAEROBIE
-            </span>
-          </div>
-          <h1 class="text-xl md:text-2xl font-bold mt-2">
-            Tu jettes ton seau en vrac : comment les capteurs devinent tout sans balance ?
-          </h1>
-          <p class="text-xs md:text-sm text-[var(--muted-foreground)] mt-0.5">
-            L'opérateur ne pèse <strong>jamais rien</strong>. Clique sur un seau ci-dessous : le serveur Python (<code class="text-emerald-400">auto_dosing.py</code> + <code class="text-emerald-400">kinetics.py</code>) calcule tout en direct.
-          </p>
-        </div>
-
-        <!-- BOUTONS "JETER UN SEAU EN VRAC" -->
-        <div class="flex flex-wrap gap-2">
-          <button onclick="throwBucket('kitchen')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition shadow">
-            🪣 1. Jeter un Seau Cuisine Vrac (~1.15 kg)
-          </button>
-          <button onclick="throwBucket('canteen_pasta')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-500 text-white transition shadow">
-            🍝 2. Jeter un Seau Cantine (Lourd en Pâtes/Pain)
-          </button>
-          <button onclick="throwBucket('algae_mix')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-cyan-600 hover:bg-cyan-500 text-white transition shadow">
-            🌿 3. Jeter un Seau Algues + Épluchures
-          </button>
-          <button onclick="throwBucket('empty_cartridge')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-rose-600/80 hover:bg-rose-500 text-white transition shadow">
-            ⚠️ 4. Panier Coquilles Vide (Crash pH)
-          </button>
-        </div>
-      </div>
-
-      <!-- CURSEUR TEMPOREL 0h -> 73h -->
-      <div class="mt-4 space-y-2">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <div class="flex flex-wrap items-center gap-2">
-            <button id="btn-play" onclick="togglePlay()" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950 hover:bg-emerald-400 transition">
-              ▶ Lecture Auto (0h → 73h)
-            </button>
-            <button onclick="setHour(0.5)" class="px-2.5 py-1 rounded text-xs bg-[var(--secondary)] hover:bg-slate-700">0.5h (Auto-Diagnostic)</button>
-            <button onclick="setHour(18)" class="px-2.5 py-1 rounded text-xs bg-[var(--secondary)] hover:bg-slate-700">18h (Cœur Acide)</button>
-            <button onclick="setHour(36)" class="px-2.5 py-1 rounded text-xs bg-[var(--secondary)] hover:bg-slate-700">36h (Essorage 650 RPM)</button>
-            <button onclick="setHour(52)" class="px-2.5 py-1 rounded text-xs bg-[var(--secondary)] hover:bg-slate-700">52h (Gavage PHA)</button>
-            <button onclick="setHour(72.5)" class="px-2.5 py-1 rounded text-xs bg-[var(--secondary)] hover:bg-slate-700">72.5h (Récolte 70°C)</button>
-          </div>
-          <div>
-            <span class="text-xs text-[var(--muted-foreground)]">Heure du cycle :</span>
-            <span id="lbl-hour" class="text-lg font-mono font-bold text-emerald-400 ml-1">t = 18.0 h</span>
-          </div>
-        </div>
-        <input id="slider-time" type="range" min="0" max="73" step="0.5" value="18" oninput="onTimeChange(this.value)" class="w-full h-2.5 cursor-pointer" />
-      </div>
-    </div>
-
-    <!-- LIGNE 1 : LES 3 ASTUCES MATÉRIELLES "ZÉRO PESÉE" (POURQUOI L'OPÉRATEUR NE PÈSE RIEN) -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-
-      <!-- ASTUCE 1 : JAUGE DE POIDS SOUS LES PIEDS (HX711) + VANNE D'EAU AUTO -->
-      <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4">
-        <div class="flex items-center justify-between border-b border-[var(--border)] pb-2 mb-3">
-          <span class="text-xs font-bold uppercase text-emerald-400">⚖️ BOÎTE A — Tare Auto & Eau Auto (HX711)</span>
-          <span class="text-xs font-mono px-2 py-0.5 rounded bg-[var(--secondary)]">Coût : 2,50 €</span>
-        </div>
-        <p class="text-xs text-[var(--muted-foreground)] mb-3">
-          4 jauges de contrainte sous les pieds du tambour pèsent ce que tu jettes en vrac et ouvrent l'électrovanne d'eau toutes seules :
-        </p>
-        <div class="grid grid-cols-2 gap-2 text-xs">
-          <div class="p-2.5 rounded-xl bg-[var(--secondary)]">
-            <div class="text-[var(--muted-foreground)]">Déchets jetés (HX711)</div>
-            <div id="zd-waste" class="font-mono font-bold text-base text-white mt-0.5">1.15 kg</div>
-          </div>
-          <div class="p-2.5 rounded-xl bg-[var(--secondary)]">
-            <div class="text-[var(--muted-foreground)]">Eau injectée toute seule</div>
-            <div id="zd-water" class="font-mono font-bold text-base text-cyan-400 mt-0.5">+1.73 L</div>
-          </div>
-        </div>
-        <div class="mt-3 text-xs flex items-center justify-between text-[var(--muted-foreground)]">
-          <span>Ajuster le poids du seau jeté :</span>
-          <input id="in-waste" type="range" min="0.4" max="2.5" step="0.05" value="1.15" onchange="fetchSimulation()" class="w-36" />
-        </div>
-      </div>
-
-      <!-- ASTUCE 2 : CARTOUCHE MINÉRALE PASSIVE (COQUILLES D'ŒUFS / HUÎTRES EN EXCÈS) -->
-      <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4">
-        <div class="flex items-center justify-between border-b border-[var(--border)] pb-2 mb-3">
-          <span class="text-xs font-bold uppercase text-amber-400">🥚 BOÎTE B — Panier Passif CaCO₃ (Sans Dosage)</span>
-          <span class="text-xs font-mono px-2 py-0.5 rounded bg-[var(--secondary)]">Recharge 1× / mois</span>
-        </div>
-        <p class="text-xs text-[var(--muted-foreground)] mb-3">
-          Un panier inox contient <strong>250 g</strong> de coquilles broyées. Comme le $\text{CaCO}_3$ est <strong>insoluble à pH neutre</strong>, il ne se dissout que si l'acide l'attaque !
-        </p>
-        <div class="grid grid-cols-2 gap-2 text-xs">
-          <div class="p-2.5 rounded-xl bg-[var(--secondary)]">
-            <div class="text-[var(--muted-foreground)]">Dissous sur ce batch</div>
-            <div id="zd-caco3-used" class="font-mono font-bold text-base text-amber-400 mt-0.5">38.4 g</div>
-          </div>
-          <div class="p-2.5 rounded-xl bg-[var(--secondary)]">
-            <div class="text-[var(--muted-foreground)]">Reste dans le panier</div>
-            <div id="zd-caco3-left" class="font-mono font-bold text-base text-emerald-400 mt-0.5">181.6 g (5 tournées)</div>
-          </div>
-        </div>
-        <div class="mt-2.5 w-full h-2 rounded-full bg-[var(--secondary)] overflow-hidden">
-          <div id="bar-cartridge" class="h-full bg-emerald-500 transition-all" style="width: 72%"></div>
-        </div>
-      </div>
-
-      <!-- ASTUCE 3 : INFÉRENCE AVEUGLE EN MACÉRATION (0h -> 2h) -->
-      <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4">
-        <div class="flex items-center justify-between border-b border-[var(--border)] pb-2 mb-3">
-          <span class="text-xs font-bold uppercase text-purple-400">🔍 BOÎTE C — Devinette par le Courant & Rédox</span>
-          <span class="text-xs font-mono px-2 py-0.5 rounded bg-[var(--secondary)]">0h – 2h (45 RPM)</span>
-        </div>
-        <p class="text-xs text-[var(--muted-foreground)] mb-3">
-          Pendant que ça tourne à 45 RPM, l'ESP32 lit la force du moteur (<span id="zd-ma" class="font-mono text-white">580 mA</span>) et la conductivité (<span id="zd-ec" class="font-mono text-white">4.2 mS/cm</span>) pour deviner la recette :
-        </p>
-        <div class="grid grid-cols-3 gap-2 text-xs text-center">
-          <div class="p-2 rounded-xl bg-[var(--secondary)]">
-            <div class="text-[var(--muted-foreground)]">Sucres devinés</div>
-            <div id="zd-carbs" class="font-mono font-bold text-sm text-amber-300 mt-0.5">64.2 g/L</div>
-          </div>
-          <div class="p-2 rounded-xl bg-[var(--secondary)]">
-            <div class="text-[var(--muted-foreground)]">Ratio C/N deviné</div>
-            <div id="zd-cn" class="font-mono font-bold text-sm text-cyan-300 mt-0.5">33.9</div>
-          </div>
-          <div class="p-2 rounded-xl bg-[var(--secondary)]">
-            <div class="text-[var(--muted-foreground)]">Précurseurs 3HV</div>
-            <div id="zd-odd" class="font-mono font-bold text-sm text-purple-300 mt-0.5">21.6 %</div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- LIGNE 2 : LES 6 BOÎTES DE CAPTEURS PHYSIQUES EN DIRECT -->
-    <div class="bg-[var(--card)] border-2 border-emerald-500/30 rounded-2xl p-5">
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 border-b border-[var(--border)] pb-3 mb-4">
-        <div>
-          <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">
-            📡 TABLEAU DES 6 CAPTEURS PHYSIQUES DU TAMBOUR (HOLON 1)
-          </span>
-          <h2 class="text-base md:text-lg font-bold">
-            Ce que délivrent les sondes à <span id="sens-hour" class="font-mono text-emerald-400">t = 18.0 h</span>
-          </h2>
-        </div>
-        <div id="json-box" class="text-xs font-mono bg-[var(--secondary)] px-3 py-1.5 rounded-lg border border-[var(--border)] text-emerald-300">
-          {"t":18.0,"ph":6.58,"orp_mv":-265,"do_mg_l":0.1,"rpm":8,"motor_ma":322,"ec_ms":7.4}
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3">
-        <!-- 1. pH -->
-        <div class="p-3 rounded-xl bg-[var(--secondary)] border border-[var(--border)]">
-          <div class="text-xs text-[var(--muted-foreground)]">🧪 1. Sonde pH</div>
-          <div id="s-ph" class="text-2xl font-mono font-bold text-emerald-400 mt-1">6.58</div>
-          <div id="s-ph-tag" class="text-xs font-semibold text-emerald-400 mt-1">✅ Tampon CaCO₃ actif</div>
-          <p class="text-xs text-[var(--muted-foreground)] mt-2 pt-2 border-t border-[var(--border)]">
-            Reste entre 5.8 et 6.8 tant qu'il reste des coquilles dans le panier.
-          </p>
-        </div>
-
-        <!-- 2. ORP -->
-        <div class="p-3 rounded-xl bg-[var(--secondary)] border border-[var(--border)]">
-          <div class="text-xs text-[var(--muted-foreground)]">⚡ 2. Rédox (ORP)</div>
-          <div id="s-orp" class="text-2xl font-mono font-bold text-amber-400 mt-1">-265 mV</div>
-          <div id="s-orp-tag" class="text-xs font-semibold text-amber-400 mt-1">🔒 Fermentation acide</div>
-          <p class="text-xs text-[var(--muted-foreground)] mt-2 pt-2 border-t border-[var(--border)]">
-            Négatif (-250 mV) de 2h à 36h, puis positif (+160 mV) sous bullage.
-          </p>
-        </div>
-
-        <!-- 3. O2 dissous -->
-        <div class="p-3 rounded-xl bg-[var(--secondary)] border border-[var(--border)]">
-          <div class="text-xs text-[var(--muted-foreground)]">🫧 3. O₂ Dissous</div>
-          <div id="s-do" class="text-2xl font-mono font-bold text-cyan-400 mt-1">0.10 mg/L</div>
-          <div id="s-do-tag" class="text-xs font-semibold text-slate-400 mt-1">💤 Anoxie Phase 1</div>
-          <p class="text-xs text-[var(--muted-foreground)] mt-2 pt-2 border-t border-[var(--border)]">
-            0.1 mg/L sans air (0–36h) → 8.2 mg/L dès que le compresseur bulle.
-          </p>
-        </div>
-
-        <!-- 4. Courant Moteur & RPM -->
-        <div class="p-3 rounded-xl bg-[var(--secondary)] border border-[var(--border)]">
-          <div class="text-xs text-[var(--muted-foreground)]">🌀 4. Rotation & Couple</div>
-          <div id="s-rpm" class="text-2xl font-mono font-bold text-purple-400 mt-1">8 RPM</div>
-          <div id="s-ma-tag" class="text-xs font-semibold text-purple-300 mt-1">⚡ Moteur : 322 mA</div>
-          <p id="s-shear-tag" class="text-xs text-[var(--muted-foreground)] mt-2 pt-2 border-t border-[var(--border)]">
-            Cisaillement Kolmogorov λK = 537 µm (Flocs intacts).
-          </p>
-        </div>
-
-        <!-- 5. Conductivité EC -->
-        <div class="p-3 rounded-xl bg-[var(--secondary)] border border-[var(--border)]">
-          <div class="text-xs text-[var(--muted-foreground)]">🧂 5. Conductivité EC</div>
-          <div id="s-ec" class="text-2xl font-mono font-bold text-yellow-300 mt-1">7.4 mS/cm</div>
-          <div class="text-xs font-semibold text-yellow-400 mt-1">📈 Ions & Acides dissous</div>
-          <p class="text-xs text-[var(--muted-foreground)] mt-2 pt-2 border-t border-[var(--border)]">
-            Monte quand les coquilles ($\text{Ca}^{2+}$) et les acides gras se dissolvent.
-          </p>
-        </div>
-
-        <!-- 6. Température -->
-        <div class="p-3 rounded-xl bg-[var(--secondary)] border border-[var(--border)]">
-          <div class="text-xs text-[var(--muted-foreground)]">🌡️ 6. Température</div>
-          <div id="s-temp" class="text-2xl font-mono font-bold text-orange-400 mt-1">30.0 °C</div>
-          <div id="s-temp-tag" class="text-xs font-semibold text-orange-300 mt-1">🔥 Régulation PID</div>
-          <p class="text-xs text-[var(--muted-foreground)] mt-2 pt-2 border-t border-[var(--border)]">
-            30°C (Acide) → 26°C (Gavage PHA) → 70°C (Lyse récolte finale).
-          </p>
-        </div>
-      </div>
-
-      <!-- GRAPHIQUE TEMPOREL + BOÎTE BIOLOGIQUE & BOÎTE PLASTIQUE -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mt-5 pt-4 border-t border-[var(--border)]">
-        <div class="lg:col-span-8">
-          <div class="flex flex-wrap items-center justify-between text-xs mb-2">
-            <span class="font-bold">📈 Courbes en direct du moteur Python (0h → 73h) :</span>
-            <div class="flex flex-wrap gap-3">
-              <span class="text-emerald-400 font-semibold">● pH (×10)</span>
-              <span class="text-amber-400 font-semibold">● AGV réels (g/L)</span>
-              <span class="text-cyan-400 font-semibold">● % Plastique PHA dans cellules</span>
-              <span class="text-purple-400 font-semibold">● Rédox ORP</span>
-            </div>
-          </div>
-          <div class="bg-[var(--secondary)] p-2 rounded-xl border border-[var(--border)]">
-            <canvas id="sim-canvas" width="820" height="220" class="w-full h-52 block"></canvas>
-          </div>
-        </div>
-
-        <!-- ÉTAT INTERNE & PLASTIQUE FINAL -->
-        <div class="lg:col-span-4 flex flex-col justify-between bg-[var(--secondary)] p-4 rounded-xl border border-[var(--border)] text-xs space-y-3">
-          <div>
-            <div class="font-bold text-emerald-400 uppercase mb-2">🦠 État Biologique Interne & EKF</div>
-            <div class="space-y-1.5">
-              <div class="flex justify-between">
-                <span class="text-[var(--muted-foreground)]">Sucres restants :</span>
-                <span id="b-carb" class="font-mono font-bold">8.2 g/L</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-[var(--muted-foreground)]">AGV réels vs EKF :</span>
-                <span id="b-vfa" class="font-mono font-bold text-amber-400">41.2 g/L (EKF: 40.5 g/L)</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-[var(--muted-foreground)]">Acides toxiques [HVFA] :</span>
-                <span id="b-hvfa" class="font-mono font-bold text-rose-400">0.58 g/L (Max 1.8)</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-[var(--muted-foreground)]">PHA intracellulaire :</span>
-                <span id="b-pha" class="font-mono font-bold text-cyan-400">0.02 g/L (3.8%)</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="pt-3 border-t border-[var(--border)]">
-            <div class="font-bold text-cyan-400 uppercase mb-1.5">🏆 Bioplastique PHBV récolté à 73h</div>
-            <div class="grid grid-cols-2 gap-2">
-              <div class="p-2 rounded bg-[var(--card)]">
-                <div class="text-[var(--muted-foreground)]">Poudre PHBV sèche</div>
-                <div id="p-mass" class="font-mono font-bold text-sm text-emerald-400">8.9 g</div>
-              </div>
-              <div class="p-2 rounded bg-[var(--card)]">
-                <div class="text-[var(--muted-foreground)]">Taux 3HV / Fusion</div>
-                <div id="p-tm" class="font-mono font-bold text-sm text-cyan-300">13.0% / 156°C</div>
-              </div>
-            </div>
-            <div id="p-app" class="mt-2 text-[var(--muted-foreground)] italic">
-              Application : Films souples & Piézoélectricité (d33 = 14.6 pC/N)
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
+<header>
+  <div class="brand">
+    <h1>
+      <span>Jumeau Numérique v2.0 — Bioraffinerie Urbaine de Clamart</span>
+    </h1>
+    <p>Architecture Holarchique Pilotée par les Produits (Tare HX711 + EC0 &bull; Panier Passif CaCO3 &bull; Loi &Delta;EC &amp; DO Spike &bull; OpenRAMAN SHA-256)</p>
   </div>
+  <div class="badge-row">
+    <span class="pill" id="badge-sqlite">SQLite : Connecté</span>
+    <span class="pill amber" id="badge-cal">Modèle : Constantes Théoriques</span>
+    <span class="pill cyan" id="badge-ledger">Chaîne SHA-256 : Vérifiée</span>
+  </div>
+</header>
 
-  <script>
-    let simData = null;
-    let currentHour = 18.0;
-    let playTimer = null;
-    let currentPayload = {
-      gross_waste_kg: 1.15,
-      motor_current_ma: 580.0,
-      conductivity_ec_ms_cm: 4.2,
-      initial_orp_drop_mv_h: -115.0,
-      cartridge_mass_g: 220.0
+<nav class="tabs">
+  <button class="tab-btn active" onclick="switchTab('tab-sim', this)">1. Pilotage &amp; 4 Programmes Multi-Molécules</button>
+  <button class="tab-btn" onclick="switchTab('tab-cal', this)">2. Réel vs Jumeau &amp; Auto-Calibration IA</button>
+  <button class="tab-btn" onclick="switchTab('tab-coa', this)">3. Preuve Qualité OpenRAMAN &amp; Certificat CoA</button>
+  <button class="tab-btn" onclick="switchTab('tab-db', this)">4. Historique SQLite &amp; Registre Bayésien</button>
+</nav>
+
+<main>
+  <!-- ==================== TAB 1: MULTI-MOLECULE SIMULATION ==================== -->
+  <section id="tab-sim" class="tab-pane active">
+    <div class="prog-grid" id="program-cards"></div>
+
+    <div class="cockpit-grid">
+      <!-- Left Controls -->
+      <div class="card">
+        <h2>
+          <span>Entrée « Règle du Compost »</span>
+          <span class="pill" id="cn-pill">C/N : 27.9</span>
+        </h2>
+
+        <div class="ctrl-group">
+          <div class="ctrl-label">
+            <span>Masse Biodéchets (HX711)</span>
+            <span class="ctrl-val" id="val-waste">2.50 kg</span>
+          </div>
+          <input type="range" id="sl-waste" min="0.8" max="6.0" step="0.1" value="2.5" oninput="updateSliders()" />
+          <div class="ctrl-hint" id="hint-water">Injection d'eau auto : 3.75 L</div>
+        </div>
+
+        <div class="ctrl-group">
+          <div class="ctrl-label">
+            <span>Part Féculents / Pain Sec (Brun)</span>
+            <span class="ctrl-val" id="val-brown">33 %</span>
+          </div>
+          <input type="range" id="sl-brown" min="15" max="55" step="1" value="33" oninput="updateSliders()" />
+          <div class="ctrl-hint">Règle au doigt mouillé : ~33 % pain/féculents + ~67 % épluchures</div>
+        </div>
+
+        <div class="ctrl-group">
+          <div class="ctrl-label">
+            <span>Tare Saline Initiale EC<sub>0</sub> (t = 0.5h)</span>
+            <span class="ctrl-val" id="val-ec0">4.20 mS/cm</span>
+          </div>
+          <input type="range" id="sl-ec0" min="2.0" max="9.5" step="0.1" value="4.2" oninput="updateSliders()" />
+          <div class="ctrl-hint">Prouve l'immunité au sel NaCl : seule &Delta;EC = EC(t) &minus; EC<sub>0</sub> compte !</div>
+        </div>
+
+        <div class="ctrl-group">
+          <div class="ctrl-label">
+            <span>Panier Coquilles CaCO<sub>3</sub></span>
+            <span class="ctrl-val" id="val-caco3">250 g</span>
+          </div>
+          <input type="range" id="sl-caco3" min="80" max="250" step="10" value="250" oninput="updateSliders()" />
+          <div class="ctrl-hint">Dissolution passive auto-régulée uniquement si pH &lt; 5.8</div>
+        </div>
+
+        <div class="ctrl-group">
+          <div class="ctrl-label">
+            <span>Richesse Marc de Café (Verts)</span>
+            <span class="ctrl-val" id="val-coffee">25 %</span>
+          </div>
+          <input type="range" id="sl-coffee" min="10" max="65" step="5" value="25" oninput="updateSliders()" />
+          <div class="ctrl-hint">Apporte ~15 % lipides &amp; polyphénols (clé pour Programme 4)</div>
+        </div>
+
+        <button class="btn full" onclick="runTwinSimulation()">Simuler le Cycle Complet (RK4)</button>
+
+        <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 0.77rem; color: var(--muted);">
+          <strong style="color:#e2e8f0;">Débouchés Locaux (Clamart / IDF) :</strong>
+          <p id="prog-buyers" style="margin-top:4px;"></p>
+          <strong style="color:#e2e8f0; display:block; margin-top:8px;">Moteur Réglementaire :</strong>
+          <p id="prog-reg" style="margin-top:4px; color:#34d399;"></p>
+        </div>
+      </div>
+
+      <!-- Right KPIs & Dual Charts -->
+      <div>
+        <div class="kpi-strip">
+          <div class="kpi-box">
+            <div class="kpi-label">Produit Cible (Grade A)</div>
+            <div class="kpi-main" id="kpi-mass">-- g</div>
+            <div class="kpi-sub" id="kpi-label-a">--</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-label">Valeur Économique Nette / Cycle</div>
+            <div class="kpi-main" style="color:#34d399;" id="kpi-margin">-- €</div>
+            <div class="kpi-sub" id="kpi-annual">--</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-label">Signaux Loi Produit (&Delta;EC &amp; DO)</div>
+            <div class="kpi-main" style="color:#22d3ee;" id="kpi-events">--</div>
+            <div class="kpi-sub" id="kpi-cartridge">--</div>
+          </div>
+        </div>
+
+        <div class="chart-box">
+          <div class="chart-header">
+            <strong style="font-size:0.88rem;">Cinétique Métabolique (Holon 0) &amp; Observateur EKF</strong>
+            <div class="legend">
+              <span class="leg-item"><i class="swatch" style="background:#f59e0b"></i>Glucides (g/L)</span>
+              <span class="leg-item"><i class="swatch" style="background:#06b6d4"></i>AGV Totaux (g/L)</span>
+              <span class="leg-item"><i class="swatch" style="background:#10b981; height:4px;"></i>Molécule Grade A (g/L)</span>
+              <span class="leg-item"><i class="swatch" style="background:#a855f7"></i>Estim. EKF AGV (g/L)</span>
+            </div>
+          </div>
+          <canvas id="canvas-kinetics" width="980" height="255"></canvas>
+        </div>
+
+        <div class="chart-box">
+          <div class="chart-header">
+            <strong style="font-size:0.88rem;">Capteurs Physiques Rigoureux : &Delta;EC(t) = EC &minus; EC<sub>0</sub>, Débit CO<sub>2</sub> &amp; Oxygène Dissous (DO Spike)</strong>
+            <div class="legend">
+              <span class="leg-item"><i class="swatch" style="background:#22d3ee"></i>&Delta;EC &times; 10 (mS/cm)</span>
+              <span class="leg-item"><i class="swatch" style="background:#fb7185"></i>Débit CO2 / 5 (mL/min)</span>
+              <span class="leg-item"><i class="swatch" style="background:#34d399"></i>Oxygène DO (mg/L)</span>
+              <span class="leg-item"><i class="swatch" style="background:#fde047"></i>pH Tamponné CaCO3</span>
+            </div>
+          </div>
+          <canvas id="canvas-sensors" width="980" height="255"></canvas>
+        </div>
+
+        <div class="kpi-strip" style="margin-bottom:0;">
+          <div class="kpi-box">
+            <div class="kpi-label">Co-Produits Circulaires (Grades B &amp; C)</div>
+            <div class="kpi-main" style="font-size:1.05rem;" id="kpi-coprod">--</div>
+            <div class="kpi-sub" id="kpi-coprod-eur">--</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-label">Bilan Carbone ISO-14040</div>
+            <div class="kpi-main" style="font-size:1.05rem; color:#34d399;" id="kpi-co2">-- kg CO2e évités</div>
+            <div class="kpi-sub" id="kpi-energy">Conso électrique : -- kWh (mix FR bas-carbone)</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-label">Prédiction Bayésienne (IC 95 %)</div>
+            <div class="kpi-main" style="font-size:1.05rem; color:#c084fc;" id="kpi-bayes">--</div>
+            <div class="kpi-sub" id="kpi-batch-id">Lot actif : --</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TAB 2: REAL VS TWIN & AUTO-CALIBRATION ==================== -->
+  <section id="tab-cal" class="tab-pane">
+    <div class="info-banner">
+      <strong>Boucle Hardware-in-the-Loop (Fin 2026) :</strong> Lorsque votre consortium microbien sauvage de Clamart fermente plus vite ou différemment des constantes théoriques de la littérature, le Jumeau Numérique compare en temps réel ses courbes (pointillés) aux mesures réelles de vos sondes ESP32 (points pleins), puis <strong>ré-identifie automatiquement ses constantes biologiques</strong> par optimisation du simplexe de Nelder-Mead.
+    </div>
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px;">
+      <button class="btn cyan" onclick="acquireWetlabBatch()">1. Acquérir un Batch Réel Bruité (Sondes ESP32 Clamart)</button>
+      <button class="btn" id="btn-calibrate" onclick="calibrateOnWetlab()" disabled>2. Auto-Calibrer le Jumeau sur ce Batch Réel (Nelder-Mead)</button>
+      <button class="btn secondary" onclick="sendSingleLiveEsp32Packet()">Tester 1 Trame HTTP POST /api/telemetry/ingest</button>
+      <button class="btn secondary" onclick="resetCalibration()">Réinitialiser Paramètres d'Usine</button>
+    </div>
+
+    <div class="kpi-strip">
+      <div class="kpi-box">
+        <div class="kpi-label">Erreur Prédictive Avant Calibration</div>
+        <div class="kpi-main" style="color:#fb7185;" id="cal-rmse-before">-- %</div>
+        <div class="kpi-sub" id="cal-mass-compare">Masse réelle pesée vs prédite : --</div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-label">Erreur Prédictive Après Auto-Calibration</div>
+        <div class="kpi-main" style="color:#34d399;" id="cal-rmse-after">-- %</div>
+        <div class="kpi-sub" id="cal-status-txt">En attente d'acquisition d'un lot réel...</div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-label">Dernière Trame ESP32 Ingérée</div>
+        <div class="kpi-main" style="font-size:1.0rem; color:#22d3ee;" id="cal-live-alert">Prêt sur /api/telemetry/ingest</div>
+        <div class="kpi-sub" id="cal-live-detail">Tare EC0 + Filtre de Kalman EKF temps réel</div>
+      </div>
+    </div>
+
+    <div class="chart-box">
+      <div class="chart-header">
+        <strong style="font-size:0.88rem;">Superposition Temps Réel : Sondes Physiques ESP32 vs Jumeau Théorique vs Jumeau Auto-Calibré</strong>
+        <div class="legend">
+          <span class="leg-item"><i class="swatch" style="background:#38bdf8; height:5px;"></i>Points Sondes ESP32 (&Delta;EC mS/cm)</span>
+          <span class="leg-item"><i class="swatch" style="background:#94a3b8; border-top:2px dashed #94a3b8;"></i>Jumeau Non-Calibré (&Delta;EC)</span>
+          <span class="leg-item"><i class="swatch" style="background:#10b981; height:3px;"></i>Jumeau Auto-Calibré (&Delta;EC)</span>
+          <span class="leg-item"><i class="swatch" style="background:#fbbf24;"></i>DO Réel vs Jumeau (mg/L)</span>
+        </div>
+      </div>
+      <canvas id="canvas-calibration" width="1200" height="285"></canvas>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <h2>Paramètres Cinétiques Appris ( Consortium Local de Clamart )</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Paramètre Biologique</th>
+              <th>Défaut Littérature</th>
+              <th>Calibré Clamart</th>
+              <th>Unité</th>
+            </tr>
+          </thead>
+          <tbody id="cal-params-tbody">
+            <tr><td>&mu;<sub>max,acid</sub> (Croissance acidogènes)</td><td>0.3500</td><td>--</td><td>h<sup>-1</sup></td></tr>
+            <tr><td>Y<sub>VFA/carb</sub> (Rendement sucres &rarr; AGV)</td><td>0.7200</td><td>--</td><td>g/g</td></tr>
+            <tr><td>q<sub>PHA,max</sub> (Vitesse stockage polymère)</td><td>0.4000</td><td>--</td><td>h<sup>-1</sup></td></tr>
+            <tr><td>Y<sub>PHA/VFA</sub> (Conversion AGV &rarr; Grade A)</td><td>0.6500</td><td>--</td><td>g/g</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h2>Protocole Matériel ESP32 (Prêt à Flasher Fin 2026)</h2>
+        <pre class="code-block" id="esp32-snippet">POST http://127.0.0.1:8080/api/telemetry/ingest
+Content-Type: application/json
+
+{
+  "batch_id": "CLAMART-TAMBOUR-01",
+  "t_h": 28.5,
+  "ph": 5.84,
+  "orp_mv": -215.0,
+  "ec_ms_cm": 6.18,
+  "co2_ml_min": 5.4,
+  "do_mg_l": 0.15,
+  "temp_c": 30.1,
+  "hx711_kg": 6.25,
+  "rpm": 8
+}</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TAB 3: OPENRAMAN & SHA-256 COA ==================== -->
+  <section id="tab-coa" class="tab-pane">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+      <div>
+        <h2 style="font-size:1.05rem;">Preuve Analytique de Sortie : Spectrométrie OpenRAMAN 532 nm &amp; Certificat CoA</h2>
+        <p style="font-size:0.82rem; color:var(--muted);">La qualité commerciale n'est jamais supposée à partir des déchets d'entrée : elle est prouvée sur la poudre/molécule extraite avant vente.</p>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn" onclick="generateCoA()">Analyser par OpenRAMAN &amp; Signer le CoA SHA-256</button>
+        <button class="btn secondary" id="btn-dl-coa" onclick="downloadCoA()" disabled>Télécharger le CoA (.json)</button>
+      </div>
+    </div>
+
+    <div class="chart-box">
+      <div class="chart-header">
+        <strong style="font-size:0.88rem;">Spectre Vibrationnel Raman Corrigé de la Fluorescence (800 – 1850 cm<sup>-1</sup>)</strong>
+        <div class="legend">
+          <span class="leg-item"><i class="swatch" style="background:#10b981"></i>Intensité Raman Déconvoluée</span>
+          <span class="leg-item"><i class="swatch" style="background:#f59e0b"></i>1724 cm⁻¹ (C=O Cristallin) / 1740 cm⁻¹ (Amorphe)</span>
+          <span class="leg-item"><i class="swatch" style="background:#f43f5e"></i>1655 cm⁻¹ (Amide I Protéines = 0 %)</span>
+        </div>
+      </div>
+      <canvas id="canvas-raman" width="1200" height="260"></canvas>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <h2>Résultats Analytiques &amp; Conformité Réglementaire</h2>
+        <table>
+          <tbody id="coa-details-tbody">
+            <tr><th>Identifiant du Lot</th><td id="coa-batch">--</td></tr>
+            <tr><th>Molécule Certifiée</th><td id="coa-prod">--</td></tr>
+            <tr><th>Pureté Raman Estimée</th><td id="coa-purity">--</td></tr>
+            <tr><th>Indice de Cristallinité (1724 / 1740 cm⁻¹)</th><td id="coa-xc">--</td></tr>
+            <tr><th>Résidu Protéique Cellulaire (Bande Amide I 1655 cm⁻¹)</th><td id="coa-amide">--</td></tr>
+            <tr><th>Solvants Chlorés / Halogénés Utilisés</th><td style="color:#34d399; font-weight:700;">0.0 mL (Extraction Verte Na2CO3)</td></tr>
+            <tr><th>Conformité UE 2023/2055 (Zéro Microplastique)</th><td style="color:#34d399; font-weight:700;">CONFORME</td></tr>
+            <tr><th>Audit Ecocert UAB / NF U 42-001 (Co-produits B &amp; C)</th><td id="coa-uab">--</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h2>Empreinte Cryptographique Inaltérable (SHA-256)</h2>
+        <p style="font-size:0.8rem; color:var(--muted); margin-bottom:10px;">Ce condensat cryptographique scelle ensemble le spectre OpenRAMAN, les paramètres du cycle thermique et le registre fédéré de Clamart :</p>
+        <div style="margin-bottom:12px;">
+          <div style="font-size:0.74rem; color:var(--muted); margin-bottom:4px;">HASH MASTER COA SHA-256 :</div>
+          <code class="hash" id="coa-hash">En attente de génération...</code>
+        </div>
+        <div style="margin-bottom:12px;">
+          <div style="font-size:0.74rem; color:var(--muted); margin-bottom:4px;">BLOC REGISTRE FÉDÉRÉ (KNOWLEDGE LEDGER) :</div>
+          <code class="hash" id="coa-ledger-hash">--</code>
+        </div>
+        <pre class="code-block" id="coa-json-preview" style="max-height:150px;">Cliquez sur « Analyser par OpenRAMAN » pour générer le dossier complet.</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TAB 4: SQLITE HISTORY ==================== -->
+  <section id="tab-db" class="tab-pane">
+    <div class="card">
+      <h2>
+        <span>Lots Enregistrés dans la Base Locale SQLite (data/clamart_digital_twin.db)</span>
+        <button class="btn secondary" onclick="refreshHistory()">Actualiser SQLite</button>
+      </h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID Lot</th>
+            <th>Programme</th>
+            <th>Déchets (kg)</th>
+            <th>Tare EC<sub>0</sub></th>
+            <th>Grade A (g)</th>
+            <th>Marge Nette (€)</th>
+            <th>CO<sub>2</sub>e Évité</th>
+            <th>Statut</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="db-batches-tbody"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<script>
+  let PROGRAMS = [];
+  let selectedProgramId = "PROG_1_PHBV_COSMETIC_PIEZO";
+  let currentBatchId = null;
+  let currentWetlabBatchId = null;
+  let latestCoA = null;
+  let lastWetlabState = null;
+
+  function switchTab(tabId, btnEl) {
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    btnEl.classList.add('active');
+    if (tabId === 'tab-db') refreshHistory();
+  }
+
+  function getBatchPayload() {
+    return {
+      program_id: selectedProgramId,
+      hx711_waste_kg: parseFloat(document.getElementById('sl-waste').value),
+      brown_starch_ratio: parseFloat(document.getElementById('sl-brown').value) / 100.0,
+      baseline_ec0_ms_cm: parseFloat(document.getElementById('sl-ec0').value),
+      cartridge_caco3_g: parseFloat(document.getElementById('sl-caco3').value),
+      coffee_grounds_fraction: parseFloat(document.getElementById('sl-coffee').value) / 100.0,
     };
+  }
 
-    function throwBucket(preset) {
-      if (preset === 'kitchen') {
-        currentPayload = {
-          gross_waste_kg: 1.15,
-          motor_current_ma: 580.0,
-          conductivity_ec_ms_cm: 4.2,
-          initial_orp_drop_mv_h: -115.0,
-          cartridge_mass_g: 220.0
-        };
-      } else if (preset === 'canteen_pasta') {
-        currentPayload = {
-          gross_waste_kg: 1.45,
-          motor_current_ma: 760.0, // Pâtes/pain plus épais -> courant moteur plus fort !
-          conductivity_ec_ms_cm: 3.6,
-          initial_orp_drop_mv_h: -135.0,
-          cartridge_mass_g: 220.0
-        };
-      } else if (preset === 'algae_mix') {
-        currentPayload = {
-          gross_waste_kg: 1.30,
-          motor_current_ma: 620.0,
-          conductivity_ec_ms_cm: 7.8, // Algues riches en sels et acides aminés -> haute EC -> fort 3HV !
-          initial_orp_drop_mv_h: -110.0,
-          cartridge_mass_g: 220.0
-        };
-      } else if (preset === 'empty_cartridge') {
-        currentPayload = {
-          gross_waste_kg: 1.25,
-          motor_current_ma: 640.0,
-          conductivity_ec_ms_cm: 4.0,
-          initial_orp_drop_mv_h: -125.0,
-          cartridge_mass_g: 0.0 // Panier de coquilles vide !
-        };
-      }
-      document.getElementById('in-waste').value = currentPayload.gross_waste_kg;
-      fetchSimulation(true);
+  function updateSliders() {
+    const w = parseFloat(document.getElementById('sl-waste').value);
+    const b = parseFloat(document.getElementById('sl-brown').value);
+    const ec0 = parseFloat(document.getElementById('sl-ec0').value);
+    const ca = parseFloat(document.getElementById('sl-caco3').value);
+    const cf = parseFloat(document.getElementById('sl-coffee').value);
+
+    document.getElementById('val-waste').textContent = w.toFixed(2) + ' kg';
+    document.getElementById('hint-water').textContent = `Injection d'eau auto : ${(w * 1.5).toFixed(2)} L`;
+    document.getElementById('val-brown').textContent = b + ' %';
+    document.getElementById('val-ec0').textContent = ec0.toFixed(2) + ' mS/cm';
+    document.getElementById('val-caco3').textContent = ca.toFixed(0) + ' g';
+    document.getElementById('val-coffee').textContent = cf + ' %';
+
+    const cn = 18.0 + 30.0 * (b / 100.0);
+    const cnPill = document.getElementById('cn-pill');
+    cnPill.textContent = `C/N : ${cn.toFixed(1)}`;
+    cnPill.className = (cn >= 20 && cn <= 40) ? 'pill' : 'pill amber';
+  }
+
+  function renderProgramCards() {
+    const container = document.getElementById('program-cards');
+    container.innerHTML = '';
+    PROGRAMS.forEach(p => {
+      const div = document.createElement('div');
+      div.className = 'prog-card' + (p.program_id === selectedProgramId ? ' selected' : '');
+      div.onclick = () => {
+        selectedProgramId = p.program_id;
+        renderProgramCards();
+        runTwinSimulation();
+      };
+      div.innerHTML = `
+        <div class="prog-code">${p.code} &bull; Cycle ${p.duration_h}h</div>
+        <div class="prog-title">${p.title_fr}</div>
+        <div class="prog-price">${p.price_range_eur_per_kg}</div>
+        <div class="prog-meta">${p.process_summary_fr}</div>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  async function initApp() {
+    updateSliders();
+    const res = await fetch('/api/twin/programs');
+    const data = await res.json();
+    PROGRAMS = data.programs || [];
+    renderProgramCards();
+    updateTopBadges(data.calibration_meta, data.ledger_integrity);
+    await runTwinSimulation();
+  }
+
+  function updateTopBadges(calMeta, ledgerInt) {
+    const calBadge = document.getElementById('badge-cal');
+    if (calMeta) {
+      calBadge.textContent = `Modèle : Auto-Calibré Clamart (RMSE ${calMeta.rmse_after_pct}%)`;
+      calBadge.className = 'pill';
+    } else {
+      calBadge.textContent = 'Modèle : Constantes Théoriques';
+      calBadge.className = 'pill amber';
+    }
+    if (ledgerInt) {
+      document.getElementById('badge-ledger').textContent =
+        `Chaîne SHA-256 : ${ledgerInt.valid ? 'Intègre' : 'Alerte'} (${ledgerInt.checked_blocks} blocs)`;
+    }
+  }
+
+  async function runTwinSimulation() {
+    const payload = getBatchPayload();
+    const res = await fetch('/api/twin/simulate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const sim = await res.json();
+    currentBatchId = sim.batch_id;
+
+    updateTopBadges(sim.calibration_meta, null);
+    document.getElementById('prog-buyers').textContent = sim.program.target_buyers;
+    document.getElementById('prog-reg').textContent = sim.program.regulatory_driver;
+
+    const prod = sim.products;
+    const econ = sim.economics;
+    const ev = sim.events;
+    const cart = sim.cartridge_status;
+
+    document.getElementById('kpi-mass').textContent = `${prod.grade_a_mass_g.toFixed(1)} g  (${prod.grade_a_purity_pct}% pur)`;
+    document.getElementById('kpi-label-a').textContent = `${prod.grade_a_label} — ${prod.grade_a_value_eur.toFixed(2)} €`;
+    document.getElementById('kpi-margin').textContent = `+${econ.net_margin_batch_eur.toFixed(2)} € net`;
+    document.getElementById('kpi-annual').textContent =
+      `CA brut ${econ.gross_revenue_batch_eur.toFixed(2)} € | ${econ.annual_net_cashflow_1drum_eur.toFixed(0)} €/an (Payback ${econ.payback_months} mois)`;
+
+    const platTxt = ev.acidogenesis_plateau_h ? `${ev.acidogenesis_plateau_h}h` : 'En cours';
+    const doTxt = ev.do_spike_harvest_h ? `DO Spike ${ev.do_spike_harvest_h}h` : 'Mode anaérobie/continu';
+    document.getElementById('kpi-events').textContent = `Plateau ΔEC : ${platTxt}`;
+    document.getElementById('kpi-cartridge').textContent =
+      `${doTxt} | CaCO3 dissous : ${cart.dissolved_this_batch_g} g (${cart.cartridge_level_pct}% restant)`;
+
+    document.getElementById('kpi-coprod').textContent =
+      `${prod.grade_b_biostimulant_l} L Grade B + ${prod.grade_c_substrate_kg} kg Grade C`;
+    document.getElementById('kpi-coprod-eur').textContent =
+      `Revenu secondaire circulaire : +${prod.secondary_co_products_eur.toFixed(2)} €`;
+
+    document.getElementById('kpi-co2').textContent = `${sim.lca.total_co2_eq_avoided_kg} kg CO2e évités`;
+    document.getElementById('kpi-energy').textContent =
+      `Énergie : ${econ.energy_kwh} kWh (OpEx total : ${econ.opex_batch_eur.toFixed(2)} €)`;
+
+    const bp = sim.bayesian_posterior;
+    document.getElementById('kpi-bayes').textContent =
+      `${bp.posterior_mean_g} g  [${bp.ci_95_low_g} – ${bp.ci_95_high_g} g]`;
+    document.getElementById('kpi-batch-id').textContent = `Lot SQLite : ${sim.batch_id} (n=${bp.sample_size} lots appris)`;
+
+    drawMultiLineChart(
+      'canvas-kinetics',
+      sim.trajectory.map(p => p.t),
+      [
+        { data: sim.trajectory.map(p => p.carb), color: '#f59e0b', width: 2 },
+        { data: sim.trajectory.map(p => p.vfa), color: '#06b6d4', width: 2 },
+        { data: sim.trajectory.map(p => p.target_mol_g_l), color: '#10b981', width: 3 },
+        { data: sim.trajectory.map(p => p.ekf_vfa), color: '#a855f7', width: 1.6, dashed: true },
+      ],
+      'Concentration (g/L)',
+      ev
+    );
+
+    drawMultiLineChart(
+      'canvas-sensors',
+      sim.trajectory.map(p => p.t),
+      [
+        { data: sim.trajectory.map(p => p.delta_ec_ms * 10.0), color: '#22d3ee', width: 2.5 },
+        { data: sim.trajectory.map(p => p.co2_ml_min / 5.0), color: '#fb7185', width: 1.8 },
+        { data: sim.trajectory.map(p => p.do_mg_l), color: '#34d399', width: 2.2 },
+        { data: sim.trajectory.map(p => p.ph), color: '#fde047', width: 1.6 },
+      ],
+      'Unités Capteurs Normalisées',
+      ev
+    );
+  }
+
+  function drawMultiLineChart(canvasId, xArr, seriesList, yTitle, events = null) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width;
+    const H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    const pad = { l: 48, r: 20, t: 18, b: 30 };
+    const pw = W - pad.l - pad.r;
+    const ph = H - pad.t - pad.b;
+
+    let maxY = 10.0;
+    seriesList.forEach(s => {
+      s.data.forEach(v => { if (v > maxY) maxY = v; });
+    });
+    maxY *= 1.12;
+    const maxX = xArr.length ? xArr[xArr.length - 1] : 73;
+
+    // Grid
+    ctx.strokeStyle = '#1e293b';
+    ctx.lineWidth = 1;
+    ctx.fillStyle = '#64748b';
+    ctx.font = '11px Segoe UI, sans-serif';
+    for (let i = 0; i <= 4; i++) {
+      const y = pad.t + ph - (i / 4) * ph;
+      ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l + pw, y); ctx.stroke();
+      ctx.fillText(((i / 4) * maxY).toFixed(1), 8, y + 4);
+    }
+    for (let h = 0; h <= maxX; h += 12) {
+      const x = pad.l + (h / maxX) * pw;
+      ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, pad.t + ph); ctx.stroke();
+      ctx.fillText(h + 'h', x - 8, H - 8);
     }
 
-    async function fetchSimulation(keepPreset = false) {
-      if (!keepPreset) {
-        currentPayload.gross_waste_kg = parseFloat(document.getElementById('in-waste').value);
+    // Event markers (Plateau Delta_EC & DO Spike)
+    if (events) {
+      if (events.acidogenesis_plateau_h) {
+        const xp = pad.l + (events.acidogenesis_plateau_h / maxX) * pw;
+        ctx.save();
+        ctx.strokeStyle = 'rgba(34, 211, 238, 0.55)';
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath(); ctx.moveTo(xp, pad.t); ctx.lineTo(xp, pad.t + ph); ctx.stroke();
+        ctx.fillStyle = '#22d3ee';
+        ctx.fillText(`Plateau ΔEC (${events.acidogenesis_plateau_h}h)`, xp + 4, pad.t + 12);
+        ctx.restore();
       }
-      const res = await fetch('/api/simulate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(currentPayload)
-      });
-      simData = await res.json();
+      if (events.do_spike_harvest_h) {
+        const xd = pad.l + (events.do_spike_harvest_h / maxX) * pw;
+        ctx.save();
+        ctx.strokeStyle = 'rgba(52, 211, 153, 0.65)';
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath(); ctx.moveTo(xd, pad.t); ctx.lineTo(xd, pad.t + ph); ctx.stroke();
+        ctx.fillStyle = '#34d399';
+        ctx.fillText(`DO Spike (${events.do_spike_harvest_h}h)`, Math.min(W - 115, xd + 4), pad.t + 26);
+        ctx.restore();
+      }
+    }
 
-      // Mise à jour des 3 boîtes "Zéro-Pesée"
-      const inf = simData.inferred_feedstock;
-      const cart = simData.cartridge_status;
-      const cop = simData.copolymer;
-
-      document.getElementById('zd-waste').textContent = inf.detected_waste_kg.toFixed(2) + ' kg';
-      document.getElementById('zd-water').textContent = '+' + inf.auto_water_injected_l.toFixed(2) + ' L';
-
-      document.getElementById('zd-caco3-used').textContent = cart.dissolved_this_batch_g.toFixed(1) + ' g';
-      if (cart.remaining_cartridge_g <= 0.1) {
-        document.getElementById('zd-caco3-left').textContent = '0 g (VIDE 🚨)';
-        document.getElementById('zd-caco3-left').className = 'font-mono font-bold text-base text-rose-400 mt-0.5';
+    // Series
+    seriesList.forEach(s => {
+      ctx.save();
+      ctx.strokeStyle = s.color;
+      ctx.lineWidth = s.width || 2;
+      if (s.dashed) ctx.setLineDash([6, 4]);
+      if (s.dotsOnly) {
+        ctx.fillStyle = s.color;
+        for (let i = 0; i < s.data.length; i++) {
+          const x = pad.l + (s.xArr ? s.xArr[i] : xArr[i]) / maxX * pw;
+          const y = pad.t + ph - (s.data[i] / maxY) * ph;
+          ctx.beginPath(); ctx.arc(x, y, 2.7, 0, Math.PI * 2); ctx.fill();
+        }
       } else {
-        document.getElementById('zd-caco3-left').textContent = `${cart.remaining_cartridge_g.toFixed(0)} g (${cart.estimated_batches_remaining} tournées)`;
-        document.getElementById('zd-caco3-left').className = 'font-mono font-bold text-base text-emerald-400 mt-0.5';
-      }
-      document.getElementById('bar-cartridge').style.width = cart.cartridge_level_pct + '%';
-
-      document.getElementById('zd-ma').textContent = Math.round(currentPayload.motor_current_ma) + ' mA';
-      document.getElementById('zd-ec').textContent = currentPayload.conductivity_ec_ms_cm.toFixed(1) + ' mS/cm';
-      document.getElementById('zd-carbs').textContent = inf.inferred_carbohydrates_g_l.toFixed(1) + ' g/L';
-      document.getElementById('zd-cn').textContent = inf.inferred_cn_ratio.toFixed(1);
-      document.getElementById('zd-odd').textContent = (inf.inferred_odd_vfa_ratio * 100).toFixed(1) + ' %';
-
-      document.getElementById('p-mass').textContent = cop.final_pha_g.toFixed(1) + ' g secs';
-      document.getElementById('p-tm').textContent = `${cop.hv_mol_pct}% 3HV / ${cop.tm_c}°C`;
-      document.getElementById('p-app').textContent = `${cop.application} (d33 = ${cop.d33_pc_n} pC/N)`;
-
-      renderHour(currentHour);
-    }
-
-    function setHour(h) {
-      currentHour = parseFloat(h);
-      document.getElementById('slider-time').value = currentHour;
-      renderHour(currentHour);
-    }
-
-    function onTimeChange(val) {
-      currentHour = parseFloat(val);
-      renderHour(currentHour);
-    }
-
-    function togglePlay() {
-      const btn = document.getElementById('btn-play');
-      if (playTimer) {
-        clearInterval(playTimer);
-        playTimer = null;
-        btn.textContent = '▶ Lecture Auto (0h → 73h)';
-      } else {
-        if (currentHour >= 72.5) currentHour = 0;
-        btn.textContent = '⏸ Pause';
-        playTimer = setInterval(() => {
-          currentHour += 0.5;
-          if (currentHour > 73.0) {
-            clearInterval(playTimer);
-            playTimer = null;
-            btn.textContent = '▶ Lecture Auto (0h → 73h)';
-            return;
-          }
-          document.getElementById('slider-time').value = currentHour;
-          renderHour(currentHour);
-        }, 110);
-      }
-    }
-
-    function renderHour(h) {
-      if (!simData || !simData.trajectory) return;
-      const idx = Math.min(simData.trajectory.length - 1, Math.max(0, Math.round(h * 2)));
-      const pt = simData.trajectory[idx];
-
-      document.getElementById('lbl-hour').textContent = `t = ${pt.t.toFixed(1)} h`;
-      document.getElementById('sens-hour').textContent = `t = ${pt.t.toFixed(1)} h`;
-      document.getElementById('badge-fsm').textContent = pt.fsm_state;
-
-      document.getElementById('s-ph').textContent = pt.ph.toFixed(2);
-      const phTag = document.getElementById('s-ph-tag');
-      if (pt.ph < 4.5) {
-        phTag.textContent = '🚨 ALARME CHOC ACIDE !';
-        phTag.className = 'text-xs font-semibold text-rose-400 mt-1';
-      } else {
-        phTag.textContent = '✅ Tampon CaCO₃ passif OK';
-        phTag.className = 'text-xs font-semibold text-emerald-400 mt-1';
-      }
-
-      document.getElementById('s-orp').textContent = (pt.orp_mv >= 0 ? '+' : '') + pt.orp_mv + ' mV';
-      document.getElementById('s-orp-tag').textContent = pt.orp_mv < -120 ? '🔒 Anaérobie (Acidogenèse)' : '🌬️ Aérobie (Stockage PHA)';
-
-      document.getElementById('s-do').textContent = pt.do_mg_l.toFixed(2) + ' mg/L';
-      document.getElementById('s-do-tag').textContent = pt.aerated ? '🫧 Compresseur Air ON' : '💤 Sans bullage';
-
-      document.getElementById('s-rpm').textContent = pt.rpm + ' RPM';
-      document.getElementById('s-ma-tag').textContent = `⚡ Courant Moteur : ${pt.motor_ma} mA`;
-      document.getElementById('s-shear-tag').textContent = pt.rpm >= 600
-        ? `🌪️ Essorage Centrifuge : ${pt.rcf_g} G`
-        : `🛡️ Cisaillement λK = ${pt.lambda_k_um} µm (Flocs OK)`;
-
-      document.getElementById('s-ec').textContent = pt.ec_ms.toFixed(2) + ' mS/cm';
-      document.getElementById('s-temp').textContent = pt.temp_c.toFixed(1) + ' °C';
-
-      document.getElementById('b-carb').textContent = pt.carb.toFixed(1) + ' g/L';
-      document.getElementById('b-vfa').textContent = `${pt.vfa.toFixed(1)} g/L (EKF: ${pt.ekf_vfa.toFixed(1)} g/L)`;
-      document.getElementById('b-hvfa').textContent = `${pt.hvfa.toFixed(2)} g/L (Seuil 1.8)`;
-      document.getElementById('b-pha').textContent = `${pt.pha_g_l.toFixed(2)} g/L (${pt.pha_pct.toFixed(1)}%)`;
-
-      document.getElementById('json-box').textContent = JSON.stringify({
-        t_h: pt.t,
-        ph: pt.ph,
-        orp_mv: pt.orp_mv,
-        do_mg_l: pt.do_mg_l,
-        rpm: pt.rpm,
-        motor_ma: pt.motor_ma,
-        ec_ms: pt.ec_ms
-      });
-
-      drawChart(pt.t);
-    }
-
-    function drawChart(cursorHour) {
-      const canvas = document.getElementById('sim-canvas');
-      const ctx = canvas.getContext('2d');
-      const w = canvas.width, h = canvas.height;
-      ctx.clearRect(0, 0, w, h);
-
-      const padL = 36, padR = 16, padT = 14, padB = 24;
-      const pw = w - padL - padR, ph = h - padT - padB;
-
-      ctx.strokeStyle = 'rgba(148, 163, 184, 0.16)';
-      ctx.lineWidth = 1;
-      for (let i = 0; i <= 4; i++) {
-        const y = padT + (ph * i) / 4;
-        ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(w - padR, y); ctx.stroke();
-      }
-
-      const x36 = padL + (36.0 / 73.0) * pw;
-      ctx.strokeStyle = 'rgba(148, 163, 184, 0.45)';
-      ctx.setLineDash([4, 4]);
-      ctx.beginPath(); ctx.moveTo(x36, padT); ctx.lineTo(x36, h - padB); ctx.stroke();
-      ctx.setLineDash([]);
-
-      function plot(fn, maxV, color) {
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 2.3;
         ctx.beginPath();
-        simData.trajectory.forEach((p, idx) => {
-          const x = padL + (p.t / 73.0) * pw;
-          const y = padT + ph * (1 - Math.max(0, Math.min(1, fn(p) / maxV)));
-          if (idx === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        });
+        for (let i = 0; i < s.data.length; i++) {
+          const xv = s.xArr ? s.xArr[i] : xArr[i];
+          const x = pad.l + (xv / maxX) * pw;
+          const y = pad.t + ph - (s.data[i] / maxY) * ph;
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
         ctx.stroke();
       }
+      ctx.restore();
+    });
+  }
 
-      plot(p => p.ph * 10, 80, '#34d399');
-      plot(p => p.vfa, 65, '#fbbf24');
-      plot(p => p.pha_pct, 80, '#22d3ee');
-      plot(p => ((p.orp_mv + 350) / 600) * 80, 80, '#c084fc');
+  // ==================== TAB 2: WETLAB STREAM & AUTO-CALIBRATION ====================
+  async function acquireWetlabBatch() {
+    document.getElementById('cal-status-txt').textContent = 'Acquisition des sondes ESP32 en cours...';
+    const res = await fetch('/api/twin/wetlab_stream', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(getBatchPayload()),
+    });
+    const data = await res.json();
+    currentWetlabBatchId = data.batch_id;
+    currentBatchId = data.batch_id;
+    lastWetlabState = data;
 
-      const xCur = padL + (cursorHour / 73.0) * pw;
-      ctx.strokeStyle = '#10b981';
-      ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(xCur, padT); ctx.lineTo(xCur, h - padB); ctx.stroke();
+    document.getElementById('btn-calibrate').disabled = false;
+    document.getElementById('cal-rmse-before').textContent = `${data.rmse_uncalibrated_pct.toFixed(2)} %`;
+    document.getElementById('cal-rmse-after').textContent = '-- %';
+    document.getElementById('cal-mass-compare').textContent =
+      `Pesée réelle : ${data.observed_grade_a_g} g vs Prédit non-calibré : ${data.predicted_uncalibrated_grade_a_g} g`;
+    document.getElementById('cal-status-txt').textContent =
+      `Lot ${data.batch_id} enregistré dans SQLite (${data.esp32_telemetry.length} trames ESP32). Cliquez sur l'étape 2 !`;
+
+    const uncalTraj = data.uncalibrated_twin.trajectory;
+    const obs = data.esp32_telemetry;
+    drawMultiLineChart(
+      'canvas-calibration',
+      uncalTraj.map(p => p.t),
+      [
+        { data: uncalTraj.map(p => p.delta_ec_ms * 3.0), color: '#94a3b8', width: 2, dashed: true },
+        { data: obs.map(p => p.delta_ec_ms_cm * 3.0), xArr: obs.map(p => p.t_h), color: '#38bdf8', dotsOnly: true },
+        { data: uncalTraj.map(p => p.do_mg_l), color: '#fbbf24', width: 1.6, dashed: true },
+        { data: obs.map(p => p.do_mg_l), xArr: obs.map(p => p.t_h), color: '#f59e0b', dotsOnly: true },
+      ],
+      'ΔEC (×3) & DO (mg/L)'
+    );
+  }
+
+  async function calibrateOnWetlab() {
+    if (!currentWetlabBatchId) return;
+    const btn = document.getElementById('btn-calibrate');
+    btn.disabled = true;
+    btn.textContent = 'Identification Nelder-Mead en cours...';
+
+    const res = await fetch('/api/twin/calibrate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ batch_id: currentWetlabBatchId }),
+    });
+    const cal = await res.json();
+    btn.textContent = '2. Auto-Calibrer le Jumeau sur ce Batch Réel (Nelder-Mead)';
+    btn.disabled = false;
+
+    document.getElementById('cal-rmse-before').textContent = `${cal.rmse_before_pct.toFixed(2)} %`;
+    document.getElementById('cal-rmse-after').textContent = `${cal.rmse_after_pct.toFixed(2)} %`;
+    document.getElementById('cal-status-txt').textContent =
+      `Calibration réussie ! Masse prédite recalibrée : ${cal.calibrated_twin.products.grade_a_mass_g} g (réel : ${cal.observed_grade_a_g} g)`;
+
+    const o = cal.old_parameters;
+    const n = cal.calibrated_parameters;
+    document.getElementById('cal-params-tbody').innerHTML = `
+      <tr><td>&mu;<sub>max,acid</sub> (Croissance acidogènes)</td><td>${o.mu_max_acid}</td><td style="color:#34d399;font-weight:700;">${n.mu_max_acid}</td><td>h<sup>-1</sup></td></tr>
+      <tr><td>Y<sub>VFA/carb</sub> (Rendement sucres &rarr; AGV)</td><td>${o.y_vfa_carb}</td><td style="color:#34d399;font-weight:700;">${n.y_vfa_carb}</td><td>g/g</td></tr>
+      <tr><td>q<sub>PHA,max</sub> (Vitesse stockage polymère)</td><td>${o.q_pha_max}</td><td style="color:#34d399;font-weight:700;">${n.q_pha_max}</td><td>h<sup>-1</sup></td></tr>
+      <tr><td>Y<sub>PHA/VFA</sub> (Conversion AGV &rarr; Grade A)</td><td>${o.y_pha_vfa}</td><td style="color:#34d399;font-weight:700;">${n.y_pha_vfa}</td><td>g/g</td></tr>
+    `;
+
+    updateTopBadges({ rmse_after_pct: cal.rmse_after_pct }, cal.ledger_integrity);
+
+    const uncalTraj = cal.uncalibrated_twin.trajectory;
+    const calTraj = cal.calibrated_twin.trajectory;
+    const obs = cal.esp32_telemetry;
+    drawMultiLineChart(
+      'canvas-calibration',
+      calTraj.map(p => p.t),
+      [
+        { data: uncalTraj.map(p => p.delta_ec_ms * 3.0), color: '#64748b', width: 1.8, dashed: true },
+        { data: calTraj.map(p => p.delta_ec_ms * 3.0), color: '#10b981', width: 2.8 },
+        { data: obs.map(p => p.delta_ec_ms_cm * 3.0), xArr: obs.map(p => p.t_h), color: '#38bdf8', dotsOnly: true },
+        { data: calTraj.map(p => p.do_mg_l), color: '#fbbf24', width: 2.2 },
+        { data: obs.map(p => p.do_mg_l), xArr: obs.map(p => p.t_h), color: '#f59e0b', dotsOnly: true },
+      ],
+      'ΔEC (×3) & DO (mg/L)'
+    );
+
+    await runTwinSimulation();
+  }
+
+  async function sendSingleLiveEsp32Packet() {
+    const pkt = {
+      batch_id: currentBatchId || "CLAMART-LIVE-ESP32",
+      t_h: 29.0,
+      ph: 5.82,
+      orp_mv: -210.0,
+      ec_ms_cm: 6.35,
+      co2_ml_min: 4.8,
+      do_mg_l: 0.18,
+      temp_c: 30.2,
+      hx711_kg: 6.25,
+      rpm: 8,
+      aerated: false
+    };
+    const res = await fetch('/api/telemetry/ingest', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(pkt),
+    });
+    const out = await res.json();
+    document.getElementById('cal-live-alert').textContent = out.alerts.recommended_action;
+    document.getElementById('cal-live-detail').textContent =
+      `ΔEC = +${out.delta_ec_ms_cm} mS/cm (${out.stoich_vfa_g_l} g/L AGV) | EKF = ${out.ekf_vfa_g_l} g/L`;
+  }
+
+  async function resetCalibration() {
+    await fetch('/api/twin/reset_calibration', { method: 'POST', body: '{}' });
+    updateTopBadges(null, null);
+    document.getElementById('cal-status-txt').textContent = 'Paramètres réinitialisés aux constantes théoriques.';
+    await runTwinSimulation();
+  }
+
+  // ==================== TAB 3: OPENRAMAN & COA ====================
+  async function generateCoA(targetBatchId = null) {
+    const bid = targetBatchId || currentBatchId || "CLAMART-LOT-01";
+    const res = await fetch('/api/twin/certify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ batch_id: bid }),
+    });
+    const coa = await res.json();
+    latestCoA = coa;
+    document.getElementById('btn-dl-coa').disabled = false;
+
+    document.getElementById('coa-batch').textContent = coa.batch_id;
+    document.getElementById('coa-prod').textContent = `${coa.product_label} (${coa.grade_a_mass_g} g)`;
+    document.getElementById('coa-purity').textContent = `${coa.raman_analysis.purity_estimate_pct} %`;
+    document.getElementById('coa-xc').textContent = `${coa.raman_analysis.crystallinity_index_pct} %`;
+    document.getElementById('coa-amide').textContent = `${coa.amide_i_1655_protein_residue_pct} % (Absence validée < 2%)`;
+    document.getElementById('coa-uab').textContent = coa.ecocert_audit.status;
+    document.getElementById('coa-hash').textContent = coa.coa_sha256;
+    document.getElementById('coa-ledger-hash').textContent = coa.ledger_entry_hash;
+
+    const previewCopy = Object.assign({}, coa);
+    delete previewCopy.spectrum_plot;
+    document.getElementById('coa-json-preview').textContent = JSON.stringify(previewCopy, null, 2);
+
+    drawRamanSpectrum(coa.spectrum_plot.wavenumbers_cm1, coa.spectrum_plot.intensity_clean);
+  }
+
+  function drawRamanSpectrum(wn, intensity) {
+    const canvas = document.getElementById('canvas-raman');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+    const pad = { l: 52, r: 24, t: 22, b: 32 };
+    const pw = W - pad.l - pad.r, ph = H - pad.t - pad.b;
+
+    const minX = wn[0], maxX = wn[wn.length - 1];
+    const maxY = Math.max(...intensity, 100) * 1.15;
+
+    ctx.strokeStyle = '#1e293b';
+    ctx.fillStyle = '#64748b';
+    ctx.font = '11px Segoe UI, sans-serif';
+    for (let cm = 800; cm <= 1850; cm += 150) {
+      const x = pad.l + ((cm - minX) / (maxX - minX)) * pw;
+      ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, pad.t + ph); ctx.stroke();
+      ctx.fillText(cm + ' cm⁻¹', x - 20, H - 8);
     }
 
-    window.addEventListener('DOMContentLoaded', () => fetchSimulation(true));
-  </script>
+    const bands = [
+      { cm: 892, label: '892 Acétate', color: '#38bdf8' },
+      { cm: 1453, label: '1453 Réf C-H', color: '#a855f7' },
+      { cm: 1655, label: '1655 Amide I (0%)', color: '#f43f5e' },
+      { cm: 1724, label: '1724 C=O Crist.', color: '#f59e0b' },
+      { cm: 1740, label: '1740 Amorphe', color: '#fbbf24' },
+    ];
+    bands.forEach((b, idx) => {
+      const x = pad.l + ((b.cm - minX) / (maxX - minX)) * pw;
+      ctx.save();
+      ctx.strokeStyle = b.color;
+      ctx.setLineDash([3, 3]);
+      ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, pad.t + ph); ctx.stroke();
+      ctx.fillStyle = b.color;
+      ctx.fillText(b.label, x - 36, pad.t + 12 + (idx % 2) * 13);
+      ctx.restore();
+    });
+
+    ctx.strokeStyle = '#10b981';
+    ctx.lineWidth = 2.3;
+    ctx.beginPath();
+    for (let i = 0; i < wn.length; i++) {
+      const x = pad.l + ((wn[i] - minX) / (maxX - minX)) * pw;
+      const y = pad.t + ph - (intensity[i] / maxY) * ph;
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+
+  function downloadCoA() {
+    if (!latestCoA) return;
+    const blob = new Blob([JSON.stringify(latestCoA, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `CoA_${latestCoA.batch_id}.json`;
+    a.click();
+  }
+
+  // ==================== TAB 4: SQLITE HISTORY ====================
+  async function refreshHistory() {
+    const res = await fetch('/api/batches');
+    const data = await res.json();
+    updateTopBadges(data.calibration_meta, data.ledger_integrity);
+    const tbody = document.getElementById('db-batches-tbody');
+    tbody.innerHTML = '';
+    (data.batches || []).forEach(b => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><code class="hash">${b.batch_id}</code></td>
+        <td>${b.program_id}</td>
+        <td>${b.waste_kg.toFixed(2)} kg</td>
+        <td>${b.ec0_ms_cm.toFixed(2)} mS/cm</td>
+        <td><strong>${b.observed_grade_a_g.toFixed(1)} g</strong></td>
+        <td style="color:#34d399;">+${b.net_margin_eur.toFixed(2)} €</td>
+        <td>${b.co2_avoided_kg.toFixed(2)} kg</td>
+        <td><span class="pill cyan">${b.status}</span></td>
+        <td><button class="btn secondary" style="padding:4px 8px;font-size:0.74rem;" onclick="certifyFromTable('${b.batch_id}')">Certifier CoA</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  async function certifyFromTable(batchId) {
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    switchTab('tab-coa', tabBtns[2]);
+    await generateCoA(batchId);
+  }
+
+  window.addEventListener('DOMContentLoaded', initApp);
+</script>
 </body>
 </html>
