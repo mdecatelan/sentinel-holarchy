@@ -3,848 +3,744 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OS de la Bioéconomie Holarchique v3.0 — Bioraffinerie de Clamart</title>
+  <title>Bioraffinerie de Clamart — Tableau de Bord Clair & Précis</title>
   <style>
     :root {
-      --bg: #070b14;
-      --panel: #0f172a;
-      --panel-2: #1e293b;
-      --border: #2d3d54;
-      --text: #f1f5f9;
-      --muted: #94a3b8;
-      --emerald: #10b981;
-      --cyan: #06b6d4;
-      --amber: #f59e0b;
-      --rose: #f43f5e;
-      --violet: #a855f7;
-      --lime: #84cc16;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-soft: #f1f5f9;
+      --border: #e2e8f0;
+      --border-strong: #cbd5e1;
+      --ink: #0f172a;
+      --ink-soft: #475569;
+      --ink-muted: #64748b;
+      --green: #059669;
+      --green-bg: #ecfdf5;
+      --green-border: #a7f3d0;
+      --blue: #0284c7;
+      --blue-bg: #f0f9ff;
+      --amber: #d97706;
+      --amber-bg: #fffbeb;
+      --rose: #e11d48;
+      --rose-bg: #fff1f2;
+      --radius: 14px;
+      --shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 4px 12px rgba(15, 23, 42, 0.03);
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
       background: var(--bg);
-      color: var(--text);
-      line-height: 1.45;
-      min-height: 100vh;
+      color: var(--ink);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
     }
+
+    /* Top Bar */
     header {
-      background: linear-gradient(95deg, #090f1d 0%, #0f172a 55%, #064e3b 100%);
+      background: var(--surface);
       border-bottom: 1px solid var(--border);
-      padding: 13px 22px;
+      padding: 16px 28px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
     }
-    .brand h1 {
-      font-size: 1.18rem;
+    .brand-title {
+      font-size: 1.2rem;
       font-weight: 800;
-      letter-spacing: -0.01em;
+      letter-spacing: -0.02em;
+      color: var(--ink);
       display: flex;
       align-items: center;
       gap: 10px;
     }
-    .v-tag {
-      font-size: 0.7rem;
-      padding: 2px 8px;
-      border-radius: 6px;
-      background: rgba(16, 185, 129, 0.2);
-      border: 1px solid var(--emerald);
-      color: #6ee7b7;
+    .brand-sub { font-size: 0.84rem; color: var(--ink-muted); margin-top: 2px; }
+
+    .nav-pills {
+      display: flex;
+      background: var(--surface-soft);
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      gap: 4px;
+    }
+    .nav-pill {
+      border: none;
+      background: transparent;
+      color: var(--ink-soft);
+      font-weight: 600;
+      font-size: 0.84rem;
+      padding: 8px 16px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .nav-pill:hover { color: var(--ink); }
+    .nav-pill.active {
+      background: var(--surface);
+      color: var(--green);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .status-chip {
+      font-size: 0.76rem;
+      font-weight: 600;
+      padding: 5px 11px;
+      border-radius: 999px;
+      background: var(--green-bg);
+      color: var(--green);
+      border: 1px solid var(--green-border);
+    }
+
+    main { max-width: 1360px; margin: 0 auto; padding: 24px 28px 60px; }
+    .view-pane { display: none; }
+    .view-pane.active { display: block; }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-muted);
+      margin-bottom: 10px;
+    }
+
+    /* 4 Washing-Machine Style Program Buttons */
+    .programs-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 1024px) { .programs-row { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .programs-row { grid-template-columns: 1fr; } }
+
+    .prog-btn {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.15s;
+      box-shadow: var(--shadow);
+    }
+    .prog-btn:hover { border-color: var(--border-strong); transform: translateY(-1px); }
+    .prog-btn.selected {
+      border-color: var(--green);
+      background: linear-gradient(180deg, #ecfdf5 0%, #ffffff 65%);
+    }
+    .prog-num {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--green);
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
-    .brand p { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
-    .badge-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-    .pill {
-      font-size: 0.73rem;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: rgba(16, 185, 129, 0.14);
-      color: #34d399;
-      border: 1px solid rgba(16, 185, 129, 0.35);
-    }
-    .pill.amber { background: rgba(245, 158, 11, 0.14); color: #fbbf24; border-color: rgba(245, 158, 11, 0.35); }
-    .pill.cyan { background: rgba(6, 182, 212, 0.14); color: #22d3ee; border-color: rgba(6, 182, 212, 0.35); }
-    .pill.rose { background: rgba(244, 63, 94, 0.15); color: #fda4af; border-color: rgba(244, 63, 94, 0.4); }
-
-    nav.tabs {
-      display: flex;
-      gap: 4px;
-      padding: 8px 22px 0;
-      background: #0b1120;
-      border-bottom: 1px solid var(--border);
-      overflow-x: auto;
-    }
-    .tab-btn {
-      background: transparent;
-      color: var(--muted);
-      border: 1px solid transparent;
-      border-bottom: none;
-      padding: 9px 13px;
-      font-size: 0.81rem;
-      font-weight: 600;
-      cursor: pointer;
-      border-radius: 8px 8px 0 0;
-      transition: all 0.15s;
-      white-space: nowrap;
-    }
-    .tab-btn:hover { color: var(--text); background: rgba(255,255,255,0.03); }
-    .tab-btn.active {
-      background: var(--bg);
-      color: #34d399;
-      border-color: var(--border);
+    .prog-name { font-size: 0.98rem; font-weight: 800; color: var(--ink); margin: 3px 0 4px; }
+    .prog-desc { font-size: 0.79rem; color: var(--ink-soft); margin-bottom: 6px; }
+    .prog-tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--green);
+      background: var(--green-bg);
+      padding: 2px 8px;
+      border-radius: 6px;
     }
 
-    main { max-width: 1560px; margin: 0 auto; padding: 16px 22px 44px; }
-    .tab-pane { display: none; }
-    .tab-pane.active { display: block; }
-
-    .prog-grid {
+    /* Core 2-column layout: Left = Simple Recipe, Right = Visual Drum & 5 Steps */
+    .main-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-    @media (max-width: 1150px) { .prog-grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 680px) { .prog-grid { grid-template-columns: 1fr; } }
-    .prog-card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 11px 13px;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .prog-card:hover { border-color: #64748b; transform: translateY(-1px); }
-    .prog-card.selected {
-      border-color: var(--emerald);
-      background: linear-gradient(180deg, rgba(16,185,129,0.13) 0%, var(--panel) 100%);
-      box-shadow: 0 0 0 1px var(--emerald);
-    }
-    .prog-code { font-size: 0.7rem; font-weight: 700; color: var(--cyan); text-transform: uppercase; letter-spacing: 0.05em; }
-    .prog-title { font-size: 0.86rem; font-weight: 700; margin: 3px 0 5px; color: var(--text); }
-    .prog-price { font-size: 0.75rem; color: #34d399; font-weight: 600; margin-bottom: 3px; }
-    .prog-meta { font-size: 0.72rem; color: var(--muted); }
-
-    .cockpit-grid {
-      display: grid;
-      grid-template-columns: 325px 1fr;
-      gap: 15px;
+      grid-template-columns: 350px 1fr;
+      gap: 20px;
       align-items: start;
+      margin-bottom: 22px;
     }
-    @media (max-width: 1024px) { .cockpit-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 1024px) { .main-grid { grid-template-columns: 1fr; } }
 
     .card {
-      background: var(--panel);
+      background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 14px;
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
     }
-    .card h2 {
-      font-size: 0.89rem;
-      font-weight: 700;
-      margin-bottom: 11px;
-      color: #e2e8f0;
+    .card-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--ink);
+      margin-bottom: 4px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 8px;
     }
-    .ctrl-group { margin-bottom: 11px; }
-    .ctrl-label {
+    .card-subtitle { font-size: 0.81rem; color: var(--ink-muted); margin-bottom: 16px; }
+
+    /* Sliders */
+    .slider-block { margin-bottom: 18px; }
+    .slider-top {
       display: flex;
       justify-content: space-between;
-      font-size: 0.78rem;
-      margin-bottom: 3px;
-      color: #cbd5e1;
+      align-items: baseline;
+      margin-bottom: 6px;
     }
-    .ctrl-val { font-weight: 700; color: var(--cyan); font-family: Consolas, monospace; font-size: 0.82rem; }
-    input[type="range"] { width: 100%; accent-color: var(--emerald); cursor: pointer; }
-    .ctrl-hint { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+    .slider-name { font-size: 0.86rem; font-weight: 700; color: var(--ink); }
+    .slider-val {
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: var(--green);
+      font-variant-numeric: tabular-nums;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--green);
+      cursor: pointer;
+      height: 6px;
+    }
+    .slider-note {
+      font-size: 0.76rem;
+      color: var(--ink-muted);
+      margin-top: 4px;
+      display: flex;
+      justify-content: space-between;
+    }
 
-    .btn {
-      background: var(--emerald);
-      color: #022c22;
-      font-weight: 700;
-      border: none;
-      padding: 9px 14px;
-      border-radius: 8px;
+    /* 5 Step Timeline Stepper */
+    .steps-bar {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 760px) { .steps-bar { grid-template-columns: 1fr; } }
+    .step-pill {
+      border: 1px solid var(--border);
+      background: var(--surface-soft);
+      border-radius: 10px;
+      padding: 10px 11px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s;
+    }
+    .step-pill:hover { border-color: var(--border-strong); }
+    .step-pill.active {
+      background: var(--ink);
+      color: #ffffff;
+      border-color: var(--ink);
+    }
+    .step-pill .s-num { font-size: 0.7rem; font-weight: 700; opacity: 0.75; text-transform: uppercase; }
+    .step-pill .s-title { font-size: 0.82rem; font-weight: 700; margin-top: 2px; }
+    .step-pill .s-time { font-size: 0.71rem; opacity: 0.8; margin-top: 1px; }
+
+    /* Interactive Drum Stage */
+    .drum-stage {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 20px;
+      align-items: center;
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .drum-stage { grid-template-columns: 1fr; } }
+
+    .step-story h3 { font-size: 1.08rem; font-weight: 800; color: var(--ink); margin-bottom: 6px; }
+    .step-story p { font-size: 0.88rem; color: var(--ink-soft); margin-bottom: 12px; line-height: 1.55; }
+    .sensor-proof-box {
+      background: var(--surface);
+      border-left: 4px solid var(--blue);
+      padding: 10px 14px;
+      border-radius: 0 8px 8px 0;
       font-size: 0.82rem;
+      color: var(--ink);
+      margin-bottom: 12px;
+    }
+    .live-gauges {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .mini-gauge {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+    .mini-gauge .mg-lbl { font-size: 0.69rem; color: var(--ink-muted); text-transform: uppercase; font-weight: 700; }
+    .mini-gauge .mg-val { font-size: 0.95rem; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+    /* Output 4-card Harvest Summary */
+    .harvest-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 980px) { .harvest-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 580px) { .harvest-grid { grid-template-columns: 1fr; } }
+
+    .harvest-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      box-shadow: var(--shadow);
+    }
+    .harvest-card.highlight {
+      border: 2px solid var(--green);
+      background: linear-gradient(180deg, #ecfdf5 0%, #ffffff 70%);
+    }
+    .hc-tag { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--ink-muted); }
+    .hc-big { font-size: 1.5rem; font-weight: 800; color: var(--ink); margin: 4px 0 2px; font-variant-numeric: tabular-nums; }
+    .hc-money { font-size: 0.92rem; font-weight: 700; color: var(--green); margin-bottom: 4px; }
+    .hc-desc { font-size: 0.78rem; color: var(--ink-soft); }
+
+    /* Buttons */
+    .btn {
+      background: var(--green);
+      color: #ffffff;
+      border: none;
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 10px 16px;
+      border-radius: 9px;
       cursor: pointer;
       transition: filter 0.15s;
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      gap: 7px;
-    }
-    .btn:hover { filter: brightness(1.09); }
-    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-    .btn.secondary { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); }
-    .btn.cyan { background: var(--cyan); color: #083344; }
-    .btn.amber { background: var(--amber); color: #451a03; }
-    .btn.full { width: 100%; margin-top: 6px; }
-
-    .kpi-strip {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-    @media (max-width: 1100px) { .kpi-strip { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 640px) { .kpi-strip { grid-template-columns: 1fr; } }
-    .kpi-box {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 11px 13px;
-    }
-    .kpi-label { font-size: 0.71rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
-    .kpi-main { font-size: 1.18rem; font-weight: 800; margin: 3px 0 2px; color: var(--text); }
-    .kpi-sub { font-size: 0.73rem; color: #94a3b8; }
-
-    .chart-box {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 13px;
-      margin-bottom: 12px;
-    }
-    .chart-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
       gap: 8px;
-      margin-bottom: 8px;
     }
-    .legend { display: flex; gap: 11px; flex-wrap: wrap; font-size: 0.73rem; color: #cbd5e1; }
-    .leg-item { display: flex; align-items: center; gap: 5px; }
-    .swatch { width: 12px; height: 3px; border-radius: 2px; display: inline-block; }
-    canvas { width: 100%; height: 235px; display: block; background: #060a12; border-radius: 6px; }
+    .btn:hover { filter: brightness(1.07); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-outline {
+      background: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--border-strong);
+    }
+    .btn-outline:hover { background: var(--surface-soft); }
 
-    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
-    .three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 14px; }
-    @media (max-width: 980px) { .two-col, .three-col { grid-template-columns: 1fr; } }
-
-    .stacked-bar {
-      display: flex;
-      height: 24px;
+    canvas.clean-chart {
       width: 100%;
-      border-radius: 6px;
-      overflow: hidden;
-      margin: 8px 0;
-      border: 1px solid #1e293b;
+      height: 225px;
+      display: block;
+      background: #ffffff;
+      border-radius: 8px;
     }
-    .stacked-seg { height: 100%; transition: width 0.25s; }
 
-    table { width: 100%; border-collapse: collapse; font-size: 0.79rem; }
-    th, td { padding: 7px 9px; text-align: left; border-bottom: 1px solid #1e293b; }
-    th { color: var(--muted); font-weight: 600; font-size: 0.71rem; text-transform: uppercase; }
-    code.hash {
-      font-family: Consolas, monospace;
-      font-size: 0.73rem;
-      background: #060a12;
-      padding: 3px 6px;
-      border-radius: 4px;
-      color: #38bdf8;
-      word-break: break-all;
-    }
-    pre.code-block {
-      background: #060a12;
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+    @media (max-width: 920px) { .two-col { grid-template-columns: 1fr; } }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+    th, td { padding: 9px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+    th { font-size: 0.73rem; text-transform: uppercase; color: var(--ink-muted); font-weight: 700; }
+
+    details.precision-drawer {
+      background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px;
-      font-size: 0.74rem;
-      color: #a7f3d0;
-      overflow-x: auto;
+      border-radius: var(--radius);
+      padding: 14px 20px;
+      margin-top: 18px;
+    }
+    details.precision-drawer summary {
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: var(--ink-soft);
+      cursor: pointer;
+    }
+    code.mono {
       font-family: Consolas, monospace;
-    }
-    .info-banner {
-      background: rgba(16, 185, 129, 0.08);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-size: 0.8rem;
-      color: #d1fae5;
-      margin-bottom: 13px;
-    }
-    .event-log-item {
-      padding: 8px 10px;
-      border-left: 3px solid var(--emerald);
-      background: rgba(16, 185, 129, 0.06);
-      border-radius: 0 6px 6px 0;
-      margin-bottom: 8px;
-      font-size: 0.78rem;
+      font-size: 0.76rem;
+      background: var(--surface-soft);
+      padding: 3px 7px;
+      border-radius: 5px;
+      color: var(--blue);
+      word-break: break-all;
     }
   </style>
 </head>
 <body>
 
 <header>
-  <div class="brand">
-    <h1>
-      <span>OS de la Bioéconomie Holarchique — Clamart (92140)</span>
-      <span class="v-tag">Jumeau Numérique v3.0</span>
-    </h1>
-    <p>De la Stœchiométrie Moléculaire (Holon 0) &amp; Autopilote NMPC (Holon 1) jusqu'à l'Arbitrage B2B &amp; l'Émergence Autofinancée sur 6 Quartiers (Holons 4–5)</p>
+  <div>
+    <div class="brand-title">
+      <span>Bioraffinerie Urbaine de Clamart</span>
+      <span class="status-chip" id="top-model-chip">Calcul Physique Exact &bull; Carbone 100,0 %</span>
+    </div>
+    <div class="brand-sub">Du seau d'épluchures au produit purifié : simple comme un lave-linge, précis au dixième de gramme.</div>
   </div>
-  <div class="badge-row">
-    <span class="pill" id="badge-sqlite">SQLite : Connecté</span>
-    <span class="pill amber" id="badge-cal">Modèle : Constantes Théoriques</span>
-    <span class="pill cyan" id="badge-ledger">Registre SHA-256 : Intègre</span>
-  </div>
+
+  <nav class="nav-pills">
+    <button class="nav-pill active" onclick="switchView('view-process', this)">1. Le Tambour &amp; Ses 5 Étapes</button>
+    <button class="nav-pill" onclick="switchView('view-proof', this)">2. Contrôle Laser &amp; Sécurité Auto</button>
+    <button class="nav-pill" onclick="switchView('view-scale', this)">3. De 1 Machine à Tout Clamart</button>
+  </nav>
 </header>
 
-<nav class="tabs">
-  <button class="tab-btn active" onclick="switchTab('tab-sim', this)">1. Bioraffinerie, Carbone 100 % &amp; Thermique</button>
-  <button class="tab-btn" onclick="switchTab('tab-nmpc', this)">2. Autopilote Prédictif NMPC (Anti-Crises)</button>
-  <button class="tab-btn" onclick="switchTab('tab-arb', this)">3. Arbitrage B2B &amp; Substitution Pétrochimique</button>
-  <button class="tab-btn" onclick="switchTab('tab-net', this)">4. Réseau Clamart 2027–2030 (6 Quartiers)</button>
-  <button class="tab-btn" onclick="switchTab('tab-cal', this)">5. Sondes ESP32 &amp; Auto-Calibration IA</button>
-  <button class="tab-btn" onclick="switchTab('tab-coa', this)">6. OpenRAMAN, Passeport UE (DPP) &amp; SQLite</button>
-</nav>
-
 <main>
-  <!-- ==================== TAB 1: BIOREFINERY + CARBON CLOSURE + THERMAL ==================== -->
-  <section id="tab-sim" class="tab-pane active">
-    <div class="prog-grid" id="program-cards"></div>
+  <!-- ==================== VIEW 1: THE 5-STEP PROCESS & MASS BALANCE ==================== -->
+  <section id="view-process" class="view-pane active">
+    <div class="section-label">Étape préalable : Choisissez votre programme (comme sur une machine à laver)</div>
+    <div class="programs-row" id="program-buttons"></div>
 
-    <div class="cockpit-grid">
+    <div class="main-grid">
+      <!-- LEFT: SIMPLE BUCKET INPUTS -->
       <div class="card">
-        <h2>
-          <span>Paramètres d'Entrée &amp; Atelier</span>
-          <span class="pill" id="cn-pill">C/N : 27.9</span>
-        </h2>
+        <div class="card-title">
+          <span>1. Ce que vous versez dans la cuve</span>
+        </div>
+        <div class="card-subtitle">Aucune pesée au gramme près : la machine s'adapte toute seule.</div>
 
-        <div class="ctrl-group">
-          <div class="ctrl-label">
-            <span>Masse Biodéchets (HX711)</span>
-            <span class="ctrl-val" id="val-waste">2.50 kg</span>
+        <div class="slider-block">
+          <div class="slider-top">
+            <span class="slider-name">Poids du seau de biodéchets</span>
+            <span class="slider-val" id="lbl-waste">5,0 kg</span>
           </div>
-          <input type="range" id="sl-waste" min="0.8" max="6.0" step="0.1" value="2.5" oninput="updateSliders()" />
-          <div class="ctrl-hint" id="hint-water">Eau injectée auto : 3.75 L</div>
+          <input type="range" id="in-waste" min="1.0" max="10.0" step="0.5" value="5.0" oninput="onInputChanged()" />
+          <div class="slider-note">
+            <span>Capteur sous les pieds</span>
+            <strong style="color:var(--blue);" id="lbl-auto-water">&rarr; +7,5 L d'eau ajoutés auto</strong>
+          </div>
         </div>
 
-        <div class="ctrl-group">
-          <div class="ctrl-label">
-            <span>Part Féculents / Pain Sec (Brun)</span>
-            <span class="ctrl-val" id="val-brown">33 %</span>
+        <div class="slider-block">
+          <div class="slider-top">
+            <span class="slider-name">Dosage à l'œil (Sec vs Humide)</span>
+            <span class="slider-val" id="lbl-brown">33 % sec</span>
           </div>
-          <input type="range" id="sl-brown" min="15" max="55" step="1" value="33" oninput="updateSliders()" />
-          <div class="ctrl-hint">Règle du compost : ~1/3 pain/féculents + ~2/3 épluchures</div>
+          <input type="range" id="in-brown" min="15" max="55" step="1" value="33" oninput="onInputChanged()" />
+          <div class="slider-note">
+            <span>Pain rassis / féculents vs épluchures</span>
+            <strong id="lbl-cn-ok" style="color:var(--green);">Équilibre idéal (1/3 - 2/3)</strong>
+          </div>
         </div>
 
-        <div class="ctrl-group">
-          <div class="ctrl-label">
-            <span>Tare Saline EC<sub>0</sub> (t = 0.5h)</span>
-            <span class="ctrl-val" id="val-ec0">4.20 mS/cm</span>
+        <div class="slider-block">
+          <div class="slider-top">
+            <span class="slider-name">Part de marc de café dans l'humide</span>
+            <span class="slider-val" id="lbl-coffee">25 %</span>
           </div>
-          <input type="range" id="sl-ec0" min="2.0" max="9.5" step="0.1" value="4.2" oninput="updateSliders()" />
-          <div class="ctrl-hint">Immunité totale au sel NaCl via &Delta;EC = EC(t) &minus; EC<sub>0</sub></div>
+          <input type="range" id="in-coffee" min="10" max="65" step="5" value="25" oninput="onInputChanged()" />
+          <div class="slider-note">
+            <span>Bistrots &amp; ménages</span>
+            <span>Riche en huiles naturelles</span>
+          </div>
         </div>
 
-        <div class="ctrl-group">
-          <div class="ctrl-label">
-            <span>Panier Coquilles CaCO<sub>3</sub></span>
-            <span class="ctrl-val" id="val-caco3">250 g</span>
+        <div class="slider-block" style="padding-top:12px; border-top:1px solid var(--border); margin-bottom:10px;">
+          <div class="slider-top">
+            <span class="slider-name">Sel de cuisine dans les restes</span>
+            <span class="slider-val" id="lbl-salt">Normal (4,2 mS/cm)</span>
           </div>
-          <input type="range" id="sl-caco3" min="80" max="250" step="10" value="250" oninput="updateSliders()" />
+          <input type="range" id="in-ec0" min="2.0" max="9.0" step="0.5" value="4.2" oninput="onInputChanged()" />
+          <div class="slider-note">
+            <span>Bougez ce curseur :</span>
+            <strong style="color:var(--green);">0 impact sur la récolte !</strong>
+          </div>
         </div>
 
-        <div class="ctrl-group">
-          <div class="ctrl-label">
-            <span>Richesse Marc de Café</span>
-            <span class="ctrl-val" id="val-coffee">25 %</span>
-          </div>
-          <input type="range" id="sl-coffee" min="10" max="65" step="5" value="25" oninput="updateSliders()" />
-        </div>
-
-        <div class="ctrl-group" style="padding-top:8px; border-top:1px solid var(--border);">
-          <div class="ctrl-label">
-            <span>Température Local Atelier</span>
-            <span class="ctrl-val" id="val-amb">15 °C</span>
-          </div>
-          <input type="range" id="sl-amb" min="5" max="28" step="1" value="15" oninput="updateSliders()" />
-          <label style="display:flex; align-items:center; gap:7px; font-size:0.76rem; margin-top:6px; cursor:pointer; color:#cbd5e1;">
-            <input type="checkbox" id="chk-insul" checked onchange="runTwinSimulation()" />
-            Manteau isolant liège/néoprène 25 mm
-          </label>
-        </div>
-
-        <button class="btn full" onclick="runTwinSimulation()">Actualiser la Simulation (RK4)</button>
-
-        <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 0.74rem; color: var(--muted);">
-          <strong style="color:#e2e8f0;">Acheteurs Cibles (Clamart / IDF) :</strong>
-          <p id="prog-buyers" style="margin-top:3px;"></p>
-          <strong style="color:#e2e8f0; display:block; margin-top:7px;">Levier Réglementaire UE :</strong>
-          <p id="prog-reg" style="margin-top:3px; color:#34d399;"></p>
+        <div style="background:var(--surface-soft); border-radius:10px; padding:12px 14px; font-size:0.8rem; color:var(--ink-soft); margin-top:12px;">
+          <div style="font-weight:700; color:var(--ink); margin-bottom:4px;">Panier de coquilles d'œufs (250 g) :</div>
+          <span id="lbl-shells-used">Les coquilles fondent toutes seules uniquement quand le jus devient acide, puis s'arrêtent.</span>
         </div>
       </div>
 
-      <div>
-        <div class="kpi-strip">
-          <div class="kpi-box">
-            <div class="kpi-label">Molécule Noble (Grade A)</div>
-            <div class="kpi-main" id="kpi-mass">-- g</div>
-            <div class="kpi-sub" id="kpi-label-a">--</div>
-          </div>
-          <div class="kpi-box">
-            <div class="kpi-label">Marge Nette / Cycle 73h</div>
-            <div class="kpi-main" style="color:#34d399;" id="kpi-margin">-- €</div>
-            <div class="kpi-sub" id="kpi-annual">--</div>
-          </div>
-          <div class="kpi-box">
-            <div class="kpi-label">Loi Produit (&Delta;EC &amp; DO Spike)</div>
-            <div class="kpi-main" style="color:#22d3ee;" id="kpi-events">--</div>
-            <div class="kpi-sub" id="kpi-cartridge">--</div>
-          </div>
-          <div class="kpi-box">
-            <div class="kpi-label">Thermique &amp; Carbone Séquestré</div>
-            <div class="kpi-main" style="color:#fbbf24;" id="kpi-thermal">--</div>
-            <div class="kpi-sub" id="kpi-carbon-seq">--</div>
-          </div>
+      <!-- RIGHT: LIVE 5-STEP VISUALIZER -->
+      <div class="card">
+        <div class="card-title">
+          <span>2. Ce qui se passe dans le tambour (Cycle de 3 jours)</span>
+          <button class="btn btn-outline" style="padding:6px 12px; font-size:0.78rem;" id="btn-play" onclick="togglePlayCycle()">&#9654; Animer les 3 jours</button>
+        </div>
+        <div class="card-subtitle">Cliquez sur chacune des 5 étapes ou faites glisser le curseur temporel ci-dessous :</div>
+
+        <div class="steps-bar" id="steps-bar">
+          <button class="step-pill active" onclick="jumpToStep(0)">
+            <div class="s-num">Étape 1</div>
+            <div class="s-title">Dépôt &amp; Eau</div>
+            <div class="s-time">0h &ndash; 2h</div>
+          </button>
+          <button class="step-pill" onclick="jumpToStep(1)">
+            <div class="s-num">Étape 2</div>
+            <div class="s-title">Digestion Acide</div>
+            <div class="s-time">2h &ndash; 36h</div>
+          </button>
+          <button class="step-pill" onclick="jumpToStep(2)">
+            <div class="s-num">Étape 3</div>
+            <div class="s-title">Essorage Fibres</div>
+            <div class="s-time">36h (15 min)</div>
+          </button>
+          <button class="step-pill" onclick="jumpToStep(3)">
+            <div class="s-num">Étape 4</div>
+            <div class="s-title">Gavage à l'Air</div>
+            <div class="s-time">36h &ndash; 72h</div>
+          </button>
+          <button class="step-pill" onclick="jumpToStep(4)">
+            <div class="s-num">Étape 5</div>
+            <div class="s-title">Lavage &amp; Récolte</div>
+            <div class="s-time">72h &ndash; 73h</div>
+          </button>
         </div>
 
-        <div class="chart-box">
-          <div class="chart-header">
-            <strong style="font-size:0.85rem;">Cinétique Métabolique RK4 (Holon 0) &amp; Filtre de Kalman Étendu (EKF)</strong>
-            <div class="legend">
-              <span class="leg-item"><i class="swatch" style="background:#f59e0b"></i>Substrat / Glucides (g/L)</span>
-              <span class="leg-item"><i class="swatch" style="background:#06b6d4"></i>AGV Libres (g/L)</span>
-              <span class="leg-item"><i class="swatch" style="background:#10b981; height:4px;"></i>Molécule Cible Grade A (g/L)</span>
-              <span class="leg-item"><i class="swatch" style="background:#a855f7"></i>Estim. EKF AGV (g/L)</span>
+        <div class="drum-stage">
+          <!-- Animated Cross-Section of the 60L Drum -->
+          <div style="text-align:center;">
+            <canvas id="canvas-drum" width="280" height="230" style="background:transparent; width:280px; height:230px; margin:0 auto;"></canvas>
+            <div style="margin-top:6px;">
+              <input type="range" id="in-time-idx" min="0" max="146" step="1" value="0" oninput="onTimeScrub()" style="width:92%;" />
+              <div style="font-size:0.78rem; font-weight:700; color:var(--ink-soft);" id="lbl-scrub-time">Heure : 0,0 h / 73 h</div>
             </div>
           </div>
-          <canvas id="canvas-kinetics" width="980" height="235"></canvas>
-        </div>
 
-        <div class="chart-box">
-          <div class="chart-header">
-            <strong style="font-size:0.85rem;">Signaux Physiques Pilotés par les Produits : &Delta;EC(t) = EC &minus; EC<sub>0</sub>, Débit CO<sub>2</sub> &amp; Oxygène DO</strong>
-            <div class="legend">
-              <span class="leg-item"><i class="swatch" style="background:#22d3ee"></i>&Delta;EC &times; 10 (mS/cm)</span>
-              <span class="leg-item"><i class="swatch" style="background:#fb7185"></i>CO2 / 5 (mL/min)</span>
-              <span class="leg-item"><i class="swatch" style="background:#34d399"></i>DO (mg/L)</span>
-              <span class="leg-item"><i class="swatch" style="background:#fde047"></i>pH Tamponné CaCO3</span>
+          <!-- Plain-Language Explanation + Exact Physical Readout -->
+          <div class="step-story">
+            <h3 id="story-title">Étape 1 — Dépôt du seau &amp; remplissage d'eau automatique</h3>
+            <p id="story-body">Vous jetez les biodéchets dans le tambour. Les capteurs sous les pieds pèsent le seau, ouvrent l'arrivée d'eau à la dose exacte et mémorisent la salinité de départ.</p>
+            <div class="sensor-proof-box" id="story-sensor">
+              <strong>Comment la machine se repère :</strong> À t = 30 min, la sonde électrique enregistre le sel de cuisine de départ pour ne jamais le confondre avec les acides produits ensuite.
+            </div>
+
+            <div class="live-gauges">
+              <div class="mini-gauge">
+                <div class="mg-lbl">Température</div>
+                <div class="mg-val" id="g-temp">28 °C</div>
+              </div>
+              <div class="mini-gauge">
+                <div class="mg-lbl">Rotation</div>
+                <div class="mg-val" id="g-rpm">45 tr/min</div>
+              </div>
+              <div class="mini-gauge">
+                <div class="mg-lbl">Acidité (pH)</div>
+                <div class="mg-val" id="g-ph">6,75</div>
+              </div>
+              <div class="mini-gauge">
+                <div class="mg-lbl">Oxygène Eau</div>
+                <div class="mg-val" id="g-do">7,4 mg/L</div>
+              </div>
             </div>
           </div>
-          <canvas id="canvas-sensors" width="980" height="235"></canvas>
         </div>
 
-        <div class="two-col" style="margin-bottom:0;">
-          <div class="card">
-            <h2>
-              <span>Fermeture Stœchiométrique du Carbone Élémentaire</span>
-              <span class="pill" id="cb-closure-pill">Bilan : 100.0 %</span>
-            </h2>
-            <p style="font-size:0.75rem; color:var(--muted);" id="cb-in-txt">Carbone entrant total : -- g C</p>
-            <div class="stacked-bar" id="cb-bar"></div>
-            <div class="legend" id="cb-legend" style="margin-top:6px;"></div>
+        <!-- Single Ultra-Clean Progression Chart -->
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:6px; font-size:0.8rem;">
+            <strong style="color:var(--ink);">Transformation progressive dans la cuve (de 0h à 73h)</strong>
+            <div style="display:flex; gap:14px; font-weight:600;">
+              <span style="color:#d97706;">&#9644; Sucres des déchets</span>
+              <span style="color:#0284c7;">&#9644; Jus d'acides naturels</span>
+              <span style="color:#059669;">&#9644; Produit précieux fabriqué</span>
+            </div>
           </div>
-
-          <div class="card">
-            <h2>
-              <span>Spectre de Chaînes Carboxyliques (C2 &rarr; C8)</span>
-              <span class="pill cyan" id="vfa-odd-pill">Impairs : -- %</span>
-            </h2>
-            <table>
-              <tbody id="vfa-spec-tbody"></tbody>
-            </table>
-          </div>
+          <canvas id="canvas-clean-curve" class="clean-chart" width="920" height="205"></canvas>
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- ==================== TAB 2: NMPC AUTOPILOT & SELF-HEALING ==================== -->
-  <section id="tab-nmpc" class="tab-pane">
-    <div class="info-banner">
-      <strong>Pourquoi c'est vital pour faire naître la bioéconomie :</strong> Un bioréacteur industriel exige un ingénieur de garde 24h/24. Pour que 50 micro-bioraffineries tournent chez des artisans ou dans des tiers-lieux de quartier à Clamart, <strong>l'Autopilote Prédictif Non-Linéaire (NMPC)</strong> simule 6 heures dans le futur à chaque instant et corrige seul les erreurs humaines ou pannes matérielles avant le crash biologique.
-    </div>
-
-    <div class="prog-grid" id="crisis-cards"></div>
-
-    <div class="kpi-strip">
-      <div class="kpi-box">
-        <div class="kpi-label">Sans Autopilote (Automate Fixe)</div>
-        <div class="kpi-main" style="color:#fb7185;" id="nmpc-open-yield">-- g</div>
-        <div class="kpi-sub" id="nmpc-open-status">--</div>
-      </div>
-      <div class="kpi-box">
-        <div class="kpi-label">Avec Autopilote Holarchique NMPC</div>
-        <div class="kpi-main" style="color:#34d399;" id="nmpc-auto-yield">-- g</div>
-        <div class="kpi-sub" id="nmpc-recovery">--</div>
-      </div>
-      <div class="kpi-box">
-        <div class="kpi-label">Valeur Économique Sauvée sur le Lot</div>
-        <div class="kpi-main" style="color:#22d3ee;" id="nmpc-saved-eur">+-- €</div>
-        <div class="kpi-sub">Zéro perte de culture / Zéro intervention humaine</div>
-      </div>
-      <div class="kpi-box">
-        <div class="kpi-label">Actions Correctives Déclenchées</div>
-        <div class="kpi-main" style="color:#fbbf24;" id="nmpc-actions-count">--</div>
-        <div class="kpi-sub">Vannes HX711, PWM SSR &amp; Vortex 280 RPM</div>
-      </div>
-    </div>
-
-    <div class="two-col">
-      <div class="chart-box" style="margin-bottom:0;">
-        <div class="chart-header">
-          <strong style="font-size:0.85rem;">Comparaison Temps Réel : Sans Autopilote (Crash) vs Autopilote NMPC</strong>
-          <div class="legend">
-            <span class="leg-item"><i class="swatch" style="background:#fb7185; border-top:2px dashed #fb7185;"></i>Sans NMPC : PHBV (g/L)</span>
-            <span class="leg-item"><i class="swatch" style="background:#10b981; height:3px;"></i>Avec NMPC : PHBV (g/L)</span>
-            <span class="leg-item"><i class="swatch" style="background:#fda4af;"></i>pH Sans NMPC</span>
-            <span class="leg-item"><i class="swatch" style="background:#fde047;"></i>pH Protégé NMPC</span>
-          </div>
-        </div>
-        <canvas id="canvas-nmpc" width="760" height="255"></canvas>
+    <!-- BOTTOM: 4 ULTRA-CLEAR HARVEST & PRECISION CARDS -->
+    <div class="section-label">3. Ce que vous récoltez à la fin des 3 jours (Calcul physique exact)</div>
+    <div class="harvest-grid">
+      <div class="harvest-card highlight">
+        <div class="hc-tag">Produit A &bull; L'Ingrédient Précieux</div>
+        <div class="hc-big" id="out-a-mass">-- g</div>
+        <div class="hc-money" id="out-a-eur">-- €</div>
+        <div class="hc-desc" id="out-a-desc">--</div>
       </div>
 
-      <div class="card">
-        <h2>Journal des Décisions Autonomes de l'Autopilote NMPC</h2>
-        <p style="font-size:0.78rem; color:var(--muted); margin-bottom:10px;" id="nmpc-cause-desc"></p>
-        <div id="nmpc-log-list"></div>
+      <div class="harvest-card">
+        <div class="hc-tag">Produit B &bull; Engrais Liquide Bio</div>
+        <div class="hc-big" id="out-b-vol">-- L</div>
+        <div class="hc-money" id="out-b-eur">-- €</div>
+        <div class="hc-desc">Eau riche en protéines et calcium des coquilles d'œufs pour maraîchers.</div>
+      </div>
+
+      <div class="harvest-card">
+        <div class="hc-tag">Produit C &bull; Substrat Pleurotes</div>
+        <div class="hc-big" id="out-c-mass">-- kg</div>
+        <div class="hc-money" id="out-c-eur">-- €</div>
+        <div class="hc-desc">Pulpe de fibres et marc de café essorée à l'étape 3, prête pour champignons.</div>
+      </div>
+
+      <div class="harvest-card">
+        <div class="hc-tag">Bilan Net du Cycle (Tous frais déduits)</div>
+        <div class="hc-big" style="color:var(--green);" id="out-net-eur">+-- €</div>
+        <div class="hc-money" style="color:var(--ink-soft);" id="out-opex-detail">Électricité + eau + soude : -- €</div>
+        <div class="hc-desc" id="out-carbon-proof">100,0 % des atomes de carbone tracés.</div>
       </div>
     </div>
-  </section>
 
-  <!-- ==================== TAB 3: BIOECONOMY ARBITRAGE & FOSSIL SUBSTITUTION ==================== -->
-  <section id="tab-arb" class="tab-pane">
-    <div class="info-banner">
-      <strong>L'Intelligence Économique Quotidienne :</strong> Chaque jour à Clamart, la nature des biodéchets collectés et les commandes des acheteurs B2B changent. Cet ordonnanceur répartit dynamiquement votre flotte de tambours entre les 4 molécules pour maximiser la création de richesse locale et remplacer la pétrochimie fossile.
-    </div>
-
-    <div class="cockpit-grid">
-      <div class="card">
-        <h2>Gisements Disponibles &amp; Flotte (par cycle 73h)</h2>
-
-        <div class="ctrl-group">
-          <div class="ctrl-label"><span>Tambours 60 L actifs en parallèle</span><span class="ctrl-val" id="val-arb-drums">6 tambours</span></div>
-          <input type="range" id="sl-arb-drums" min="1" max="24" step="1" value="6" oninput="runArbitrage()" />
-        </div>
-        <div class="ctrl-group">
-          <div class="ctrl-label"><span>Pain invendu (Boulangeries)</span><span class="ctrl-val" id="val-arb-bread">12 kg</span></div>
-          <input type="range" id="sl-arb-bread" min="2" max="50" step="2" value="12" oninput="runArbitrage()" />
-        </div>
-        <div class="ctrl-group">
-          <div class="ctrl-label"><span>Marc de café (Bistrots / Cafés)</span><span class="ctrl-val" id="val-arb-coffee">10 kg</span></div>
-          <input type="range" id="sl-arb-coffee" min="2" max="50" step="2" value="10" oninput="runArbitrage()" />
-        </div>
-        <div class="ctrl-group">
-          <div class="ctrl-label"><span>Fruits mûrs (Marché du Trosy)</span><span class="ctrl-val" id="val-arb-fruit">14 kg</span></div>
-          <input type="range" id="sl-arb-fruit" min="2" max="50" step="2" value="14" oninput="runArbitrage()" />
-        </div>
-        <div class="ctrl-group">
-          <div class="ctrl-label"><span>Épluchures (Cantines &amp; Ménages)</span><span class="ctrl-val" id="val-arb-peels">24 kg</span></div>
-          <input type="range" id="sl-arb-peels" min="5" max="80" step="5" value="24" oninput="runArbitrage()" />
-        </div>
-
-        <div style="padding-top:10px; border-top:1px solid var(--border);">
-          <h2 style="margin-bottom:8px;">Prix Spot Acheteurs B2B (€/kg)</h2>
-          <div class="ctrl-group">
-            <div class="ctrl-label"><span>PHBV Cosmétique / Piézo</span><span class="ctrl-val" id="val-p-phbv">185 €/kg</span></div>
-            <input type="range" id="sl-p-phbv" min="70" max="450" step="15" value="185" oninput="runArbitrage()" />
-          </div>
-          <div class="ctrl-group">
-            <div class="ctrl-label"><span>Monomère Chiral (R)-3HB</span><span class="ctrl-val" id="val-p-r3hb">240 €/kg</span></div>
-            <input type="range" id="sl-p-r3hb" min="120" max="450" step="15" value="240" oninput="runArbitrage()" />
-          </div>
-          <div class="ctrl-group">
-            <div class="ctrl-label"><span>Rhamnolipides Tensioactifs</span><span class="ctrl-val" id="val-p-rham">64 €/kg</span></div>
-            <input type="range" id="sl-p-rham" min="35" max="110" step="5" value="64" oninput="runArbitrage()" />
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <div class="kpi-strip">
-          <div class="kpi-box">
-            <div class="kpi-label">Marge Nette Flotte / Cycle 73h</div>
-            <div class="kpi-main" style="color:#34d399;" id="arb-net-cycle">-- €</div>
-            <div class="kpi-sub" id="arb-annual-net">-- €/an de cashflow net</div>
-          </div>
-          <div class="kpi-box">
-            <div class="kpi-label">Multiplicateur vs Compostage</div>
-            <div class="kpi-main" style="color:#fbbf24;" id="arb-mult">×--</div>
-            <div class="kpi-sub" id="arb-compost-ref">Compost brut équivalent : -- €</div>
-          </div>
-          <div class="kpi-box">
-            <div class="kpi-label">Économie Incinération Ville</div>
-            <div class="kpi-main" style="color:#22d3ee;" id="arb-muni-yr">-- €/an</div>
-            <div class="kpi-sub">Taxe collecte + four ValoSeine évités</div>
-          </div>
-          <div class="kpi-box">
-            <div class="kpi-label">CO<sub>2</sub>e Évité par la Flotte</div>
-            <div class="kpi-main" style="color:#a855f7;" id="arb-co2-yr">-- t/an</div>
-            <div class="kpi-sub" id="arb-waste-proc">-- kg valorisés / cycle</div>
-          </div>
-        </div>
-
-        <div class="card" style="margin-bottom:14px;">
-          <h2>Plan d'Ordonnancement Optimal des Tambours &amp; Recettes Associées</h2>
+    <!-- PRECISION DRAWER FOR ENGINEERS / AUDITORS -->
+    <details class="precision-drawer">
+      <summary>Afficher la comptabilité atomique exacte (Bilan Carbone 100,0 %) et l'auto-calibration des sondes ESP32</summary>
+      <div class="two-col" style="margin-top:14px; margin-bottom:0;">
+        <div>
+          <h4 style="font-size:0.86rem; margin-bottom:8px;">Où va chaque gramme de Carbone entré dans la machine ?</h4>
           <table>
-            <thead>
-              <tr>
-                <th>Programme Moléculaire</th>
-                <th>Recette Optimale d'Intrants</th>
-                <th>Tambours Alloués</th>
-                <th>Déchets Traités</th>
-                <th>Production Grade A</th>
-                <th>Marge Nette</th>
-              </tr>
-            </thead>
-            <tbody id="arb-dispatch-tbody"></tbody>
+            <tbody id="tbl-carbon-exact"></tbody>
           </table>
         </div>
+        <div>
+          <h4 style="font-size:0.86rem; margin-bottom:8px;">Recalage automatique du modèle sur vos vraies sondes (Mars 2027)</h4>
+          <p style="font-size:0.8rem; color:var(--ink-soft); margin-bottom:10px;">
+            Dès votre premier vrai cycle à Clamart, cliquez ci-dessous pour que le logiciel compare sa prévision aux vraies sondes et apprenne la vitesse exacte de vos bactéries locales :
+          </p>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
+            <button class="btn btn-outline" style="font-size:0.78rem; padding:7px 12px;" onclick="runQuickCalibrationDemo()">Simuler 1er Cycle Réel &amp; Auto-Calibrer</button>
+            <button class="btn btn-outline" style="font-size:0.78rem; padding:7px 12px;" onclick="resetCal()">Réinitialiser</button>
+          </div>
+          <div id="cal-quick-result" style="font-size:0.8rem; color:var(--green); font-weight:600;"></div>
+        </div>
+      </div>
+    </details>
+  </section>
 
-        <div class="card">
-          <h2>Registre Annuel de Dé-Pétrolisation &amp; Souveraineté Matière (Substitution d'Importations)</h2>
-          <div class="kpi-strip" style="margin-bottom:0; margin-top:6px;">
-            <div class="kpi-box" style="background:#090f1d;">
-              <div class="kpi-label">Microplastiques PE/PMMA Évités</div>
-              <div class="kpi-main" style="font-size:1.05rem; color:#34d399;" id="sub-micro">-- kg/an</div>
-              <div class="kpi-sub">Cosmétique clean-label UE 2023/2055</div>
-            </div>
-            <div class="kpi-box" style="background:#090f1d;">
-              <div class="kpi-label">Synthons Chiraux Pharma Locaux</div>
-              <div class="kpi-main" style="font-size:1.05rem; color:#22d3ee;" id="sub-chiral">-- kg/an</div>
-              <div class="kpi-sub">Relocalisation chimie fine Asie &rarr; IDF</div>
-            </div>
-            <div class="kpi-box" style="background:#090f1d;">
-              <div class="kpi-label">Tensioactifs SLES Pétrochimiques</div>
-              <div class="kpi-main" style="font-size:1.05rem; color:#fbbf24;" id="sub-sles">-- kg/an</div>
-              <div class="kpi-sub">Détergence biodégradable sur marc de café</div>
-            </div>
-            <div class="kpi-box" style="background:#090f1d;">
-              <div class="kpi-label">Huile de Palmiste Tropicale (C6/C8)</div>
-              <div class="kpi-main" style="font-size:1.05rem; color:#c084fc;" id="sub-palm">-- kg/an</div>
-              <div class="kpi-sub">Zéro déforestation importée UE 2023/1115</div>
-            </div>
+  <!-- ==================== VIEW 2: LASER QUALITY PROOF & AUTO-SAFETY ==================== -->
+  <section id="view-proof" class="view-pane">
+    <div class="two-col">
+      <!-- LEFT: OPENRAMAN LASER CHECK -->
+      <div class="card">
+        <div class="card-title">
+          <span>Le Contrôle Qualité par Laser Vert (OpenRAMAN)</span>
+          <button class="btn" onclick="scanLaserCoA()">Lancer le Scan Laser (30 s)</button>
+        </div>
+        <div class="card-subtitle">
+          Pourquoi votre client cosmétique vous fait confiance même si vos épluchures changent chaque jour : la poudre finale est vérifiée par son reflet lumineux unique.
+        </div>
+
+        <canvas id="canvas-raman-clean" class="clean-chart" width="600" height="220" style="border:1px solid var(--border); margin-bottom:14px;"></canvas>
+
+        <table>
+          <tbody>
+            <tr><th>Produit contrôlé</th><td id="pr-prod">Cliquez sur « Lancer le Scan Laser » ci-dessus</td></tr>
+            <tr><th>Pureté mesurée par le laser</th><td style="font-weight:800; color:var(--green);" id="pr-purity">--</td></tr>
+            <tr><th>Résidus de bactéries / protéines</th><td id="pr-protein">--</td></tr>
+            <tr><th>Solvants toxiques utilisés</th><td style="color:var(--green); font-weight:700;">0,0 mL (Eau + Cristaux de soude uniquement)</td></tr>
+            <tr><th>Empreinte numérique infalsifiable</th><td><code class="mono" id="pr-hash">--</code></td></tr>
+          </tbody>
+        </table>
+        <div style="margin-top:12px;">
+          <button class="btn btn-outline" id="btn-dl-passport" onclick="downloadPassport()" disabled>Télécharger le Certificat Client (.json)</button>
+        </div>
+      </div>
+
+      <!-- RIGHT: SELF-PROTECTION AGAINST MISTAKES -->
+      <div class="card">
+        <div class="card-title">
+          <span>Sécurité Anti-Erreurs Automatique</span>
+        </div>
+        <div class="card-subtitle">
+          Que se passe-t-il en cas d'imprévu dans l'atelier ? Testez un incident ci-dessous pour voir comment la machine sauve la récolte toute seule :
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px;" id="safety-buttons">
+          <button class="btn btn-outline" onclick="testSafety('CRISIS_ACID_OVERLOAD', this)">Trop de pain sucré d'un coup</button>
+          <button class="btn btn-outline" onclick="testSafety('CRISIS_AERATION_FOULING', this)">Bulleur d'air encrassé</button>
+          <button class="btn btn-outline" onclick="testSafety('CRISIS_WINTER_COLD_SNAP', this)">Panne chauffage (Hiver 6 °C)</button>
+          <button class="btn btn-outline" onclick="testSafety('CRISIS_HIGH_SALT_CANTEEN', this)">Restes de cantine très salés</button>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px;">
+          <div style="background:var(--rose-bg); border:1px solid #fecdd3; border-radius:10px; padding:12px;">
+            <div style="font-size:0.73rem; font-weight:700; color:var(--rose); text-transform:uppercase;">Machine classique sans sécurité</div>
+            <div style="font-size:1.25rem; font-weight:800; color:var(--rose); margin:3px 0;" id="saf-bad">--</div>
+            <div style="font-size:0.77rem; color:var(--ink-soft);" id="saf-bad-txt">--</div>
+          </div>
+          <div style="background:var(--green-bg); border:1px solid var(--green-border); border-radius:10px; padding:12px;">
+            <div style="font-size:0.73rem; font-weight:700; color:var(--green); text-transform:uppercase;">Votre Tambour Auto-Protégé</div>
+            <div style="font-size:1.25rem; font-weight:800; color:var(--green); margin:3px 0;" id="saf-good">--</div>
+            <div style="font-size:0.77rem; color:var(--ink-soft);" id="saf-good-txt">--</div>
           </div>
         </div>
+
+        <div style="font-size:0.82rem; font-weight:700; margin-bottom:6px;">Ce que l'automatisme fait tout seul :</div>
+        <div id="saf-steps" style="font-size:0.82rem; color:var(--ink-soft);"></div>
       </div>
     </div>
   </section>
 
-  <!-- ==================== TAB 4: CLAMART 2027-2030 TERRITORIAL EMERGENCE ==================== -->
-  <section id="tab-net" class="tab-pane">
-    <div class="info-banner">
-      <strong>Comment faire naître la bioéconomie avec seulement 3 250 € au départ (Mars 2027) :</strong> Au lieu de lever 5 M€ de dette pour une usine centrale ICPE bloquée 4 ans en procédures, <strong>le Tambour n°1 finance le Tambour n°2 par son propre cashflow</strong>. Chaque nouveau tambour rejoint le registre fédéré SHA-256 et accélère l'apprentissage bayésien de tout le réseau de Clamart.
-    </div>
-
-    <div class="cockpit-grid">
+  <!-- ==================== VIEW 3: FROM 1 MACHINE TO ALL CLAMART ==================== -->
+  <section id="view-scale" class="view-pane">
+    <div class="main-grid">
       <div class="card">
-        <h2>Lois d'Émergence Autofinancée (36 Mois)</h2>
-        <div class="ctrl-group">
-          <div class="ctrl-label"><span>Tambours initiaux (Mars 2027)</span><span class="ctrl-val" id="val-net-init">1 tambour</span></div>
-          <input type="range" id="sl-net-init" min="1" max="6" step="1" value="1" oninput="runEmergence()" />
-          <div class="ctrl-hint" id="hint-seed-cap">Capital d'amorçage unique : 3 250 €</div>
+        <div class="card-title"><span>La Naissance de la Bioéconomie Locale</span></div>
+        <div class="card-subtitle">
+          Pas besoin d'emprunter 5 millions d'euros : la 1<sup>re</sup> machine paie les pièces de la 2<sup>e</sup> avec ses propres ventes.
         </div>
 
-        <div class="ctrl-group">
-          <div class="ctrl-label"><span>Part des bénéfices réinvestie</span><span class="ctrl-val" id="val-net-reinv">65 %</span></div>
-          <input type="range" id="sl-net-reinv" min="0" max="90" step="5" value="65" oninput="runEmergence()" />
-          <div class="ctrl-hint">Dès que la cagnotte atteint 1 100 €, un nouveau tambour est fabriqué !</div>
+        <div class="slider-block">
+          <div class="slider-top">
+            <span class="slider-name">Machines au départ (Mars 2027)</span>
+            <span class="slider-val" id="sc-init-lbl">1 machine</span>
+          </div>
+          <input type="range" id="sc-init" min="1" max="5" step="1" value="1" oninput="updateScaleView()" />
+          <div class="slider-note">
+            <span>Budget total de départ (local + laser inclus) :</span>
+            <strong id="sc-seed-eur" style="color:var(--ink);">3 250 €</strong>
+          </div>
         </div>
 
-        <div class="ctrl-group">
-          <div class="ctrl-label"><span>Cible maximale sur Clamart</span><span class="ctrl-val" id="val-net-max">48 tambours</span></div>
-          <input type="range" id="sl-net-max" min="8" max="60" step="4" value="48" oninput="runEmergence()" />
-          <div class="ctrl-hint">Répartis en 6 micro-hubs de quartier (8 tambours + 1 OpenRAMAN / hub)</div>
+        <div class="slider-block">
+          <div class="slider-top">
+            <span class="slider-name">Part des gains réinvestie</span>
+            <span class="slider-val" id="sc-reinv-lbl">65 %</span>
+          </div>
+          <input type="range" id="sc-reinv" min="0" max="90" step="5" value="65" oninput="updateScaleView()" />
+          <div class="slider-note">
+            <span>Chaque fois que 1 100 € sont gagnés</span>
+            <strong style="color:var(--green);">&rarr; +1 machine fabriquée</strong>
+          </div>
         </div>
 
-        <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border);">
-          <h2>Holarchie vs Méga-Usine Centrale</h2>
+        <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border);">
+          <div style="font-size:0.84rem; font-weight:800; margin-bottom:8px;">Pourquoi ce modèle bat l'usine géante :</div>
           <table>
             <tbody>
-              <tr><td><strong>Capital initial</strong></td><td style="color:#34d399;font-weight:700;" id="cmp-seed">3 250 €</td><td style="color:#fb7185;">4 800 000 €</td></tr>
-              <tr><td><strong>Délai mise en route</strong></td><td style="color:#34d399;font-weight:700;">3 mois</td><td style="color:#fb7185;">42 mois (ICPE)</td></tr>
-              <tr><td><strong>Camions diesel</strong></td><td style="color:#34d399;font-weight:700;">0 (circuit 450m)</td><td style="color:#fb7185;">Flotte lourde</td></tr>
-              <tr><td><strong>Panne systémique</strong></td><td style="color:#34d399;font-weight:700;">Impossible</td><td style="color:#fb7185;">Critique (SPOF)</td></tr>
+              <tr><td><strong>Mise de départ</strong></td><td style="color:var(--green);font-weight:700;" id="tbl-seed">3 250 €</td><td style="color:var(--rose);">4 800 000 €</td></tr>
+              <tr><td><strong>Mise en service</strong></td><td style="color:var(--green);font-weight:700;">3 mois (Mars 2027)</td><td style="color:var(--rose);">4 ans d'autorisations</td></tr>
+              <tr><td><strong>Transport déchets</strong></td><td style="color:var(--green);font-weight:700;">À pied / vélo (&lt; 450 m)</td><td style="color:var(--rose);">Camions diesel</td></tr>
             </tbody>
           </table>
         </div>
       </div>
 
       <div>
-        <div class="kpi-strip">
-          <div class="kpi-box">
-            <div class="kpi-label">Parc Autofinancé à M+36 (Mars 2030)</div>
-            <div class="kpi-main" style="color:#34d399;" id="net-final-drums">-- tambours</div>
-            <div class="kpi-sub" id="net-final-hubs">-- quartiers couverts + -- stations OpenRAMAN</div>
+        <div class="harvest-grid" style="grid-template-columns:repeat(3, 1fr);">
+          <div class="harvest-card highlight">
+            <div class="hc-tag">Parc au bout de 3 ans (Mars 2030)</div>
+            <div class="hc-big" id="sc-drums-36">-- machines</div>
+            <div class="hc-money" id="sc-hubs-36">-- quartiers équipés à Clamart</div>
+            <div class="hc-desc">100 % autofinancées par la vente des produits, sans dette.</div>
           </div>
-          <div class="kpi-box">
-            <div class="kpi-label">Excédent Net Annuel Réseau (M+36)</div>
-            <div class="kpi-main" style="color:#22d3ee;" id="net-runrate">-- €/an</div>
-            <div class="kpi-sub" id="net-jobs">-- emplois locaux d'artisans bio-raffineurs</div>
+          <div class="harvest-card">
+            <div class="hc-tag">Revenu Net Annuel du Réseau</div>
+            <div class="hc-big" style="color:var(--green);" id="sc-rev-yr">+-- €/an</div>
+            <div class="hc-money" id="sc-jobs">-- emplois locaux créés</div>
+            <div class="hc-desc" id="sc-treasury">Trésorerie nette accumulée : -- €</div>
           </div>
-          <div class="kpi-box">
-            <div class="kpi-label">Effet Réseau Bayésien Fédéré</div>
-            <div class="kpi-main" style="color:#fbbf24;" id="net-fed-boost">+-- %</div>
-            <div class="kpi-sub">Gain de rendement par partage de paramètres SHA-256</div>
-          </div>
-          <div class="kpi-box">
-            <div class="kpi-label">Impact Cumulé Ville de Clamart (3 ans)</div>
-            <div class="kpi-main" style="color:#c084fc;" id="net-waste-cum">-- tonnes</div>
-            <div class="kpi-sub" id="net-muni-cum">-- € d'incinération publique économisés</div>
+          <div class="harvest-card">
+            <div class="hc-tag">Biodéchets détournés du four</div>
+            <div class="hc-big" style="color:var(--blue);" id="sc-tonnes">-- tonnes</div>
+            <div class="hc-money" id="sc-co2">-- tonnes de CO2 évitées</div>
+            <div class="hc-desc" id="sc-muni">Économie d'incinération pour la ville : -- €</div>
           </div>
         </div>
 
-        <div class="two-col">
-          <div class="chart-box" style="margin-bottom:0;">
-            <div class="chart-header">
-              <strong style="font-size:0.85rem;">Carte Holarchique des 6 Quartiers de Clamart (Maillage Fédéré)</strong>
-              <span class="pill cyan">Rayon collecte douce &lt; 450 m</span>
-            </div>
-            <canvas id="canvas-clamart-map" width="540" height="275"></canvas>
+        <div class="two-col" style="margin-bottom:0;">
+          <div class="card">
+            <div class="card-title"><span>Implantation dans les 6 quartiers de Clamart</span></div>
+            <div class="card-subtitle">Chaque point vert représente un micro-atelier de quartier autonome (&lt; 450 m des commerces) :</div>
+            <canvas id="canvas-map-clean" class="clean-chart" width="460" height="230"></canvas>
           </div>
-
-          <div class="chart-box" style="margin-bottom:0;">
-            <div class="chart-header">
-              <strong style="font-size:0.85rem;">Croissance Organique Sans Dette (M+1 &rarr; M+36)</strong>
-              <div class="legend">
-                <span class="leg-item"><i class="swatch" style="background:#10b981; height:3px;"></i>Tambours Actifs</span>
-                <span class="leg-item"><i class="swatch" style="background:#38bdf8;"></i>Cashflow Mensuel (/100 €)</span>
-                <span class="leg-item"><i class="swatch" style="background:#f59e0b;"></i>Gain IA Fédérée (%)</span>
-              </div>
-            </div>
-            <canvas id="canvas-emergence" width="540" height="275"></canvas>
+          <div class="card">
+            <div class="card-title"><span>Multiplication naturelle des machines sur 36 mois</span></div>
+            <div class="card-subtitle">Courbe verte : nombre de machines en service à Clamart mois après mois :</div>
+            <canvas id="canvas-growth-clean" class="clean-chart" width="460" height="230"></canvas>
           </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==================== TAB 5: ESP32 HIL & AUTO-CALIBRATION ==================== -->
-  <section id="tab-cal" class="tab-pane">
-    <div class="info-banner">
-      <strong>Pont Matériel ESP32 &amp; Identification Système (Fin 2026 – Mars 2027) :</strong> Compare en direct les mesures bruitées de vos sondes physiques (`EC`, `DO`, `pH`, `ORP`) au modèle théorique, puis ré-identifie automatiquement les constantes cinétiques propres à votre consortium microbien de Clamart par l'algorithme du simplexe de Nelder-Mead.
-    </div>
-
-    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;">
-      <button class="btn cyan" onclick="acquireWetlabBatch()">1. Acquérir un Lot Réel Bruité (Sondes ESP32 Clamart)</button>
-      <button class="btn" id="btn-calibrate" onclick="calibrateOnWetlab()" disabled>2. Auto-Calibrer le Jumeau sur ce Lot Réel (Nelder-Mead)</button>
-      <button class="btn secondary" onclick="sendSingleLiveEsp32Packet()">Tester 1 Trame HTTP POST /api/telemetry/ingest</button>
-      <button class="btn secondary" onclick="resetCalibration()">Réinitialiser Constantes d'Usine</button>
-    </div>
-
-    <div class="kpi-strip">
-      <div class="kpi-box">
-        <div class="kpi-label">RMSE Avant Calibration</div>
-        <div class="kpi-main" style="color:#fb7185;" id="cal-rmse-before">-- %</div>
-        <div class="kpi-sub" id="cal-mass-compare">Pesée réelle vs prédite : --</div>
-      </div>
-      <div class="kpi-box">
-        <div class="kpi-label">RMSE Après Auto-Calibration</div>
-        <div class="kpi-main" style="color:#34d399;" id="cal-rmse-after">-- %</div>
-        <div class="kpi-sub" id="cal-status-txt">En attente d'un lot réel...</div>
-      </div>
-      <div class="kpi-box">
-        <div class="kpi-label">Intervalle Bayésien (IC 95 %)</div>
-        <div class="kpi-main" style="color:#c084fc;" id="cal-bayes-ci">--</div>
-        <div class="kpi-sub">Mis à jour dans le registre SHA-256</div>
-      </div>
-      <div class="kpi-box">
-        <div class="kpi-label">Dernière Décision Automate ESP32</div>
-        <div class="kpi-main" style="font-size:0.95rem; color:#22d3ee;" id="cal-live-alert">Prêt sur /api/telemetry/ingest</div>
-        <div class="kpi-sub" id="cal-live-detail">Tare EC0 + EKF actifs</div>
-      </div>
-    </div>
-
-    <div class="chart-box">
-      <div class="chart-header">
-        <strong style="font-size:0.85rem;">Superposition : Points Sondes ESP32 vs Jumeau Non-Calibré (Pointillés) vs Jumeau Auto-Calibré (Continu)</strong>
-        <div class="legend">
-          <span class="leg-item"><i class="swatch" style="background:#38bdf8; height:5px;"></i>Points Sondes ESP32 (&Delta;EC)</span>
-          <span class="leg-item"><i class="swatch" style="background:#94a3b8; border-top:2px dashed #94a3b8;"></i>Jumeau Non-Calibré</span>
-          <span class="leg-item"><i class="swatch" style="background:#10b981; height:3px;"></i>Jumeau Auto-Calibré</span>
-          <span class="leg-item"><i class="swatch" style="background:#fbbf24;"></i>DO Réel vs Jumeau (mg/L)</span>
-        </div>
-      </div>
-      <canvas id="canvas-calibration" width="1200" height="260"></canvas>
-    </div>
-
-    <div class="two-col">
-      <div class="card">
-        <h2>Constantes Biologiques Apprises sur Souche Locale</h2>
-        <table>
-          <thead><tr><th>Constante Cinétique</th><th>Défaut Littérature</th><th>Calibrée Clamart</th><th>Unité</th></tr></thead>
-          <tbody id="cal-params-tbody">
-            <tr><td>&mu;<sub>max,acid</sub> (Croissance acidogènes)</td><td>0.3500</td><td>--</td><td>h<sup>-1</sup></td></tr>
-            <tr><td>Y<sub>VFA/carb</sub> (Rendement sucres &rarr; AGV)</td><td>0.7200</td><td>--</td><td>g/g</td></tr>
-            <tr><td>q<sub>PHA,max</sub> (Vitesse synthèse polymère)</td><td>0.4000</td><td>--</td><td>h<sup>-1</sup></td></tr>
-            <tr><td>Y<sub>PHA/VFA</sub> (Conversion AGV &rarr; Grade A)</td><td>0.6500</td><td>--</td><td>g/g</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="card">
-        <h2>Trame JSON MicroPython ESP32 (Prête pour Décembre 2026)</h2>
-        <pre class="code-block">POST http://127.0.0.1:8080/api/telemetry/ingest
-{"batch_id":"CLAMART-01","t_h":28.5,"ph":5.84,"orp_mv":-215.0,"ec_ms_cm":6.18,"co2_ml_min":5.4,"do_mg_l":0.15,"temp_c":30.1,"hx711_kg":6.25,"rpm":8}</pre>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==================== TAB 6: OPENRAMAN + EU DPP PASSPORT + SQLITE ==================== -->
-  <section id="tab-coa" class="tab-pane">
-    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
-      <div>
-        <h2 style="font-size:1.03rem;">Souveraineté Analytique : OpenRAMAN 532 nm (`11 cm⁻¹`) &amp; Passeport Produit Européen (ESPR 2024/1781)</h2>
-        <p style="font-size:0.79rem; color:var(--muted);">Preuve spectrale sur site + Passeport Numérique Européen (DPP) scellé par SHA-256 permettant la vente directe B2B sans intermédiaire.</p>
-      </div>
-      <div style="display:flex; gap:10px;">
-        <button class="btn" onclick="generateCoA()">Scanner à l'OpenRAMAN &amp; Émettre le Passeport UE (DPP)</button>
-        <button class="btn secondary" id="btn-dl-coa" onclick="downloadCoA()" disabled>Exporter Passeport CoA (.json)</button>
-      </div>
-    </div>
-
-    <div class="chart-box">
-      <div class="chart-header">
-        <strong style="font-size:0.85rem;">Spectre OpenRAMAN 532 nm Déconvolué (1800 tr/mm, fente 15 µm — Fenêtre 800 à 1850 cm<sup>-1</sup>)</strong>
-        <div class="legend">
-          <span class="leg-item"><i class="swatch" style="background:#10b981"></i>Signal Raman Net</span>
-          <span class="leg-item"><i class="swatch" style="background:#f59e0b"></i>1724 cm⁻¹ (C=O Cristallin) / 1740 cm⁻¹ (Amorphe)</span>
-          <span class="leg-item"><i class="swatch" style="background:#f43f5e"></i>1655 cm⁻¹ (Amide I Protéines = 0 %)</span>
-        </div>
-      </div>
-      <canvas id="canvas-raman" width="1200" height="245"></canvas>
-    </div>
-
-    <div class="two-col">
-      <div class="card">
-        <h2>Passeport Numérique de Produit Européen (EU-DPP / ESPR 2024/1781)</h2>
-        <table>
-          <tbody>
-            <tr><th>Identifiant Unique URN</th><td><code class="hash" id="dpp-urn">En attente de scan OpenRAMAN...</code></td></tr>
-            <tr><th>Molécule &amp; Masse Certifiée</th><td id="coa-prod">--</td></tr>
-            <tr><th>Pureté Spectrale OpenRAMAN</th><td id="coa-purity">--</td></tr>
-            <tr><th>Cristallinité (Déconvolution 1724/1740 cm⁻¹)</th><td id="coa-xc">--</td></tr>
-            <tr><th>Résidu Protéique (Amide I 1655 cm⁻¹)</th><td id="coa-amide">--</td></tr>
-            <tr><th>Carbone Biogénique (Norme EN 16640)</th><td style="color:#34d399;font-weight:700;">100,0 % (0,0 % pétrochimie fossile)</td></tr>
-            <tr><th>Empreinte Carbone Produit (PCF ISO-14040)</th><td style="color:#34d399;font-weight:700;" id="dpp-pcf">-- kg CO2e / kg produit (Puits carbone net)</td></tr>
-            <tr><th>Conformité UE 2023/2055 &amp; UE 2023/1115</th><td style="color:#34d399;font-weight:700;">Zéro Microplastique &bull; Zéro Déforestation</td></tr>
-            <tr><th>Audit Co-Produits Ecocert UAB</th><td id="coa-uab">--</td></tr>
-            <tr><th>Signature Cryptographique SHA-256</th><td><code class="hash" id="coa-hash">--</code></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="card">
-        <h2>
-          <span>Registre SQLite des Lots (`clamart_digital_twin.db`)</span>
-          <button class="btn secondary" style="padding:4px 10px;font-size:0.74rem;" onclick="refreshHistory()">Actualiser</button>
-        </h2>
-        <div style="max-height:330px; overflow-y:auto;">
-          <table>
-            <thead>
-              <tr><th>Lot</th><th>Prog</th><th>Grade A</th><th>Marge</th><th>Statut</th><th>Action</th></tr>
-            </thead>
-            <tbody id="db-batches-tbody"></tbody>
-          </table>
         </div>
       </div>
     </div>
@@ -852,328 +748,513 @@
 </main>
 
 <script>
-  let PROGRAMS = [];
-  let CRISIS_SCENARIOS = [];
+  const PROGRAM_UI_META = {
+    "PROG_1_PHBV_COSMETIC_PIEZO": {
+      num: "Programme 1",
+      shortName: "Poudre Cosmétique Pure",
+      plainDesc: "Transforme pain + épluchures en billes blanches biodégradables remplaçant les microplastiques dans les crèmes.",
+      priceTag: "85 à 320 €/kg"
+    },
+    "PROG_2_CHIRAL_R3HB_MONOMER": {
+      num: "Programme 2",
+      shortName: "Briques Pharma & Nutrition",
+      plainDesc: "Chauffe plus longtemps à la fin (3h à 80 °C) pour découper les billes en molécules pures très recherchées.",
+      priceTag: "~240 €/kg"
+    },
+    "PROG_3_CAPROIC_C6_OIL": {
+      num: "Programme 3",
+      shortName: "Huile Sans Huile de Palme",
+      plainDesc: "Sans bulleur d'air : les fruits mûrs fermentent jusqu'à former une huile antimicrobienne qui flotte à la surface.",
+      priceTag: "~26 €/kg (Gros volume)"
+    },
+    "PROG_4_RHAMNOLIPIDS_COFFEE": {
+      num: "Programme 4",
+      shortName: "Base Savon au Marc de Café",
+      plainDesc: "Convertit l'huile résiduelle du marc de café des bistrots en moussant naturel doux pour shampoings écologiques.",
+      priceTag: "~60 €/kg"
+    }
+  };
+
+  const STEP_STORIES = [
+    {
+      title: "Étape 1 — On jette le seau, la machine dose l'eau toute seule (0h – 2h)",
+      body: "Vous versez vos biodéchets sans rien peser au préalable. Les capteurs sous les pieds du tambour mesurent le poids ajouté et ouvrent l'électrovanne d'eau exactement à 1,5 fois le poids des déchets.",
+      sensor: "Repère intelligent : Au bout de 30 minutes, la sonde électrique mémorise le sel de cuisine déjà présent dans les restes (tare automatique) pour qu'il ne fausse jamais la suite."
+    },
+    {
+      title: "Étape 2 — Digestion sans air : formation du jus d'acides naturels (2h – 36h)",
+      body: "Couvercle fermé à 30 °C, une première famille de bactéries découpe le pain et les épluchures en petits acides naturels. Dès que l'eau s'acidifie, les coquilles d'œufs du panier fondent juste ce qu'il faut pour protéger les bactéries.",
+      sensor: "Comment la machine sait que c'est fini : En fondant, le calcium des coquilles augmente la conductivité électrique de l'eau. Dès qu'elle plafonne et que les bulles cessent, 100 % des sucres sont digérés."
+    },
+    {
+      title: "Étape 3 — Essorage à 650 tours/min : récupération des fibres (36h)",
+      body: "Le tambour accélère pendant 15 minutes comme une machine à laver à l'essorage. Toutes les fibres solides et le marc restent dans la passoire inox (votre Produit C prêt pour les pleurotes), tandis que le jus clair d'acides est conservé.",
+      sensor: "Séparation propre : En retirant les fibres riches en azote maintenant, on affame volontairement la seconde famille de bactéries en engrais pour les forcer à stocker des billes blanches à l'étape suivante."
+    },
+    {
+      title: "Étape 4 — Gavage à l'air : les bactéries se remplissent de billes blanches (36h – 72h)",
+      body: "Le bulleur envoie de l'air dans le jus d'acides. Comme un ours qui fait du gras avant l'hiver, les bactéries transforment les acides en minuscules billes blanches à l'intérieur de leurs cellules (jusqu'à 75 % de leur poids).",
+      sensor: "Signal exact de récolte : Tant que les bactéries mangent, elles consomment tout l'oxygène de l'eau (oxygène bas). À la minute où elles sont pleines, elles cessent de respirer et l'oxygène remonte d'un bond (> 7,8 mg/L)."
+    },
+    {
+      title: "Étape 5 — Lavage doux aux cristaux de soude & récolte (72h – 73h)",
+      body: "La cuve monte à 70 °C avec un peu de cristaux de soude (zéro solvant toxique). L'enveloppe des bactéries s'ouvre : la poudre blanche pure coule au fond (Produit A), et l'eau riche en protéines et calcium devient votre engrais bio (Produit B).",
+      sensor: "Contrôle final : Un coup de laser vert OpenRAMAN de 30 secondes sur la poudre séchée confirme sa pureté (> 95 %) avant mise en sachet."
+    }
+  ];
+
   let selectedProgramId = "PROG_1_PHBV_COSMETIC_PIEZO";
-  let selectedCrisisId = "CRISIS_ACID_OVERLOAD";
+  let lastSim = null;
   let currentBatchId = null;
-  let currentWetlabBatchId = null;
   let latestCoA = null;
+  let playTimer = null;
 
-  function switchTab(tabId, btnEl) {
-    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(tabId).classList.add('active');
-    btnEl.classList.add('active');
-    if (tabId === 'tab-nmpc') runNMPCComparison();
-    if (tabId === 'tab-arb') runArbitrage();
-    if (tabId === 'tab-net') runEmergence();
-    if (tabId === 'tab-coa') refreshHistory();
+  function switchView(viewId, btn) {
+    document.querySelectorAll('.view-pane').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.nav-pill').forEach(b => b.classList.remove('active'));
+    document.getElementById(viewId).classList.add('active');
+    btn.classList.add('active');
+    if (viewId === 'view-proof') {
+      const firstBtn = document.querySelector('#safety-buttons button');
+      testSafety('CRISIS_ACID_OVERLOAD', firstBtn);
+    }
+    if (viewId === 'view-scale') updateScaleView();
   }
 
-  function getBatchPayload() {
-    return {
-      program_id: selectedProgramId,
-      hx711_waste_kg: parseFloat(document.getElementById('sl-waste').value),
-      brown_starch_ratio: parseFloat(document.getElementById('sl-brown').value) / 100.0,
-      baseline_ec0_ms_cm: parseFloat(document.getElementById('sl-ec0').value),
-      cartridge_caco3_g: parseFloat(document.getElementById('sl-caco3').value),
-      coffee_grounds_fraction: parseFloat(document.getElementById('sl-coffee').value) / 100.0,
-      ambient_workshop_temp_c: parseFloat(document.getElementById('sl-amb').value),
-      insulated_jacket: document.getElementById('chk-insul').checked,
-    };
+  function renderProgramButtons() {
+    const row = document.getElementById('program-buttons');
+    row.innerHTML = '';
+    Object.keys(PROGRAM_UI_META).forEach(pid => {
+      const m = PROGRAM_UI_META[pid];
+      const btn = document.createElement('button');
+      btn.className = 'prog-btn' + (pid === selectedProgramId ? ' selected' : '');
+      btn.onclick = () => {
+        selectedProgramId = pid;
+        renderProgramButtons();
+        runSim();
+      };
+      btn.innerHTML = `
+        <div class="prog-num">${m.num}</div>
+        <div class="prog-name">${m.shortName}</div>
+        <div class="prog-desc">${m.plainDesc}</div>
+        <span class="prog-tag">Prix de vente : ${m.priceTag}</span>
+      `;
+      row.appendChild(btn);
+    });
   }
 
-  function updateSliders() {
-    const w = parseFloat(document.getElementById('sl-waste').value);
-    const b = parseFloat(document.getElementById('sl-brown').value);
-    const ec0 = parseFloat(document.getElementById('sl-ec0').value);
-    const ca = parseFloat(document.getElementById('sl-caco3').value);
-    const cf = parseFloat(document.getElementById('sl-coffee').value);
-    const amb = parseFloat(document.getElementById('sl-amb').value);
+  function onInputChanged() {
+    const w = parseFloat(document.getElementById('in-waste').value);
+    const b = parseInt(document.getElementById('in-brown').value);
+    const cf = parseInt(document.getElementById('in-coffee').value);
+    const ec0 = parseFloat(document.getElementById('in-ec0').value);
 
-    document.getElementById('val-waste').textContent = w.toFixed(2) + ' kg';
-    document.getElementById('hint-water').textContent = `Eau injectée auto : ${(w * 1.5).toFixed(2)} L`;
-    document.getElementById('val-brown').textContent = b + ' %';
-    document.getElementById('val-ec0').textContent = ec0.toFixed(2) + ' mS/cm';
-    document.getElementById('val-caco3').textContent = ca.toFixed(0) + ' g';
-    document.getElementById('val-coffee').textContent = cf + ' %';
-    document.getElementById('val-amb').textContent = amb + ' °C';
+    document.getElementById('lbl-waste').textContent = w.toFixed(1).replace('.', ',') + ' kg';
+    document.getElementById('lbl-auto-water').innerHTML = `&rarr; +${(w * 1.5).toFixed(1).replace('.', ',')} L d'eau ajoutés auto`;
+    document.getElementById('lbl-brown').textContent = `${b} % sec`;
+    document.getElementById('lbl-coffee').textContent = `${cf} %`;
+
+    let saltTxt = `Normal (${ec0.toFixed(1).replace('.', ',')} mS/cm)`;
+    if (ec0 < 3.0) saltTxt = `Peu salé (${ec0.toFixed(1).replace('.', ',')} mS/cm)`;
+    else if (ec0 > 6.5) saltTxt = `Très salé (${ec0.toFixed(1).replace('.', ',')} mS/cm)`;
+    document.getElementById('lbl-salt').textContent = saltTxt;
 
     const cn = 18.0 + 30.0 * (b / 100.0);
-    const cnPill = document.getElementById('cn-pill');
-    cnPill.textContent = `C/N : ${cn.toFixed(1)}`;
-    cnPill.className = (cn >= 20 && cn <= 40) ? 'pill' : 'pill amber';
-  }
-
-  function renderProgramCards() {
-    const container = document.getElementById('program-cards');
-    container.innerHTML = '';
-    PROGRAMS.forEach(p => {
-      const div = document.createElement('div');
-      div.className = 'prog-card' + (p.program_id === selectedProgramId ? ' selected' : '');
-      div.onclick = () => {
-        selectedProgramId = p.program_id;
-        renderProgramCards();
-        runTwinSimulation();
-      };
-      div.innerHTML = `
-        <div class="prog-code">${p.code} &bull; ${p.duration_h}h</div>
-        <div class="prog-title">${p.title_fr}</div>
-        <div class="prog-price">${p.price_range_eur_per_kg}</div>
-        <div class="prog-meta">${p.process_summary_fr}</div>
-      `;
-      container.appendChild(div);
-    });
-  }
-
-  function renderCrisisCards() {
-    const container = document.getElementById('crisis-cards');
-    container.innerHTML = '';
-    CRISIS_SCENARIOS.forEach((c, idx) => {
-      const div = document.createElement('div');
-      div.className = 'prog-card' + (c.scenario_id === selectedCrisisId ? ' selected' : '');
-      div.onclick = () => {
-        selectedCrisisId = c.scenario_id;
-        renderCrisisCards();
-        runNMPCComparison();
-      };
-      div.innerHTML = `
-        <div class="prog-code">CRISE #${idx + 1}</div>
-        <div class="prog-title">${c.title_fr}</div>
-        <div class="prog-meta">${c.nmpc_strategy_fr}</div>
-      `;
-      container.appendChild(div);
-    });
-  }
-
-  async function initApp() {
-    updateSliders();
-    const res = await fetch('/api/v3/bootstrap');
-    const data = await res.json();
-    PROGRAMS = data.programs || [];
-    CRISIS_SCENARIOS = data.crisis_scenarios || [];
-    renderProgramCards();
-    renderCrisisCards();
-    updateTopBadges(data.calibration_meta, data.ledger_integrity);
-    await runTwinSimulation();
-  }
-
-  function updateTopBadges(calMeta, ledgerInt) {
-    const calBadge = document.getElementById('badge-cal');
-    if (calMeta) {
-      calBadge.textContent = `Modèle : Auto-Calibré Clamart (RMSE ${calMeta.rmse_after_pct}%)`;
-      calBadge.className = 'pill';
+    const cnEl = document.getElementById('lbl-cn-ok');
+    if (cn >= 22 && cn <= 36) {
+      cnEl.textContent = `Équilibre idéal (C/N ${cn.toFixed(0)})`;
+      cnEl.style.color = 'var(--green)';
     } else {
-      calBadge.textContent = 'Modèle : Constantes Théoriques';
-      calBadge.className = 'pill amber';
+      cnEl.textContent = `Acceptable (C/N ${cn.toFixed(0)})`;
+      cnEl.style.color = 'var(--amber)';
     }
-    if (ledgerInt) {
-      document.getElementById('badge-ledger').textContent =
-        `Registre SHA-256 : ${ledgerInt.valid ? 'Intègre' : 'Alerte'} (${ledgerInt.checked_blocks} blocs)`;
-    }
+
+    runSim();
   }
 
-  // ==================== TAB 1: SIMULATION + CARBON + THERMAL ====================
-  async function runTwinSimulation() {
+  async function runSim() {
+    const payload = {
+      program_id: selectedProgramId,
+      hx711_waste_kg: parseFloat(document.getElementById('in-waste').value),
+      brown_starch_ratio: parseFloat(document.getElementById('in-brown').value) / 100.0,
+      coffee_grounds_fraction: parseFloat(document.getElementById('in-coffee').value) / 100.0,
+      baseline_ec0_ms_cm: parseFloat(document.getElementById('in-ec0').value),
+      cartridge_caco3_g: 250.0,
+      ambient_workshop_temp_c: 16.0,
+      insulated_jacket: true
+    };
+
     const res = await fetch('/api/twin/simulate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(getBatchPayload()),
+      body: JSON.stringify(payload)
     });
     const sim = await res.json();
+    lastSim = sim;
     currentBatchId = sim.batch_id;
-    updateTopBadges(sim.calibration_meta, null);
-
-    document.getElementById('prog-buyers').textContent = sim.program.target_buyers;
-    document.getElementById('prog-reg').textContent = sim.program.regulatory_driver;
 
     const prod = sim.products;
     const econ = sim.economics;
-    const ev = sim.events;
     const cart = sim.cartridge_status;
     const cb = sim.carbon_balance;
-    const th = sim.thermal_balance;
-    const vs = sim.vfa_spectrum;
 
-    document.getElementById('kpi-mass').textContent = `${prod.grade_a_mass_g.toFixed(1)} g (${prod.grade_a_purity_pct}%)`;
-    document.getElementById('kpi-label-a').textContent = `${prod.grade_a_label}`;
-    document.getElementById('kpi-margin').textContent = `+${econ.net_margin_batch_eur.toFixed(2)} € net`;
-    document.getElementById('kpi-annual').textContent =
-      `CA ${econ.gross_revenue_batch_eur.toFixed(2)} € | +${econ.annual_net_cashflow_1drum_eur.toFixed(0)} €/an`;
+    document.getElementById('lbl-shells-used').innerHTML =
+      `Sur ce cycle, <strong>${cart.dissolved_this_batch_g.toFixed(0)} g</strong> de coquilles d'œufs fondent toutes seules pour neutraliser l'acidité (il reste <strong>${cart.remaining_cartridge_g.toFixed(0)} g</strong> dans le panier).`;
 
-    const platTxt = ev.acidogenesis_plateau_h ? `${ev.acidogenesis_plateau_h}h` : 'Continu';
-    const doTxt = ev.do_spike_harvest_h ? `DO Spike ${ev.do_spike_harvest_h}h` : 'Anaérobie';
-    document.getElementById('kpi-events').textContent = `Plateau ΔEC : ${platTxt}`;
-    document.getElementById('kpi-cartridge').textContent =
-      `${doTxt} | CaCO3 : -${cart.dissolved_this_batch_g} g (${cart.cartridge_level_pct}% restant)`;
+    // Outputs
+    document.getElementById('out-a-mass').textContent = `${prod.grade_a_mass_g.toFixed(1).replace('.', ',')} g`;
+    document.getElementById('out-a-eur').textContent = `Valeur : ${prod.grade_a_value_eur.toFixed(2).replace('.', ',')} € (pureté ${prod.grade_a_purity_pct} %)`;
+    document.getElementById('out-a-desc').textContent = prod.grade_a_label;
 
-    document.getElementById('kpi-thermal').textContent =
-      `${th.thermal_heating_kwh} kWh chauffe (-${th.insulation_energy_saved_pct}% isolé)`;
-    document.getElementById('kpi-carbon-seq').textContent =
-      `${cb.carbon_sequestered_in_products_pct}% du carbone valorisé en A+B+C (${sim.lca.total_co2_eq_avoided_kg} kg CO2e évités)`;
+    const valB = (prod.grade_b_biostimulant_l * 4.5).toFixed(2).replace('.', ',');
+    document.getElementById('out-b-vol').textContent = `${prod.grade_b_biostimulant_l.toFixed(1).replace('.', ',')} L`;
+    document.getElementById('out-b-eur').textContent = `Valeur : ~${valB} €`;
 
-    // Carbon closure bar
-    document.getElementById('cb-closure-pill').textContent = `Bilan : ${cb.mass_balance_closure_pct.toFixed(1)} %`;
-    document.getElementById('cb-in-txt').textContent =
-      `Carbone entrant : ${cb.total_carbon_input_g} g C (${cb.c_input_biowaste_g} g biodéchets + ${cb.c_input_caco3_shells_g} g coquilles CaCO3)`;
-    const totC = Math.max(1e-3, cb.total_carbon_input_g);
-    const segs = [
-      { label: 'Grade A Noble', val: cb.c_out_grade_a_molecule_g, color: '#10b981' },
-      { label: 'Grade B Peptides', val: cb.c_out_grade_b_biostimulant_g, color: '#06b6d4' },
-      { label: 'Grade C Pleurotes', val: cb.c_out_grade_c_myco_substrate_g, color: '#84cc16' },
-      { label: 'CO2 Biogénique', val: cb.c_out_biogenic_co2_g, color: '#64748b' },
-    ];
-    document.getElementById('cb-bar').innerHTML = segs
-      .map(s => `<div class="stacked-seg" style="width:${(s.val / totC * 100).toFixed(1)}%; background:${s.color};" title="${s.label}: ${s.val} g C"></div>`)
-      .join('');
-    document.getElementById('cb-legend').innerHTML = segs
-      .map(s => `<span class="leg-item"><i class="swatch" style="background:${s.color};height:8px;"></i>${s.label} : <strong>${s.val} g C</strong></span>`)
-      .join('');
+    const valC = (prod.secondary_co_products_eur - prod.grade_b_biostimulant_l * 4.5);
+    document.getElementById('out-c-mass').textContent = `${prod.grade_c_substrate_kg.toFixed(2).replace('.', ',')} kg`;
+    document.getElementById('out-c-eur').textContent = `Substrat pleurotes valorisé`;
 
-    // VFA chain spectrum
-    document.getElementById('vfa-odd-pill').textContent = `Impairs (3HV) : ${vs.odd_chain_pct} %`;
-    document.getElementById('vfa-spec-tbody').innerHTML = `
-      <tr><td>Acétate (C2) &amp; Butyrate (C4)</td><td><strong>${vs.c2_acetate_g_l} / ${vs.c4_butyrate_g_l} g/L</strong></td><td style="color:var(--muted);">Précurseurs 3HB cristallin</td></tr>
-      <tr><td>Propionate (C3) &amp; Valérate (C5)</td><td><strong style="color:#22d3ee;">${vs.c3_propionate_g_l} / ${vs.c5_valerate_g_l} g/L</strong></td><td style="color:var(--muted);">Souplesse &amp; piézoélectricité 3HV</td></tr>
-      <tr><td>Caproate (C6) &amp; Caprylate (C8)</td><td><strong style="color:#34d399;">${vs.c6_caproate_g_l} / ${vs.c8_caprylate_g_l} g/L</strong></td><td style="color:var(--muted);">Phase huileuse sans palme (${vs.medium_chain_c6_c8_pct}%)</td></tr>
+    document.getElementById('out-net-eur').textContent = `+${econ.net_margin_batch_eur.toFixed(2).replace('.', ',')} € net`;
+    document.getElementById('out-opex-detail').textContent =
+      `Coût électricité (${econ.energy_kwh} kWh) + eau + soude : ${econ.opex_batch_eur.toFixed(2).replace('.', ',')} €`;
+    document.getElementById('out-carbon-proof').textContent =
+      `Bilan matière vérifié à ${cb.mass_balance_closure_pct.toFixed(1)} % (${sim.lca.total_co2_eq_avoided_kg} kg CO2 évités).`;
+
+    // Precision table
+    document.getElementById('tbl-carbon-exact').innerHTML = `
+      <tr><td>Carbone entré (Biodéchets + Coquilles dissoutes)</td><td><strong>${cb.total_carbon_input_g} g de Carbone</strong></td></tr>
+      <tr><td>&rarr; Retrouvé dans le Produit A précieux</td><td style="color:var(--green);font-weight:700;">${cb.c_out_grade_a_molecule_g} g C</td></tr>
+      <tr><td>&rarr; Retrouvé dans l'Engrais liquide B</td><td>${cb.c_out_grade_b_biostimulant_g} g C</td></tr>
+      <tr><td>&rarr; Retrouvé dans le Substrat champignons C</td><td>${cb.c_out_grade_c_myco_substrate_g} g C</td></tr>
+      <tr><td>&rarr; Respiré naturellement par les bactéries (CO2)</td><td>${cb.c_out_biogenic_co2_g} g C</td></tr>
+      <tr><td><strong>Total comptabilisé en sortie</strong></td><td><strong>${cb.mass_balance_closure_pct.toFixed(1)} % (Zéro perte cachée)</strong></td></tr>
     `;
 
-    drawMultiLineChart(
-      'canvas-kinetics',
-      sim.trajectory.map(p => p.t),
-      [
-        { data: sim.trajectory.map(p => p.carb), color: '#f59e0b', width: 2 },
-        { data: sim.trajectory.map(p => p.vfa), color: '#06b6d4', width: 2 },
-        { data: sim.trajectory.map(p => p.target_mol_g_l), color: '#10b981', width: 3 },
-        { data: sim.trajectory.map(p => p.ekf_vfa), color: '#a855f7', width: 1.6, dashed: true },
-      ],
-      ev
-    );
-
-    drawMultiLineChart(
-      'canvas-sensors',
-      sim.trajectory.map(p => p.t),
-      [
-        { data: sim.trajectory.map(p => p.delta_ec_ms * 10.0), color: '#22d3ee', width: 2.5 },
-        { data: sim.trajectory.map(p => p.co2_ml_min / 5.0), color: '#fb7185', width: 1.8 },
-        { data: sim.trajectory.map(p => p.do_mg_l), color: '#34d399', width: 2.2 },
-        { data: sim.trajectory.map(p => p.ph), color: '#fde047', width: 1.6 },
-      ],
-      ev
-    );
+    const scrub = document.getElementById('in-time-idx');
+    scrub.max = sim.trajectory.length - 1;
+    onTimeScrub();
   }
 
-  // ==================== TAB 2: NMPC AUTOPILOT ====================
-  async function runNMPCComparison() {
+  function stepIndexFromHour(h) {
+    if (h < 2.0) return 0;
+    if (h < 36.0) return 1;
+    if (h < 37.0) return 2;
+    if (h < 72.0) return 3;
+    return 4;
+  }
+
+  function jumpToStep(stepIdx) {
+    if (!lastSim) return;
+    const targetHours = [0.5, 18.0, 36.0, 54.0, 72.5];
+    const h = targetHours[stepIdx] || 0;
+    let bestIdx = 0;
+    lastSim.trajectory.forEach((pt, i) => {
+      if (Math.abs(pt.t - h) < Math.abs(lastSim.trajectory[bestIdx].t - h)) bestIdx = i;
+    });
+    document.getElementById('in-time-idx').value = bestIdx;
+    onTimeScrub();
+  }
+
+  function onTimeScrub() {
+    if (!lastSim) return;
+    const idx = parseInt(document.getElementById('in-time-idx').value);
+    const pt = lastSim.trajectory[Math.min(idx, lastSim.trajectory.length - 1)];
+    const sIdx = stepIndexFromHour(pt.t);
+
+    document.querySelectorAll('#steps-bar .step-pill').forEach((el, i) => {
+      el.classList.toggle('active', i === sIdx);
+    });
+
+    const st = STEP_STORIES[sIdx];
+    document.getElementById('story-title').textContent = st.title;
+    document.getElementById('story-body').textContent = st.body;
+    document.getElementById('story-sensor').innerHTML = `<strong>Repère capteur :</strong> ${st.sensor}`;
+
+    document.getElementById('lbl-scrub-time').textContent =
+      `Instant observé : ${pt.t.toFixed(1).replace('.', ',')} h sur ${lastSim.trajectory[lastSim.trajectory.length - 1].t} h`;
+    document.getElementById('g-temp').textContent = `${pt.temp_c.toFixed(0)} °C`;
+    document.getElementById('g-rpm').textContent = `${pt.rpm.toFixed(0)} tr/min`;
+    document.getElementById('g-ph').textContent = pt.ph.toFixed(2).replace('.', ',');
+    document.getElementById('g-do').textContent = `${pt.do_mg_l.toFixed(1).replace('.', ',')} mg/L`;
+
+    drawDrumCrossSection(pt, sIdx);
+    drawCleanProgressionChart(lastSim.trajectory, idx);
+  }
+
+  function togglePlayCycle() {
+    const btn = document.getElementById('btn-play');
+    if (playTimer) {
+      clearInterval(playTimer);
+      playTimer = null;
+      btn.innerHTML = '&#9654; Animer les 3 jours';
+      return;
+    }
+    btn.innerHTML = '&#9208; Pause';
+    const scrub = document.getElementById('in-time-idx');
+    if (parseInt(scrub.value) >= parseInt(scrub.max)) scrub.value = 0;
+    playTimer = setInterval(() => {
+      let v = parseInt(scrub.value) + 2;
+      if (v >= parseInt(scrub.max)) {
+        scrub.value = scrub.max;
+        onTimeScrub();
+        clearInterval(playTimer);
+        playTimer = null;
+        btn.innerHTML = '&#9654; Rejouer les 3 jours';
+        return;
+      }
+      scrub.value = v;
+      onTimeScrub();
+    }, 90);
+  }
+
+  function drawDrumCrossSection(pt, stepIdx) {
+    const canvas = document.getElementById('canvas-drum');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    const cx = W / 2, cy = 112, R = 84;
+
+    // Outer Stainless Tank
+    ctx.fillStyle = '#e2e8f0';
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.roundRect(cx - R - 14, cy - R - 12, (R + 14) * 2, (R + 12) * 2, 22);
+    ctx.fill();
+    ctx.stroke();
+
+    // Inner Drum Circle
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+    ctx.clip();
+
+    // Liquid color transitions naturally by biochemical stage
+    let liqColor = 'rgba(217, 119, 6, 0.28)'; // Step 0/1: brownish-amber organic mash
+    if (stepIdx === 1) liqColor = 'rgba(245, 158, 11, 0.35)'; // Vinegar broth
+    if (stepIdx === 2) liqColor = 'rgba(14, 165, 233, 0.22)'; // Spin-dry separation
+    if (stepIdx === 3) liqColor = 'rgba(16, 185, 129, 0.28)'; // Milky aerated PHBV synthesis
+    if (stepIdx === 4) liqColor = 'rgba(56, 189, 248, 0.20)'; // Clear protein supernatant + white powder bottom
+
+    const liqTop = stepIdx === 2 ? cy + 28 : cy - 18;
+    ctx.fillStyle = liqColor;
+    ctx.fillRect(cx - R, liqTop, R * 2, R * 2);
+
+    // Step 4: Pure white powder settled at the bottom of the drum!
+    if (stepIdx === 4 || pt.target_mol_g_l > 1.5) {
+      const hPowder = Math.min(28, pt.target_mol_g_l * 2.2);
+      ctx.fillStyle = '#ffffff';
+      ctx.strokeStyle = '#059669';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy + R - 8, 48, hPowder, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    // Step 3 (Aeration): Rising oxygen bubbles
+    if (pt.aerated) {
+      ctx.fillStyle = 'rgba(2, 132, 199, 0.55)';
+      for (let b = 0; b < 14; b++) {
+        const bx = cx - 45 + (b * 7) % 90;
+        const by = cy + R - 14 - ((pt.t * 19 + b * 17) % 85);
+        ctx.beginPath(); ctx.arc(bx, by, 3, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+
+    // Passive Eggshell CaCO3 Basket on the left wall
+    const shellFill = Math.max(0.2, Math.min(1.0, pt.caco3_g_l / 20.0));
+    ctx.fillStyle = '#fef3c7';
+    ctx.strokeStyle = '#b45309';
+    ctx.lineWidth = 1.5;
+    ctx.fillRect(cx - R + 10, cy - 8, 22, 36);
+    ctx.strokeRect(cx - R + 10, cy - 8, 22, 36);
+    ctx.fillStyle = '#f59e0b';
+    ctx.fillRect(cx - R + 12, cy - 8 + 34 * (1 - shellFill), 18, 34 * shellFill);
+
+    ctx.restore();
+
+    // Perforated Inox Drum Rim
+    ctx.strokeStyle = stepIdx === 2 ? '#0284c7' : '#334155';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([7, 5]);
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Load cells (HX711 feet) at bottom
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(cx - 72, cy + R + 12, 26, 9);
+    ctx.fillRect(cx + 46, cy + R + 12, 26, 9);
+
+    // Clear labels
+    ctx.fillStyle = '#475569';
+    ctx.font = 'bold 10px Inter, Segoe UI, sans-serif';
+    ctx.fillText('Coquilles', cx - R - 8, cy - 14);
+    if (stepIdx === 4) {
+      ctx.fillStyle = '#059669';
+      ctx.fillText('Poudre pure au fond', cx - 46, cy + R - 12);
+    }
+  }
+
+  function drawCleanProgressionChart(traj, activeIdx) {
+    const canvas = document.getElementById('canvas-clean-curve');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    const pad = { l: 42, r: 18, t: 16, b: 26 };
+    const pw = W - pad.l - pad.r, ph = H - pad.t - pad.b;
+
+    let maxY = 10;
+    traj.forEach(p => {
+      maxY = Math.max(maxY, p.carb, p.vfa, p.target_mol_g_l);
+    });
+    maxY *= 1.12;
+    const maxT = traj[traj.length - 1].t;
+
+    // Subtle horizontal grid
+    ctx.strokeStyle = '#f1f5f9';
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '11px Inter, Segoe UI, sans-serif';
+    for (let i = 0; i <= 3; i++) {
+      const y = pad.t + ph - (i / 3) * ph;
+      ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l + pw, y); ctx.stroke();
+      ctx.fillText(((i / 3) * maxY).toFixed(0) + ' g/L', 4, y + 4);
+    }
+    [0, 12, 24, 36, 48, 60, 72].forEach(h => {
+      if (h <= maxT) {
+        const x = pad.l + (h / maxT) * pw;
+        ctx.fillText('J' + (h / 24 + 1).toFixed(1).replace('.0', '') + ` (${h}h)`, x - 18, H - 6);
+      }
+    });
+
+    const series = [
+      { key: 'carb', color: '#d97706', width: 2.2 },
+      { key: 'vfa', color: '#0284c7', width: 2.2 },
+      { key: 'target_mol_g_l', color: '#059669', width: 3.2 }
+    ];
+    series.forEach(s => {
+      ctx.strokeStyle = s.color;
+      ctx.lineWidth = s.width;
+      ctx.beginPath();
+      traj.forEach((p, i) => {
+        const x = pad.l + (p.t / maxT) * pw;
+        const y = pad.t + ph - (p[s.key] / maxY) * ph;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+    });
+
+    // Active time cursor line
+    const curPt = traj[Math.min(activeIdx, traj.length - 1)];
+    const cx = pad.l + (curPt.t / maxT) * pw;
+    ctx.strokeStyle = '#0f172a';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 3]);
+    ctx.beginPath(); ctx.moveTo(cx, pad.t); ctx.lineTo(cx, pad.t + ph); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // ==================== VIEW 2: LASER SCAN & AUTO-SAFETY ====================
+  async function scanLaserCoA() {
+    const res = await fetch('/api/twin/certify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ batch_id: currentBatchId || 'CLAMART-LOT-01' })
+    });
+    const coa = await res.json();
+    latestCoA = coa;
+    document.getElementById('btn-dl-passport').disabled = false;
+
+    document.getElementById('pr-prod').textContent = `${coa.product_label} (${coa.grade_a_mass_g} g)`;
+    document.getElementById('pr-purity').textContent = `${coa.raman_analysis.purity_estimate_pct} % de pureté confirmée`;
+    document.getElementById('pr-protein').textContent = `${coa.amide_i_1655_protein_residue_pct} % (Aucune trace de bactéries restantes)`;
+    document.getElementById('pr-hash').textContent = coa.coa_sha256;
+
+    const wn = coa.spectrum_plot.wavenumbers_cm1;
+    const inten = coa.spectrum_plot.intensity_clean;
+    const canvas = document.getElementById('canvas-raman-clean');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+    const pad = { l: 24, r: 20, t: 24, b: 28 };
+    const pw = W - pad.l - pad.r, ph = H - pad.t - pad.b;
+    const minX = wn[0], maxX = wn[wn.length - 1];
+    const maxY = Math.max(...inten, 100) * 1.15;
+
+    // Highlight key peaks cleanly
+    const marks = [
+      { cm: 1453, txt: 'Repère C-H', col: '#64748b' },
+      { cm: 1655, txt: 'Zone Impuretés (0%)', col: '#e11d48' },
+      { cm: 1724, txt: 'Pic Produit Pur (1724)', col: '#059669' }
+    ];
+    ctx.font = 'bold 11px Inter, Segoe UI, sans-serif';
+    marks.forEach(m => {
+      const x = pad.l + ((m.cm - minX) / (maxX - minX)) * pw;
+      ctx.strokeStyle = m.col;
+      ctx.setLineDash([3, 3]);
+      ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, pad.t + ph); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = m.col;
+      ctx.fillText(m.txt, x - 48, pad.t - 6);
+    });
+
+    ctx.strokeStyle = '#059669';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    wn.forEach((w, i) => {
+      const x = pad.l + ((w - minX) / (maxX - minX)) * pw;
+      const y = pad.t + ph - (inten[i] / maxY) * ph;
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+  }
+
+  function downloadPassport() {
+    if (!latestCoA) return;
+    const blob = new Blob([JSON.stringify(latestCoA, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `Certificat_Purete_${latestCoA.batch_id}.json`;
+    a.click();
+  }
+
+  async function testSafety(scenarioId, btnEl) {
+    document.querySelectorAll('#safety-buttons button').forEach(b => b.style.borderColor = 'var(--border-strong)');
+    if (btnEl) btnEl.style.borderColor = 'var(--green)';
+
     const res = await fetch('/api/v3/nmpc_resilience', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ scenario_id: selectedCrisisId }),
+      body: JSON.stringify({ scenario_id: scenarioId })
     });
     const data = await res.json();
     const cmp = data.comparison;
 
-    document.getElementById('nmpc-open-yield').textContent = `${cmp.open_loop_pha_g} g (${cmp.open_loop_net_eur} €)`;
-    document.getElementById('nmpc-open-status').textContent = cmp.open_loop_crashed
-      ? 'CRASH BIOLOGIQUE (Mort cellulaire pH < 4,35)'
-      : 'Perte sévère de conversion';
-    document.getElementById('nmpc-auto-yield').textContent = `${cmp.nmpc_autopilot_pha_g} g (${cmp.nmpc_autopilot_net_eur} €)`;
-    document.getElementById('nmpc-recovery').textContent = `${cmp.yield_recovery_pct}% du rendement nominal préservé`;
-    document.getElementById('nmpc-saved-eur').textContent = `+${cmp.value_saved_by_nmpc_eur.toFixed(2)} € sauvés`;
-    document.getElementById('nmpc-actions-count').textContent = `${data.interventions_log.length} actions auto`;
-    document.getElementById('nmpc-cause-desc').textContent = data.meta.cause_fr;
+    document.getElementById('saf-bad').textContent = `${cmp.open_loop_pha_g} g récoltés`;
+    document.getElementById('saf-bad-txt').textContent = cmp.open_loop_crashed
+      ? 'Les bactéries meurent par excès d’acidité : lot gâché.'
+      : 'La transformation cale en route : grosse perte.';
 
-    document.getElementById('nmpc-log-list').innerHTML = data.interventions_log
-      .map(it => `<div class="event-log-item"><strong style="color:#34d399;">[${it.action}]</strong><br/>${it.detail_fr}</div>`)
+    document.getElementById('saf-good').textContent = `${cmp.nmpc_autopilot_pha_g} g récoltés`;
+    document.getElementById('saf-good-txt').textContent =
+      `Lot sauvé (+${cmp.value_saved_by_nmpc_eur.toFixed(2).replace('.', ',')} € préservés automatiquement).`;
+
+    document.getElementById('saf-steps').innerHTML = data.interventions_log
+      .map(it => `<div style="padding:8px 10px; background:var(--surface-soft); border-left:3px solid var(--green); border-radius:0 6px 6px 0; margin-bottom:6px;">${it.detail_fr}</div>`)
       .join('');
-
-    drawMultiLineChart(
-      'canvas-nmpc',
-      data.nmpc_trajectory.map(p => p.t),
-      [
-        { data: data.open_loop_trajectory.map(p => p.pha_g_l), color: '#fb7185', width: 2, dashed: true },
-        { data: data.nmpc_trajectory.map(p => p.pha_g_l), color: '#10b981', width: 3 },
-        { data: data.open_loop_trajectory.map(p => p.ph), color: '#fda4af', width: 1.5, dashed: true },
-        { data: data.nmpc_trajectory.map(p => p.ph), color: '#fde047', width: 2 },
-      ]
-    );
   }
 
-  // ==================== TAB 3: ARBITRAGE OPTIMIZER ====================
-  async function runArbitrage() {
-    const drums = parseInt(document.getElementById('sl-arb-drums').value);
-    const bread = parseFloat(document.getElementById('sl-arb-bread').value);
-    const coffee = parseFloat(document.getElementById('sl-arb-coffee').value);
-    const fruit = parseFloat(document.getElementById('sl-arb-fruit').value);
-    const peels = parseFloat(document.getElementById('sl-arb-peels').value);
-    const pPhbv = parseFloat(document.getElementById('sl-p-phbv').value);
-    const pR3hb = parseFloat(document.getElementById('sl-p-r3hb').value);
-    const pRham = parseFloat(document.getElementById('sl-p-rham').value);
+  // ==================== VIEW 3: CLAMART SCALING ====================
+  async function updateScaleView() {
+    const initD = parseInt(document.getElementById('sc-init').value);
+    const reinv = parseInt(document.getElementById('sc-reinv').value);
 
-    document.getElementById('val-arb-drums').textContent = `${drums} tambours`;
-    document.getElementById('val-arb-bread').textContent = `${bread} kg`;
-    document.getElementById('val-arb-coffee').textContent = `${coffee} kg`;
-    document.getElementById('val-arb-fruit').textContent = `${fruit} kg`;
-    document.getElementById('val-arb-peels').textContent = `${peels} kg`;
-    document.getElementById('val-p-phbv').textContent = `${pPhbv} €/kg`;
-    document.getElementById('val-p-r3hb').textContent = `${pR3hb} €/kg`;
-    document.getElementById('val-p-rham').textContent = `${pRham} €/kg`;
-
-    const res = await fetch('/api/v3/arbitrage_dispatch', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        active_drums_count: drums,
-        bakery_bread_kg: bread,
-        cafe_coffee_grounds_kg: coffee,
-        market_ripe_fruits_kg: fruit,
-        household_canteen_peels_kg: peels,
-        price_phbv_cosmetic_piezo_eur_kg: pPhbv,
-        price_chiral_r3hb_eur_kg: pR3hb,
-        price_rhamnolipids_eur_kg: pRham,
-      }),
-    });
-    const data = await res.json();
-    const ec = data.cycle_economics;
-    const sub = data.petrochemical_substitution_annual;
-
-    document.getElementById('arb-net-cycle').textContent = `+${ec.net_margin_per_73h_cycle_eur.toFixed(2)} €`;
-    document.getElementById('arb-annual-net').textContent = `+${ec.annual_fleet_net_cashflow_eur.toLocaleString('fr-FR')} €/an (100 cycles)`;
-    document.getElementById('arb-mult').textContent = `×${ec.bioeconomy_value_multiplier_x}`;
-    document.getElementById('arb-compost-ref').textContent = `Compostage simple : ${ec.naive_composting_value_eur} € / cycle`;
-    document.getElementById('arb-muni-yr').textContent = `${ec.annual_municipal_savings_eur.toLocaleString('fr-FR')} €/an`;
-    document.getElementById('arb-co2-yr').textContent = `${ec.annual_co2_avoided_tonnes} t/an`;
-    document.getElementById('arb-waste-proc').textContent =
-      `${data.supply_summary.total_processed_per_cycle_kg} kg traités sur ${data.supply_summary.total_available_biowaste_kg} kg dispo`;
-
-    document.getElementById('arb-dispatch-tbody').innerHTML = data.dispatch_plan
-      .map(a => `
-        <tr>
-          <td><strong>${a.name_fr}</strong></td>
-          <td style="color:var(--muted);">${a.feed_recipe_fr}</td>
-          <td><span class="pill ${a.drums_assigned > 0 ? '' : 'amber'}">${a.drums_assigned} tambour(s)</span></td>
-          <td>${a.waste_processed_kg} kg</td>
-          <td><strong>${a.grade_a_total_g} g</strong></td>
-          <td style="color:#34d399;font-weight:700;">+${a.net_margin_total_eur.toFixed(2)} €</td>
-        </tr>
-      `).join('');
-
-    document.getElementById('sub-micro').textContent = `${sub.microplastics_pmma_pe_replaced_kg_yr} kg/an`;
-    document.getElementById('sub-chiral').textContent = `${sub.chiral_pharma_building_blocks_kg_yr} kg/an`;
-    document.getElementById('sub-sles').textContent = `${sub.petro_surfactants_sles_replaced_kg_yr} kg/an`;
-    document.getElementById('sub-palm').textContent = `${sub.palm_kernel_oil_c6_c8_replaced_kg_yr} kg/an`;
-  }
-
-  // ==================== TAB 4: CLAMART 36-MONTH EMERGENCE & MAP ====================
-  async function runEmergence() {
-    const initD = parseInt(document.getElementById('sl-net-init').value);
-    const reinv = parseFloat(document.getElementById('sl-net-reinv').value);
-    const maxD = parseInt(document.getElementById('sl-net-max').value);
-
-    document.getElementById('val-net-init').textContent = `${initD} tambour${initD > 1 ? 's' : ''}`;
-    document.getElementById('val-net-reinv').textContent = `${reinv} %`;
-    document.getElementById('val-net-max').textContent = `${maxD} tambours`;
+    document.getElementById('sc-init-lbl').textContent = `${initD} machine${initD > 1 ? 's' : ''}`;
+    document.getElementById('sc-reinv-lbl').textContent = `${reinv} %`;
 
     const res = await fetch('/api/v3/clamart_emergence', {
       method: 'POST',
@@ -1182,76 +1263,54 @@
         initial_drums: initD,
         reinvestment_rate: reinv / 100.0,
         months: 36,
-        max_clamart_drums: maxD,
-      }),
+        max_clamart_drums: 48
+      })
     });
     const data = await res.json();
     const f = data.final_month_36;
 
-    document.getElementById('hint-seed-cap').textContent =
-      `Capital d'amorçage unique : ${data.initial_seed_capital_eur.toLocaleString('fr-FR')} € (zéro dette ensuite)`;
-    document.getElementById('cmp-seed').textContent = `${data.initial_seed_capital_eur.toLocaleString('fr-FR')} €`;
+    const seedStr = `${data.initial_seed_capital_eur.toLocaleString('fr-FR')} €`;
+    document.getElementById('sc-seed-eur').textContent = seedStr;
+    document.getElementById('tbl-seed').textContent = seedStr;
 
-    document.getElementById('net-final-drums').textContent = `${f.active_drums_clamart} tambours`;
-    document.getElementById('net-final-hubs').textContent =
-      `${f.active_neighborhood_hubs}/6 quartiers actifs &bull; ${f.openraman_stations} stations OpenRAMAN`;
-    document.getElementById('net-runrate').textContent = `+${f.annualized_runrate_net_eur.toLocaleString('fr-FR')} €/an`;
-    document.getElementById('net-jobs').textContent =
-      `${f.local_green_jobs_fte} ETP locaux | Trésorerie cumulée : ${f.cumulative_free_treasury_eur.toLocaleString('fr-FR')} €`;
-    document.getElementById('net-fed-boost').textContent = `+${f.federated_yield_gain_pct} %`;
-    document.getElementById('net-waste-cum').textContent = `${f.cumulative_biowaste_diverted_tonnes} tonnes`;
-    document.getElementById('net-muni-cum').textContent =
-      `${f.cumulative_municipal_tax_saved_eur.toLocaleString('fr-FR')} € économisés (${f.cumulative_co2_avoided_tonnes} t CO2e)`;
+    document.getElementById('sc-drums-36').textContent = `${f.active_drums_clamart} machines`;
+    document.getElementById('sc-hubs-36').textContent = `${f.active_neighborhood_hubs} quartiers équipés sur 6`;
+    document.getElementById('sc-rev-yr').textContent = `+${f.annualized_runrate_net_eur.toLocaleString('fr-FR')} €/an`;
+    document.getElementById('sc-jobs').textContent = `${f.local_green_jobs_fte} emplois locaux temps plein`;
+    document.getElementById('sc-treasury').textContent =
+      `Trésorerie nette accumulée : ${f.cumulative_free_treasury_eur.toLocaleString('fr-FR')} €`;
+    document.getElementById('sc-tonnes').textContent = `${f.cumulative_biowaste_diverted_tonnes} tonnes`;
+    document.getElementById('sc-co2').textContent = `${f.cumulative_co2_avoided_tonnes} tonnes de CO2 évitées`;
+    document.getElementById('sc-muni').textContent =
+      `Incinération publique économisée : ${f.cumulative_municipal_tax_saved_eur.toLocaleString('fr-FR')} €`;
 
-    drawClamartMap(data.clamart_districts);
-    drawMultiLineChart(
-      'canvas-emergence',
-      data.timeline.map(p => p.month),
-      [
-        { data: data.timeline.map(p => p.active_drums), color: '#10b981', width: 3 },
-        { data: data.timeline.map(p => Math.max(0, p.monthly_net_cashflow_eur / 100.0)), color: '#38bdf8', width: 2.2 },
-        { data: data.timeline.map(p => p.federated_efficiency_boost_pct), color: '#f59e0b', width: 2 },
-      ],
-      null,
-      'M+'
-    );
+    drawCleanClamartMap(data.clamart_districts);
+    drawCleanGrowthChart(data.timeline);
   }
 
-  function drawClamartMap(districts) {
-    const canvas = document.getElementById('canvas-clamart-map');
+  function drawCleanClamartMap(districts) {
+    const canvas = document.getElementById('canvas-map-clean');
     const ctx = canvas.getContext('2d');
     const W = canvas.width, H = canvas.height;
     ctx.clearRect(0, 0, W, H);
 
-    // Stylized Clamart municipal boundary polygon (Bois de Clamart in center-south/east, Gare in north)
-    ctx.save();
-    ctx.fillStyle = '#0b1528';
-    ctx.strokeStyle = '#1e3a5f';
+    ctx.fillStyle = '#f8fafc';
+    ctx.strokeStyle = '#cbd5e1';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(W * 0.18, H * 0.20);
+    ctx.moveTo(W * 0.16, H * 0.20);
     ctx.lineTo(W * 0.58, H * 0.08);
-    ctx.lineTo(W * 0.82, H * 0.24);
-    ctx.lineTo(W * 0.88, H * 0.78);
-    ctx.lineTo(W * 0.52, H * 0.92);
-    ctx.lineTo(W * 0.14, H * 0.68);
+    ctx.lineTo(W * 0.84, H * 0.24);
+    ctx.lineTo(W * 0.88, H * 0.80);
+    ctx.lineTo(W * 0.50, H * 0.92);
+    ctx.lineTo(W * 0.12, H * 0.68);
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
 
-    // Bois de Clamart green zone
-    ctx.fillStyle = 'rgba(16, 185, 129, 0.07)';
-    ctx.beginPath();
-    ctx.ellipse(W * 0.50, H * 0.58, W * 0.16, H * 0.14, -0.2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#334155';
-    ctx.font = 'italic 11px Segoe UI, sans-serif';
-    ctx.fillText('Forêt de Meudon / Clamart', W * 0.39, H * 0.60);
-
-    // Draw federated SHA-256 ledger mesh links between online hubs
     const online = districts.filter(d => d.online);
-    ctx.strokeStyle = 'rgba(6, 182, 212, 0.35)';
-    ctx.setLineDash([4, 4]);
+    ctx.strokeStyle = '#a7f3d0';
+    ctx.lineWidth = 1.5;
     for (let i = 0; i < online.length; i++) {
       for (let j = i + 1; j < online.length; j++) {
         ctx.beginPath();
@@ -1260,331 +1319,86 @@
         ctx.stroke();
       }
     }
-    ctx.setLineDash([]);
 
-    // Draw neighborhood hub nodes
     districts.forEach(d => {
       const cx = d.x * W, cy = d.y * H;
-      const r = d.online ? 8 + d.active_drums * 1.1 : 6;
-
-      if (d.online) {
-        ctx.fillStyle = 'rgba(16, 185, 129, 0.18)';
-        ctx.beginPath(); ctx.arc(cx, cy, r + 9, 0, Math.PI * 2); ctx.fill();
-      }
-
-      ctx.fillStyle = d.online ? '#10b981' : '#475569';
+      const r = d.online ? 7 + d.active_drums * 0.9 : 5;
+      ctx.fillStyle = d.online ? '#059669' : '#94a3b8';
       ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = '#060a12';
-      ctx.lineWidth = 2;
-      ctx.stroke();
 
-      ctx.fillStyle = '#f8fafc';
-      ctx.font = 'bold 11px Segoe UI, sans-serif';
-      ctx.fillText(d.name_fr, Math.min(W - 185, Math.max(10, cx - 55)), cy - r - 6);
-      ctx.fillStyle = d.online ? '#34d399' : '#64748b';
-      ctx.font = '10px Segoe UI, sans-serif';
-      ctx.fillText(
-        d.online ? `${d.active_drums} tambours (${d.annual_biowaste_tonnes} t/an)` : 'En réserve',
-        Math.min(W - 150, Math.max(10, cx - 45)),
-        cy + r + 12
-      );
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 10px Inter, Segoe UI, sans-serif';
+      const shortTitle = d.name_fr.split('/')[0].trim();
+      ctx.fillText(`${shortTitle} (${d.active_drums})`, Math.min(W - 115, Math.max(8, cx - 38)), cy - r - 5);
     });
-    ctx.restore();
   }
 
-  // ==================== SHARED MULTI-LINE CHART ====================
-  function drawMultiLineChart(canvasId, xArr, seriesList, events = null, xPrefix = '') {
-    const canvas = document.getElementById(canvasId);
-    if (!canvas) return;
+  function drawCleanGrowthChart(timeline) {
+    const canvas = document.getElementById('canvas-growth-clean');
     const ctx = canvas.getContext('2d');
     const W = canvas.width, H = canvas.height;
     ctx.clearRect(0, 0, W, H);
-
-    const pad = { l: 46, r: 18, t: 18, b: 28 };
+    const pad = { l: 38, r: 16, t: 16, b: 26 };
     const pw = W - pad.l - pad.r, ph = H - pad.t - pad.b;
 
-    let maxY = 8.0;
-    seriesList.forEach(s => s.data.forEach(v => { if (v > maxY) maxY = v; }));
-    maxY *= 1.13;
-    const maxX = xArr.length ? xArr[xArr.length - 1] : 73;
-
-    ctx.strokeStyle = '#1e293b';
-    ctx.lineWidth = 1;
+    const maxD = Math.max(10, ...timeline.map(p => p.active_drums)) * 1.1;
+    ctx.strokeStyle = '#f1f5f9';
     ctx.fillStyle = '#64748b';
-    ctx.font = '11px Segoe UI, sans-serif';
-    for (let i = 0; i <= 4; i++) {
-      const y = pad.t + ph - (i / 4) * ph;
+    ctx.font = '11px Inter, Segoe UI, sans-serif';
+    for (let i = 0; i <= 3; i++) {
+      const y = pad.t + ph - (i / 3) * ph;
       ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l + pw, y); ctx.stroke();
-      ctx.fillText(((i / 4) * maxY).toFixed(1), 6, y + 4);
+      ctx.fillText(Math.round((i / 3) * maxD), 8, y + 4);
     }
-    const stepX = maxX <= 40 ? 6 : 12;
-    for (let xv = 0; xv <= maxX; xv += stepX) {
-      const x = pad.l + (xv / maxX) * pw;
-      ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, pad.t + ph); ctx.stroke();
-      ctx.fillText(xPrefix ? (xPrefix + xv) : (xv + 'h'), x - 10, H - 8);
-    }
-
-    if (events) {
-      if (events.acidogenesis_plateau_h) {
-        const xp = pad.l + (events.acidogenesis_plateau_h / maxX) * pw;
-        ctx.save();
-        ctx.strokeStyle = 'rgba(34, 211, 238, 0.55)';
-        ctx.setLineDash([4, 4]);
-        ctx.beginPath(); ctx.moveTo(xp, pad.t); ctx.lineTo(xp, pad.t + ph); ctx.stroke();
-        ctx.fillStyle = '#22d3ee';
-        ctx.fillText(`Plateau ΔEC (${events.acidogenesis_plateau_h}h)`, xp + 4, pad.t + 12);
-        ctx.restore();
-      }
-      if (events.do_spike_harvest_h) {
-        const xd = pad.l + (events.do_spike_harvest_h / maxX) * pw;
-        ctx.save();
-        ctx.strokeStyle = 'rgba(52, 211, 153, 0.65)';
-        ctx.setLineDash([4, 4]);
-        ctx.beginPath(); ctx.moveTo(xd, pad.t); ctx.lineTo(xd, pad.t + ph); ctx.stroke();
-        ctx.fillStyle = '#34d399';
-        ctx.fillText(`DO Spike (${events.do_spike_harvest_h}h)`, Math.min(W - 115, xd + 4), pad.t + 26);
-        ctx.restore();
-      }
-    }
-
-    seriesList.forEach(s => {
-      ctx.save();
-      ctx.strokeStyle = s.color;
-      ctx.lineWidth = s.width || 2;
-      if (s.dashed) ctx.setLineDash([6, 4]);
-      if (s.dotsOnly) {
-        ctx.fillStyle = s.color;
-        for (let i = 0; i < s.data.length; i++) {
-          const xv = s.xArr ? s.xArr[i] : xArr[i];
-          const x = pad.l + (xv / maxX) * pw;
-          const y = pad.t + ph - (s.data[i] / maxY) * ph;
-          ctx.beginPath(); ctx.arc(x, y, 2.7, 0, Math.PI * 2); ctx.fill();
-        }
-      } else {
-        ctx.beginPath();
-        for (let i = 0; i < s.data.length; i++) {
-          const xv = s.xArr ? s.xArr[i] : xArr[i];
-          const x = pad.l + (xv / maxX) * pw;
-          const y = pad.t + ph - (s.data[i] / maxY) * ph;
-          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        }
-        ctx.stroke();
-      }
-      ctx.restore();
-    });
-  }
-
-  // ==================== TAB 5: WETLAB & AUTO-CALIBRATION ====================
-  async function acquireWetlabBatch() {
-    document.getElementById('cal-status-txt').textContent = 'Acquisition des sondes ESP32...';
-    const res = await fetch('/api/twin/wetlab_stream', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(getBatchPayload()),
-    });
-    const data = await res.json();
-    currentWetlabBatchId = data.batch_id;
-    currentBatchId = data.batch_id;
-
-    document.getElementById('btn-calibrate').disabled = false;
-    document.getElementById('cal-rmse-before').textContent = `${data.rmse_uncalibrated_pct.toFixed(2)} %`;
-    document.getElementById('cal-rmse-after').textContent = '-- %';
-    document.getElementById('cal-mass-compare').textContent =
-      `Réel : ${data.observed_grade_a_g} g vs Prédit : ${data.predicted_uncalibrated_grade_a_g} g`;
-    document.getElementById('cal-status-txt').textContent =
-      `${data.esp32_telemetry.length} trames ESP32 reçues. Lancez l'auto-calibration !`;
-
-    const uncalTraj = data.uncalibrated_twin.trajectory;
-    const obs = data.esp32_telemetry;
-    drawMultiLineChart(
-      'canvas-calibration',
-      uncalTraj.map(p => p.t),
-      [
-        { data: uncalTraj.map(p => p.delta_ec_ms * 3.0), color: '#94a3b8', width: 2, dashed: true },
-        { data: obs.map(p => p.delta_ec_ms_cm * 3.0), xArr: obs.map(p => p.t_h), color: '#38bdf8', dotsOnly: true },
-        { data: uncalTraj.map(p => p.do_mg_l), color: '#fbbf24', width: 1.6, dashed: true },
-        { data: obs.map(p => p.do_mg_l), xArr: obs.map(p => p.t_h), color: '#f59e0b', dotsOnly: true },
-      ]
-    );
-  }
-
-  async function calibrateOnWetlab() {
-    if (!currentWetlabBatchId) return;
-    const btn = document.getElementById('btn-calibrate');
-    btn.disabled = true;
-    btn.textContent = 'Optimisation Nelder-Mead...';
-
-    const res = await fetch('/api/twin/calibrate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ batch_id: currentWetlabBatchId }),
-    });
-    const cal = await res.json();
-    btn.textContent = '2. Auto-Calibrer le Jumeau sur ce Lot Réel (Nelder-Mead)';
-    btn.disabled = false;
-
-    document.getElementById('cal-rmse-before').textContent = `${cal.rmse_before_pct.toFixed(2)} %`;
-    document.getElementById('cal-rmse-after').textContent = `${cal.rmse_after_pct.toFixed(2)} %`;
-    document.getElementById('cal-status-txt').textContent =
-      `Recalibré : ${cal.calibrated_twin.products.grade_a_mass_g} g (pesé : ${cal.observed_grade_a_g} g)`;
-    const bp = cal.bayesian_posterior;
-    document.getElementById('cal-bayes-ci').textContent = `${bp.posterior_mean_g} g [${bp.ci_95_low_g}–${bp.ci_95_high_g}]`;
-
-    const o = cal.old_parameters, n = cal.calibrated_parameters;
-    document.getElementById('cal-params-tbody').innerHTML = `
-      <tr><td>&mu;<sub>max,acid</sub></td><td>${o.mu_max_acid}</td><td style="color:#34d399;font-weight:700;">${n.mu_max_acid}</td><td>h<sup>-1</sup></td></tr>
-      <tr><td>Y<sub>VFA/carb</sub></td><td>${o.y_vfa_carb}</td><td style="color:#34d399;font-weight:700;">${n.y_vfa_carb}</td><td>g/g</td></tr>
-      <tr><td>q<sub>PHA,max</sub></td><td>${o.q_pha_max}</td><td style="color:#34d399;font-weight:700;">${n.q_pha_max}</td><td>h<sup>-1</sup></td></tr>
-      <tr><td>Y<sub>PHA/VFA</sub></td><td>${o.y_pha_vfa}</td><td style="color:#34d399;font-weight:700;">${n.y_pha_vfa}</td><td>g/g</td></tr>
-    `;
-
-    updateTopBadges({ rmse_after_pct: cal.rmse_after_pct }, cal.ledger_integrity);
-
-    const uncalTraj = cal.uncalibrated_twin.trajectory;
-    const calTraj = cal.calibrated_twin.trajectory;
-    const obs = cal.esp32_telemetry;
-    drawMultiLineChart(
-      'canvas-calibration',
-      calTraj.map(p => p.t),
-      [
-        { data: uncalTraj.map(p => p.delta_ec_ms * 3.0), color: '#64748b', width: 1.8, dashed: true },
-        { data: calTraj.map(p => p.delta_ec_ms * 3.0), color: '#10b981', width: 2.8 },
-        { data: obs.map(p => p.delta_ec_ms_cm * 3.0), xArr: obs.map(p => p.t_h), color: '#38bdf8', dotsOnly: true },
-        { data: calTraj.map(p => p.do_mg_l), color: '#fbbf24', width: 2.2 },
-        { data: obs.map(p => p.do_mg_l), xArr: obs.map(p => p.t_h), color: '#f59e0b', dotsOnly: true },
-      ]
-    );
-    await runTwinSimulation();
-  }
-
-  async function sendSingleLiveEsp32Packet() {
-    const res = await fetch('/api/telemetry/ingest', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        batch_id: currentBatchId || "CLAMART-LIVE-ESP32",
-        t_h: 29.0, ph: 5.82, orp_mv: -210.0, ec_ms_cm: 6.35,
-        co2_ml_min: 4.8, do_mg_l: 0.18, temp_c: 30.2, hx711_kg: 6.25, rpm: 8, aerated: false
-      }),
-    });
-    const out = await res.json();
-    document.getElementById('cal-live-alert').textContent = out.alerts.recommended_action;
-    document.getElementById('cal-live-detail').textContent =
-      `ΔEC = +${out.delta_ec_ms_cm} mS/cm (${out.stoich_vfa_g_l} g/L AGV) | EKF = ${out.ekf_vfa_g_l} g/L`;
-  }
-
-  async function resetCalibration() {
-    await fetch('/api/twin/reset_calibration', { method: 'POST', body: '{}' });
-    updateTopBadges(null, null);
-    await runTwinSimulation();
-  }
-
-  // ==================== TAB 6: OPENRAMAN + EU DPP + SQLITE ====================
-  async function generateCoA(targetBatchId = null) {
-    const bid = targetBatchId || currentBatchId || "CLAMART-LOT-01";
-    const res = await fetch('/api/twin/certify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ batch_id: bid }),
-    });
-    const coa = await res.json();
-    latestCoA = coa;
-    document.getElementById('btn-dl-coa').disabled = false;
-
-    const dpp = coa.eu_digital_product_passport || {};
-    document.getElementById('dpp-urn').textContent = dpp.dpp_urn || coa.batch_id;
-    document.getElementById('coa-prod').textContent = `${coa.product_label} (${coa.grade_a_mass_g} g)`;
-    document.getElementById('coa-purity').textContent = `${coa.raman_analysis.purity_estimate_pct} %`;
-    document.getElementById('coa-xc').textContent = `${coa.raman_analysis.crystallinity_index_pct} %`;
-    document.getElementById('coa-amide').textContent = `${coa.amide_i_1655_protein_residue_pct} % (Validé < 2 %)`;
-    document.getElementById('dpp-pcf').textContent =
-      `${dpp.product_carbon_footprint_kg_co2e_per_kg} kg CO2e / kg produit (Puits carbone net)`;
-    document.getElementById('coa-uab').textContent = coa.ecocert_audit.status;
-    document.getElementById('coa-hash').textContent = coa.coa_sha256;
-
-    drawRamanSpectrum(coa.spectrum_plot.wavenumbers_cm1, coa.spectrum_plot.intensity_clean);
-    await refreshHistory();
-  }
-
-  function drawRamanSpectrum(wn, intensity) {
-    const canvas = document.getElementById('canvas-raman');
-    const ctx = canvas.getContext('2d');
-    const W = canvas.width, H = canvas.height;
-    ctx.clearRect(0, 0, W, H);
-    const pad = { l: 50, r: 22, t: 20, b: 30 };
-    const pw = W - pad.l - pad.r, ph = H - pad.t - pad.b;
-
-    const minX = wn[0], maxX = wn[wn.length - 1];
-    const maxY = Math.max(...intensity, 100) * 1.15;
-
-    ctx.strokeStyle = '#1e293b';
-    ctx.fillStyle = '#64748b';
-    ctx.font = '11px Segoe UI, sans-serif';
-    for (let cm = 800; cm <= 1850; cm += 150) {
-      const x = pad.l + ((cm - minX) / (maxX - minX)) * pw;
-      ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, pad.t + ph); ctx.stroke();
-      ctx.fillText(cm + ' cm⁻¹', x - 20, H - 8);
-    }
-
-    const bands = [
-      { cm: 892, label: '892 Acétate', color: '#38bdf8' },
-      { cm: 1453, label: '1453 Réf C-H', color: '#a855f7' },
-      { cm: 1655, label: '1655 Amide I (0%)', color: '#f43f5e' },
-      { cm: 1724, label: '1724 C=O Crist.', color: '#f59e0b' },
-      { cm: 1740, label: '1740 Amorphe', color: '#fbbf24' },
-    ];
-    bands.forEach((b, idx) => {
-      const x = pad.l + ((b.cm - minX) / (maxX - minX)) * pw;
-      ctx.save();
-      ctx.strokeStyle = b.color;
-      ctx.setLineDash([3, 3]);
-      ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, pad.t + ph); ctx.stroke();
-      ctx.fillStyle = b.color;
-      ctx.fillText(b.label, x - 36, pad.t + 12 + (idx % 2) * 13);
-      ctx.restore();
+    [1, 12, 24, 36].forEach(m => {
+      const x = pad.l + ((m - 1) / 35) * pw;
+      ctx.fillText(`Mois ${m}`, x - 16, H - 6);
     });
 
-    ctx.strokeStyle = '#10b981';
-    ctx.lineWidth = 2.3;
+    ctx.strokeStyle = '#059669';
+    ctx.lineWidth = 3;
     ctx.beginPath();
-    for (let i = 0; i < wn.length; i++) {
-      const x = pad.l + ((wn[i] - minX) / (maxX - minX)) * pw;
-      const y = pad.t + ph - (intensity[i] / maxY) * ph;
+    timeline.forEach((p, i) => {
+      const x = pad.l + (i / (timeline.length - 1)) * pw;
+      const y = pad.t + ph - (p.active_drums / maxD) * ph;
       if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-    }
+    });
     ctx.stroke();
   }
 
-  function downloadCoA() {
-    if (!latestCoA) return;
-    const blob = new Blob([JSON.stringify(latestCoA, null, 2)], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `EU_DPP_CoA_${latestCoA.batch_id}.json`;
-    a.click();
-  }
-
-  async function refreshHistory() {
-    const res = await fetch('/api/batches');
-    const data = await res.json();
-    updateTopBadges(data.calibration_meta, data.ledger_integrity);
-    const tbody = document.getElementById('db-batches-tbody');
-    tbody.innerHTML = '';
-    (data.batches || []).forEach(b => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><code class="hash">${b.batch_id}</code></td>
-        <td>${b.program_id.replace('PROG_', 'P')}</td>
-        <td><strong>${b.observed_grade_a_g.toFixed(1)} g</strong></td>
-        <td style="color:#34d399;">+${b.net_margin_eur.toFixed(2)} €</td>
-        <td><span class="pill cyan">${b.status}</span></td>
-        <td><button class="btn secondary" style="padding:3px 7px;font-size:0.72rem;" onclick="generateCoA('${b.batch_id}')">DPP</button></td>
-      `;
-      tbody.appendChild(tr);
+  async function runQuickCalibrationDemo() {
+    const outEl = document.getElementById('cal-quick-result');
+    outEl.textContent = 'Simulation des vraies sondes ESP32 et apprentissage en cours...';
+    const wRes = await fetch('/api/twin/wetlab_stream', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ program_id: selectedProgramId, hx711_waste_kg: parseFloat(document.getElementById('in-waste').value) })
     });
+    const wet = await wRes.json();
+    const cRes = await fetch('/api/twin/calibrate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ batch_id: wet.batch_id })
+    });
+    const cal = await cRes.json();
+    document.getElementById('top-model-chip').textContent =
+      `Modèle Calibré sur Clamart (Précision ${100 - cal.rmse_after_pct >= 95 ? '>' : ''}${(100 - cal.rmse_after_pct).toFixed(1)} %)`;
+    outEl.textContent =
+      `Écart avant apprentissage : ${cal.rmse_before_pct} % → Après auto-calibration : ${cal.rmse_after_pct} % (Récolte pesée : ${cal.observed_grade_a_g} g).`;
+    await runSim();
   }
 
-  window.addEventListener('DOMContentLoaded', initApp);
+  async function resetCal() {
+    await fetch('/api/twin/reset_calibration', { method: 'POST', body: '{}' });
+    document.getElementById('top-model-chip').textContent = 'Calcul Physique Exact • Carbone 100,0 %';
+    document.getElementById('cal-quick-result').textContent = 'Constantes remises aux valeurs standards.';
+    await runSim();
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    renderProgramButtons();
+    onInputChanged();
+  });
 </script>
 </body>
 </html>
