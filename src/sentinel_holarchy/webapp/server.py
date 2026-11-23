@@ -1,6 +1,6 @@
 """
-Local Web Server (http://127.0.0.1:8080) for the Clamart Biorefinery Digital Twin v2.0.
-Connects the interactive Cockpit UI & ESP32 hardware nodes to all Python Holons + SQLite.
+Local Web Server (http://127.0.0.1:8080) for the Clamart Biorefinery Digital Twin v3.0
+(OS de la Bioéconomie Holarchique — Holon 0 to Holon 5).
 """
 
 import json
@@ -20,12 +20,18 @@ from sentinel_holarchy.holon1_hardware.auto_dosing import (
     BlindFeedstockInferencer,
     PassiveBufferCartridge,
 )
+from sentinel_holarchy.holon1_hardware.nmpc_autopilot import NMPCAutopilotEngine
 from sentinel_holarchy.holon1_hardware.pid_controller import HydrodynamicShearModel
 from sentinel_holarchy.holon1_hardware.soft_sensor import BioprocessEKFSoftSensor
 from sentinel_holarchy.holon3_intelligence.digital_twin import ClamartDigitalTwinService
+from sentinel_holarchy.holon4_territory.bioeconomy_os import (
+    BioeconomyArbitrageOptimizer,
+    ClamartDailySupplyAndDemand,
+    ClamartHolarchicNetworkSimulator,
+    CLAMART_DISTRICTS,
+)
 
 
-# Singleton Digital Twin v2.0 service backed by local SQLite & SHA-256 Knowledge Ledger
 DEFAULT_TWIN_SERVICE: Optional[ClamartDigitalTwinService] = None
 
 
@@ -138,15 +144,18 @@ def dispatch_api_request(
     payload: Optional[Dict[str, Any]] = None,
     service: Optional[ClamartDigitalTwinService] = None,
 ) -> tuple[HTTPStatus, Dict[str, Any]]:
-    """Pure dispatcher function (testable without opening sockets)."""
+    """Pure REST dispatcher supporting Digital Twin v1, v2, and v3 Bioeconomy OS."""
     svc = service or get_twin_service()
     body = payload or {}
 
     if method == "GET":
-        if path == "/api/twin/programs":
+        if path in ("/api/twin/programs", "/api/v3/bootstrap"):
             params, meta = svc.db.get_latest_calibrated_parameters()
             return HTTPStatus.OK, {
+                "version": "3.0.0-bioeconomy-os",
                 "programs": MultiMoleculeEngine.list_programs(),
+                "crisis_scenarios": NMPCAutopilotEngine.list_scenarios(),
+                "clamart_districts": CLAMART_DISTRICTS,
                 "active_parameters": {
                     "mu_max_acid": params.mu_max_acid,
                     "y_vfa_carb": params.y_vfa_carb,
@@ -173,7 +182,14 @@ def dispatch_api_request(
         if path == "/api/twin/simulate":
             inp = parse_batch_input(body)
             use_cal = bool(body.get("use_calibrated", True))
-            return HTTPStatus.OK, svc.run_simulation(inp, use_calibrated=use_cal)
+            ambient_c = float(body.get("ambient_workshop_temp_c", 16.0))
+            insulated = bool(body.get("insulated_jacket", True))
+            return HTTPStatus.OK, svc.run_simulation(
+                inp,
+                use_calibrated=use_cal,
+                ambient_workshop_temp_c=ambient_c,
+                insulated_jacket=insulated,
+            )
 
         if path == "/api/telemetry/ingest":
             return HTTPStatus.OK, svc.ingest_esp32_packet(body)
@@ -196,6 +212,37 @@ def dispatch_api_request(
         if path == "/api/twin/certify":
             batch_id = str(body.get("batch_id", "CLAMART-DEMO-01"))
             return HTTPStatus.OK, svc.issue_certificate_coa(batch_id)
+
+        if path == "/api/v3/nmpc_resilience":
+            scenario_id = str(body.get("scenario_id", "CRISIS_ACID_OVERLOAD"))
+            return HTTPStatus.OK, NMPCAutopilotEngine.simulate_resilience_comparison(scenario_id)
+
+        if path == "/api/v3/arbitrage_dispatch":
+            supply = ClamartDailySupplyAndDemand(
+                bakery_bread_kg=float(body.get("bakery_bread_kg", 12.0)),
+                cafe_coffee_grounds_kg=float(body.get("cafe_coffee_grounds_kg", 10.0)),
+                market_ripe_fruits_kg=float(body.get("market_ripe_fruits_kg", 14.0)),
+                household_canteen_peels_kg=float(body.get("household_canteen_peels_kg", 24.0)),
+                eggshells_oyster_shells_kg=float(body.get("eggshells_oyster_shells_kg", 3.0)),
+                active_drums_count=int(body.get("active_drums_count", 6)),
+                price_phbv_cosmetic_piezo_eur_kg=float(body.get("price_phbv_cosmetic_piezo_eur_kg", 185.0)),
+                price_chiral_r3hb_eur_kg=float(body.get("price_chiral_r3hb_eur_kg", 240.0)),
+                price_caproic_c6_eur_kg=float(body.get("price_caproic_c6_eur_kg", 28.0)),
+                price_rhamnolipids_eur_kg=float(body.get("price_rhamnolipids_eur_kg", 64.0)),
+            )
+            return HTTPStatus.OK, BioeconomyArbitrageOptimizer.optimize_cycle_dispatch(supply)
+
+        if path == "/api/v3/clamart_emergence":
+            init_drums = int(body.get("initial_drums", 1))
+            reinvest = float(body.get("reinvestment_rate", 0.65))
+            months = int(body.get("months", 36))
+            max_drums = int(body.get("max_clamart_drums", 48))
+            return HTTPStatus.OK, ClamartHolarchicNetworkSimulator.simulate_36_month_emergence(
+                initial_drums=init_drums,
+                reinvestment_rate=reinvest,
+                months=months,
+                max_clamart_drums=max_drums,
+            )
 
         if path == "/api/simulate":
             return HTTPStatus.OK, run_python_simulation(body)
@@ -251,7 +298,7 @@ class BioDrumHTTPHandler(BaseHTTPRequestHandler):
 
 def start_server(host: str = "127.0.0.1", port: int = 8080) -> None:
     server = ThreadingHTTPServer((host, port), BioDrumHTTPHandler)
-    print(f"Sentinel Holarchy Digital Twin v2.0 running on http://{host}:{port}")
+    print(f"Sentinel Holarchy Bioeconomy OS v3.0 running on http://{host}:{port}")
     server.serve_forever()
 
 

@@ -27,6 +27,10 @@ from sentinel_holarchy.holon0_microbial.multi_molecules import (
     MultiMoleculeEngine,
     RefiningProgramId,
 )
+from sentinel_holarchy.holon0_microbial.thermodynamics_flux import (
+    CarbonAndThermalBalanceEngine,
+    ThermalReactorConfig,
+)
 from sentinel_holarchy.holon1_hardware.auto_dosing import StoichiometricProductTracker
 from sentinel_holarchy.holon1_hardware.soft_sensor import BioprocessEKFSoftSensor
 from sentinel_holarchy.holon2_workshop.ecocert_validator import EcocertUABAuditor, LabAssayResults
@@ -576,6 +580,8 @@ class ClamartDigitalTwinService:
         inp: BiorefineryBatchInput,
         use_calibrated: bool = True,
         batch_id: Optional[str] = None,
+        ambient_workshop_temp_c: float = 16.0,
+        insulated_jacket: bool = True,
     ) -> Dict[str, Any]:
         if use_calibrated:
             params, cal_meta = self.db.get_latest_calibrated_parameters(inp.program_id)
@@ -584,6 +590,28 @@ class ClamartDigitalTwinService:
 
         engine = MultiMoleculeEngine(params=params)
         sim = engine.simulate_batch(inp, dt_h=0.5)
+
+        carbon_bal = CarbonAndThermalBalanceEngine.compute_carbon_mass_balance(sim)
+        thermal_bal = CarbonAndThermalBalanceEngine.simulate_thermal_profile(
+            sim,
+            ThermalReactorConfig(
+                ambient_workshop_temp_c=ambient_workshop_temp_c,
+                insulated_jacket=insulated_jacket,
+            ),
+        )
+        peak_vfa = float(sim["events"]["peak_vfa_g_l"])
+        caproate_peak = (
+            float(sim["trajectory"][-1]["target_mol_g_l"])
+            if inp.program_id == RefiningProgramId.PROG_3_CAPROIC_C6_OIL.value
+            else 0.0
+        )
+        vfa_spectrum = CarbonAndThermalBalanceEngine.resolve_vfa_chain_spectrum(
+            total_vfa_g_l=peak_vfa,
+            odd_vfa_ratio=float(sim["feedstock"]["odd_vfa_ratio"]),
+            program_id=inp.program_id,
+            caproate_c6_g_l=caproate_peak,
+        )
+
         bid = batch_id or f"CLAMART-{datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')}"
         self.db.save_batch(bid, inp, sim, status="SIMULATED")
 
@@ -595,6 +623,9 @@ class ClamartDigitalTwinService:
                 intrant_type=inp.program_id,
                 prior_mean_g=sim["products"]["grade_a_mass_g"],
             ),
+            "carbon_balance": carbon_bal,
+            "thermal_balance": thermal_bal,
+            "vfa_spectrum": vfa_spectrum,
             **sim,
         }
 
@@ -878,6 +909,23 @@ class ClamartDigitalTwinService:
         records = self.ledger.load_ledger()
         latest_block_hash = records[-1]["entry_hash"] if records else analysis["coa_sha256"]
 
+        lca_info = summary.get("lca", {})
+        grade_a_kg = max(1e-4, float(products["grade_a_mass_g"]) / 1000.0)
+        net_avoided_kg = float(lca_info.get("total_co2_eq_avoided_kg", 2.8))
+        pcf_kg_co2e_per_kg = round(-net_avoided_kg / grade_a_kg, 2)
+
+        dpp_passport = {
+            "dpp_urn": f"urn:eu:espr-dpp:clamart-holarchy:{batch_id}",
+            "espr_2024_1781_compliant": True,
+            "en_16640_biogenic_carbon_pct": 100.0,
+            "fossil_petrochemical_carbon_pct": 0.0,
+            "product_carbon_footprint_kg_co2e_per_kg": pcf_kg_co2e_per_kg,
+            "deforestation_free_eu_2023_1115": True,
+            "microplastic_free_eu_2023_2055": True,
+            "marine_biodegradability_iso_14852": "Biodégradation enzymatique marine < 6 mois",
+            "origin_municipality": "Clamart (92140) — Vallée Sud Grand Paris",
+        }
+
         canonical_coa = {
             "batch_id": batch_id,
             "issued_at": datetime.now(timezone.utc).isoformat(),
@@ -890,6 +938,7 @@ class ClamartDigitalTwinService:
             "halogenated_solvents_ml": 0.0,
             "eu_2023_2055_microplastic_free": True,
             "amide_i_1655_protein_residue_pct": amide_i_ratio_pct,
+            "eu_digital_product_passport": dpp_passport,
             "raman_analysis": analysis,
             "ecocert_audit": ecocert_report,
             "ledger_block_index": ledger_count,
